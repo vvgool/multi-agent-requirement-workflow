@@ -1,6 +1,6 @@
 # 宿主适配契约
 
-初始化和协调派发只加载当前宿主一行。统一产品/开发/测试角色及交接，宿主只负责真实注册、文件读取、派发、等待、结果和恢复；不复制阶段业务规则。
+初始化按 [宿主选择规则](../skills/setup-requirement-workflow/references/installation.md#宿主选择与批量初始化) 加载全部目标宿主行；业务协调派发只加载当前实际宿主一行。统一产品/开发/测试角色及交接，宿主只负责真实注册、文件读取、派发、等待、结果和恢复；不复制阶段业务规则。
 
 | host | 原生角色 product / development / testing | 定义位置 | 适配说明 |
 | --- | --- | --- | --- |
@@ -16,7 +16,9 @@
 
 ## 初始化输出与能力
 
-本机回执 schema_version=2：package（真实四字段身份）、framework_path（项目相对路径）、owned_files（路径与实际SHA256）、owned_blocks（文件、标记、区块实际SHA256）、hosts。普通已有文件不作为整体拥有项；AGENTS/CLAUDE/.gitignore 只拥有指定区块。hosts.<host> 保存真实可取得的 host_version（不可得=null）、role_mapping、file_installation、entry_probe、三个 native_role_probes（status、真实host_task_id或null、实际结果/原因）、native_role_invocation、end_to_end。状态为 passed/pending/failed；相同包下追加第二宿主时保留其他宿主回执，不把它们改成当前宿主通过。回执缺失不能接管已有未声明文件。
+本机回执 schema_version=2：package（真实四字段身份）、framework_path（项目相对路径）、owned_files（路径与实际SHA256）、owned_blocks（文件、标记、区块实际SHA256）、hosts。普通已有文件不作为整体拥有项；AGENTS/CLAUDE/.gitignore 只拥有指定区块。默认初始化当前宿主和项目检测到的宿主；显式范围优先。全部目标先预检，再用同一 pending 安装，共享一份锁和缓存。非当前宿主只准备文件，不启动其程序；逐宿主报告 file_installation 和原生 pending。
+
+hosts.<host> 保存真实可取得的 host_version（不可得=null）、role_mapping、file_installation、entry_probe、三个 native_role_probes（status、真实host_task_id或null、实际结果/原因）、native_role_invocation、end_to_end。状态为 passed/pending/failed；相同包下追加宿主时保留其他宿主有效回执，不把它们改成当前宿主通过；升级或拥有内容变化则将旧探测连同原包身份移入 hosts.<host>.probe_history，当前探测重置 pending。回执缺失不能接管已有未声明文件。
 
 current host 必须来自实际会话或用户明确选定，不能从项目名称或安装目录推断。检查可用的注册格式、文件读取、原生角色选择、委派、等待/结束事实、恢复/查询、项目权限及外部连接；工具名和版本以实际宿主为准。不强行改模型/权限或安装宿主工具。原生选择缺失记 host_role_selection_unavailable，委派缺失记 host_delegation_unavailable；未知宿主返回 unsupported_host。某版本格式不支持时返回 host_format_unsupported，不套用另一个宿主配置。
 

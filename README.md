@@ -11,7 +11,8 @@
 ```text
 请从 https://github.com/vvgool/multi-agent-requirement-workflow 获取需求协作框架。
 在临时目录获取代码，读取其中 skills/setup-requirement-workflow/SKILL.md，
-为当前项目初始化，使用当前宿主的适配。
+为当前项目初始化，自动检测项目内的 Codex、Claude Code、OpenCode 配置，
+为当前宿主及检测到的宿主一起准备适配文件。
 首次安装解析仓库默认分支并固定实际完整提交 SHA 和包摘要；
 已有 workflow.lock.yaml 时按锁恢复，不自动升级。
 保留项目已有规则和配置，不提交完整框架缓存。
@@ -28,11 +29,15 @@
 | --- | --- |
 | workflow.yaml：项目策略 | 是 |
 | workflow.lock.yaml：Git URL、完整提交、版本和包摘要 | 是 |
-| AGENTS.md 中的短入口、当前宿主的三个薄角色、.gitignore 区块 | 是 |
+| AGENTS.md 中的短入口、目标宿主各自的三个薄角色、.gitignore 区块 | 是 |
 | Claude Code 的 CLAUDE.md 短桥接 | 使用 Claude Code 时提交 |
 | .agents/requirement-workflow-cache/、本机回执和中断记录 | 否 |
 
-全新项目 Codex/OpenCode 默认涉及 7 个文件，Claude Code 8 个；已有文件保留原文，只添加受管区块。三个宿主可按需增量安装，共用一个版本锁，不必一次生成全部宿主文件。
+默认初始化当前宿主及项目中检测到的宿主：.codex/ 对应 Codex；.claude/ 或 CLAUDE.md 对应 Claude Code；.opencode/ 或 opencode.json/jsonc 对应 OpenCode。只在项目根检测，不因机器装了 CLI 就生成配置。可明确要求“只初始化当前宿主”或“全部三个宿主”。
+
+全新项目单宿主 Codex/OpenCode 涉及 7 个文件、Claude Code 8 个，三个宿主一起共 14 个；共享一份版本锁、缓存和 AGENTS 入口。已有文件保留原文，只添加受管区块。所有目标先预检，任一冲突先停止整批写入，写入中断则保留原批次计划供恢复，不将半安装标为成功。
+
+文件可一次准备，原生激活按宿主分别验证：在 Codex 中不能把 Claude Code/OpenCode 标为已激活。未验证者保持 pending；后续进入对应宿主会话再只读探测。
 
 协调 Agent **运行在主会话**：宿主读取项目 AGENTS.md 后，按版本锁定位缓存，再加载 agents/coordinator-agent.md 和状态路由规则。因此只注册产品、开发、测试三个原生子 Agent。入口详见 [宿主适配](workflow/host-adapters.md)。
 
@@ -62,7 +67,7 @@
 
 ```text
 按当前项目 workflow.lock.yaml 获取并核验固定提交的框架，
-补齐当前宿主的本机需求协作环境。保留版本和已有文件，不自动升级。
+补齐当前宿主及项目检测到的宿主的本机需求协作环境。保留版本和已有文件，不自动升级。
 ```
 
 初始仓库 URL 用于找到框架；后续以项目锁为准。升级需要明确提出，并确认旧活动任务结束。旧快照或 manual 锁不会因为仓库上线而自动换源。
@@ -91,7 +96,7 @@
   workflow.yaml                   # 项目策略
   workflow.lock.yaml              # 框架来源、固定版本与摘要
   AGENTS.md                       # 简短主会话入口
-  .codex/、.claude/或.opencode/    # 只生成当前宿主的三个薄角色
+  .codex/、.claude/或.opencode/    # 每个目标宿主三个薄角色
   .agents/requirement-workflow-cache/<sha256>/ # 本地缓存，Git忽略
   agent-features/<需求名称>/
     README.md                      # 人工入口：进度、有效文稿、待办及 Issue 同步提示
@@ -133,7 +138,7 @@ optional 在首次派发前选择绑定或跳过；required 在业务派发前�
 
 共享发布包包含framework.yaml、AGENTS.md、README.md、workflow.yaml、agents/、skills/、workflow/、templates/。docs/和本框架自身agent-features/不默认安装到业务项目。三个宿主不需要使用相同插件格式；插件只作为可选分发方式。
 
-业务项目通常只需提交workflow.yaml、workflow.lock.yaml、入口和当前宿主的三个薄角色，以及精确的.gitignore区块；Claude Code按需多一份CLAUDE.md短桥接。完整包缓存和本机探测回执不提交。换机按锁重建环境，显式升级项目绑定；用户修改的入口不覆盖，旧包和需求证据不自动清理。详情见 [包与版本规则](workflow/package.md)。
+业务项目通常只需提交workflow.yaml、workflow.lock.yaml、入口和各目标宿主的三个薄角色，以及精确的.gitignore区块；Claude Code按需多一份CLAUDE.md短桥接。完整包缓存和本机探测回执不提交。换机按锁重建环境，显式升级项目绑定；用户修改的入口不覆盖，旧包和需求证据不自动清理。详情见 [包与版本规则](workflow/package.md)。
 
 旧 `.agents/requirement-workflow/installation.json` 快照安装保持原状，不自动迁移。本框架不新增后台服务或跨会话锁，同一需求仅一个协调会话推进。升级/换宿主前确认旧任务结束；审批、开发基线和历史run不得改写。更完整的目标和职责说明位于开发目录docs/planning/。
 

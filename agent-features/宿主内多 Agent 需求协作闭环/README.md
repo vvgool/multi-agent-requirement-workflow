@@ -8,6 +8,7 @@
 
 | 文档 | 用途/结论 | 来源 |
 | --- | --- | --- |
+| [多宿主批量初始化验证](../../docs/verification/detected-host-initialization.md) | 项目检测、三宿主批次、冲突保护及恢复通过；原生待验 | 本轮独立隔离评估 |
 | [GitHub 安装来源验证](../../docs/verification/github-installation.md) | GitHub 已上传；URL 获取、固定提交恢复和字节保留通过 | 本轮真实远程读取验证 |
 | [通用初始化验证](../../docs/verification/portable-initialization.md) | 版本锁、三宿主薄入口与本地缓存；文件验证通过，原生待验 | 本轮独立隔离验证 |
 | [整体规划](../../docs/planning/overall-goals.md) | 当前目标、实现边界及后续顺序 | 本轮文档整理 |

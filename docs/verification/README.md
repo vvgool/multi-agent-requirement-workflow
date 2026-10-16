@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | 产品、开发、测试 Skill | 独立角色隔离执行，真实模板和结果产物 | 初始化后原生角色完整流程 |
 | 需求正常闭环 | 真实用户确认后的手动加载原型正常流程 | 原生注册闭环、完整测试失败修复循环 |
-| 项目级初始化 | 三宿主薄入口、同摘要缓存、重复/冲突保护；Codex 克隆恢复、Codex/OpenCode 中断恢复 | 三宿主新会话原生发现/调用；多宿主追加、显式升级 |
+| 项目级初始化 | 三宿主薄入口、同摘要缓存、重复/冲突保护；Codex 克隆恢复、Codex/OpenCode 中断恢复；项目检测批量安装与恢复 | 三宿主新会话原生发现/调用；已有安装增量加宿主、显式升级 |
 | 成果布局 2 | 三文档案例、待评审案例、固化/路径/保护检查 | 原生注册后的完整新版闭环 |
 | Issue | 静态检查及 15 个独立协议模拟 | 真实平台权限、读写、直接 ID 恢复及全部故障路径 |
 | 飞书 | 来源/授权契约 | 真实飞书读写 |
@@ -24,6 +24,7 @@
 | 看开发及精简文档 | [精简开发](adaptive-development-skill.md)、[初版开发历史](feature-development-skill.md) |
 | 看测试偏离和基线核对 | [测试 Skill](acceptance-testing-skill.md) |
 | 看正常需求闭环 | [协调原型正常流程](coordinated-lifecycle.md) |
+| 看项目宿主检测及批量初始化 | [多宿主批次验证](detected-host-initialization.md) |
 | 看 GitHub URL 获取与固定提交恢复 | [GitHub 安装来源](github-installation.md) |
 | 看三宿主轻量安装与共享 | [通用初始化](portable-initialization.md) |
 | 看旧 Codex 快照安装及恢复 | [初始化](codex-project-initialization.md)、[后续修复](audit-fixes.md) |
