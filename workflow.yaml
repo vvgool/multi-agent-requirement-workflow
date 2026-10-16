@@ -9,5 +9,5 @@ documents:
 approval:
   channel: coordinator
 issue_tracking:
-  binding: "off"
-  sync: "off"
+  binding: "optional"
+  sync: "milestones"
