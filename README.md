@@ -74,7 +74,7 @@
 
 无法联网时，可先在有权限的机器获取相同提交的代码，再向 Agent 提供本地包目录；已有 Git 锁须核实该目录确实对应锁定提交，无法证明时停止，不能改成 manual 绕过。无锁的新项目仍可按手动包安装。
 
-三个宿主的文件初始化已有隔离验证；**真实原生角色激活及完整需求闭环仍待验证**。无原生选择能力时记录 pending，不使用通用 Agent 冒充通过。完整开发仓库中的 [验证索引](https://github.com/vvgool/multi-agent-requirement-workflow/tree/main/docs/verification) 记录实际边界；该目录不随核心包安装。
+三个宿主的文件初始化已有隔离验证；**真实原生角色激活及完整需求闭环仍待验证**。无原生选择能力时记录 pending，不使用通用 Agent 冒充通过。仓库中的 [验证摘要](https://github.com/vvgool/multi-agent-requirement-workflow/tree/main/docs/verification) 记录实际边界；完整测试快照和运行记录不随当前源码分发。
 
 ## 角色与流程
 
@@ -134,9 +134,9 @@ optional 在首次派发前选择绑定或跳过；required 在业务派发前�
 
 ## 验证与维护
 
-初始化区分文件安装、当前宿主原生激活和完整需求闭环，具体以本项目本机回执为准。共享框架的开发验证入口为完整目录中的 docs/verification/README.md；历史手动加载正常闭环及旧快照证据不能作为当前三宿主原生通过的证明。真实飞书和Issue平台联调仍需独立完成。
+初始化区分文件安装、当前宿主原生激活和完整需求闭环，具体以本项目本机回执为准。验证范围见 docs/verification/README.md；历史手动加载正常闭环及旧快照证据不能作为当前三宿主原生通过的证明。真实飞书和Issue平台联调仍需独立完成。
 
-共享发布包包含framework.yaml、AGENTS.md、README.md、workflow.yaml、agents/、skills/、workflow/、templates/。docs/和本框架自身agent-features/不默认安装到业务项目。三个宿主不需要使用相同插件格式；插件只作为可选分发方式。
+共享发布包包含framework.yaml、AGENTS.md、README.md、workflow.yaml、agents/、skills/、workflow/、templates/。docs/不默认安装到业务项目。框架自身agent-features/、早期docs/superpowers/、完整验证夹具及运行记录仅保留本地，不进入当前仓库版本。三个宿主不需要使用相同插件格式；插件只作为可选分发方式。
 
 业务项目通常只需提交workflow.yaml、workflow.lock.yaml、入口和各目标宿主的三个薄角色，以及精确的.gitignore区块；Claude Code按需多一份CLAUDE.md短桥接。完整包缓存和本机探测回执不提交。换机按锁重建环境，显式升级项目绑定；用户修改的入口不覆盖，旧包和需求证据不自动清理。详情见 [包与版本规则](workflow/package.md)。
 
@@ -145,3 +145,15 @@ optional 在首次派发前选择绑定或跳过；required 在业务派发前�
 ## 仓库与安装来源
 
 源码：https://github.com/vvgool/multi-agent-requirement-workflow。推荐使用 Git 来源；锁定提交和实际包摘要共同确定安装身份。共享核心包含哪些文件、如何计算摘要以及旧版兼容，见 [包与版本规则](workflow/package.md)。
+
+
+当前仓库布局：
+
+```text
+agents/              # 四个逻辑角色
+skills/              # 阶段及支持 Skill、模板和宿主适配
+workflow/            # 共享流程契约
+templates/           # 交接及状态模板
+docs/planning/       # 当前目标与职责
+docs/verification/README.md  # 精简验证摘要
+```

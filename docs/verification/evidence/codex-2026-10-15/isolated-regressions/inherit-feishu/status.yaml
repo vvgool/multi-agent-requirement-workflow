@@ -1,8 +1,0 @@
-fixture_only: true
-requirements_revision: 2
-stage: draft
-execution_status: blocked
-approval: null
-active_run: null
-block_reason: example_source_without_readable_body; preserved feishu source; no local
-  fallback

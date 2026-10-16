@@ -1,8 +1,0 @@
-host: Codex
-host_task_id: /root/coordinator_smoke/product_smoke
-started_at: '2026-10-15T07:04:05.707098+00:00'
-status: completed
-observed_at: '2026-10-15T07:04:05.707238+00:00'
-identifier_kind: canonical task_name returned by collaboration.spawn_agent
-completion_evidence: null
-ended_at: '2026-10-15T07:05:32.201932+00:00'

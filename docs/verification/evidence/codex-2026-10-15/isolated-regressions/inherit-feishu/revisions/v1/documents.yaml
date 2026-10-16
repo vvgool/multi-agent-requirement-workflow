@@ -1,9 +1,0 @@
-documents:
-  provider: local
-  feishu:
-    parent_node_url: null
-    write_enabled: false
-  requirements:
-    provider: feishu
-    url: https://example.feishu.cn/wiki/example
-    access: read

@@ -1,7 +1,0 @@
-stage: draft
-execution_status: blocked
-approval: null
-reason: 'source_path_reserved: review/ is framework-maintained; blocked before preparing
-  input or dispatch'
-input_created: false
-product_dispatched: false

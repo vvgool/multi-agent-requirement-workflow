@@ -1,7 +1,0 @@
-stage: draft
-execution_status: blocked
-approval: null
-reason: 'source_output_realpath_collision: review output symlink points to readonly
-  source'
-input_created: false
-product_dispatched: false

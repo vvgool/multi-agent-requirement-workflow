@@ -1,8 +1,0 @@
-host: codex
-mode: manual_load_prototype
-host_task_id: /root/lifecycle_product
-invoked_at: '2026-10-15T09:54:02.775456+00:00'
-status: completed
-native_role_invocation: false
-completed_at: '2026-10-15T09:56:25.946264+00:00'
-result_path: revisions/v1/runs/run-product-001/outputs/result.yaml

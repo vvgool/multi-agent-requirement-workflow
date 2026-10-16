@@ -1,7 +1,0 @@
-fixture_only: true
-requirements_revision: 2
-stage: draft
-execution_status: idle
-approval: null
-active_run: null
-last_event: source inheritance and fresh local read only; no product dispatch

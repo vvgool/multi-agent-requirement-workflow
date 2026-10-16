@@ -1,9 +1,0 @@
-feature_id: 679f8b18-0adc-43e0-9a46-2f6cf2a4ca31
-revision: 1
-documents:
-- path: revisions/v1/documents/requirements.md
-  sha256: 563ece8d2d132d91985d8b15967b663e8e729876a3d114ea6006bf6164f5b8f2
-sources: []
-effective_config:
-  path: revisions/v1/.workflow/runs/run-product-layout-001/effective-config.yaml
-  sha256: 35a9de2087779dd72087a2dfffd4861947c7682c42c63276d4c135d1884539e6

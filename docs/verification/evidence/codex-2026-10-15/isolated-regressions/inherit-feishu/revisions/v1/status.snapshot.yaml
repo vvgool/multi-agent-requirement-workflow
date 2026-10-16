@@ -1,8 +1,0 @@
-fixture_only: true
-requirements_revision: 1
-stage: draft
-execution_status: blocked
-approval: null
-superseded_by: 2
-superseded_reason: source inheritance regression; original example has no readable
-  body

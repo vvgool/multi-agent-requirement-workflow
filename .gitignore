@@ -3,7 +3,13 @@
 __pycache__/
 *.py[cod]
 
-# Local workflow installation (historical evidence directories remain tracked)
+# Local workflow installation
 /.agents/requirement-workflow-cache/
 /.agents/requirement-workflow.local.json
 /.agents/requirement-workflow.pending.json
+
+# Framework-local maintenance records; business projects use a separate template.
+/agent-features/
+/docs/superpowers/
+/docs/verification/*
+!/docs/verification/README.md

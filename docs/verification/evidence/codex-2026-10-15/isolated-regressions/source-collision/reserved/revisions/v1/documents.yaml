@@ -1,5 +1,0 @@
-documents:
-  requirements:
-    provider: local
-    path: review/requirements.md
-    access: read

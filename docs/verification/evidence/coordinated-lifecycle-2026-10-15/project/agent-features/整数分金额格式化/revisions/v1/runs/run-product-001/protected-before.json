@@ -1,7 +1,0 @@
-{
-  "agent-features/整数分金额格式化/revisions/v1/input.md": "5f6c4cd9642f633a9cece47041a92465be2979e8fc1af98318a52225365e0420",
-  "AGENTS.md": "a05215b2d2abef8113f52e8248e63941d06977ad1ca377fae855ac60f7e1229f",
-  "workflow.yaml": "35a9de2087779dd72087a2dfffd4861947c7682c42c63276d4c135d1884539e6",
-  "agent-features/整数分金额格式化/revisions/v1/runs/run-product-001/effective-config.yaml": "35a9de2087779dd72087a2dfffd4861947c7682c42c63276d4c135d1884539e6",
-  "agent-features/整数分金额格式化/revisions/v1/runs/run-product-001/sources/manifest.yaml": "f306b85b98942b7695337e5c1fe3613d282c917f3521216eb7be71e770e4259d"
-}

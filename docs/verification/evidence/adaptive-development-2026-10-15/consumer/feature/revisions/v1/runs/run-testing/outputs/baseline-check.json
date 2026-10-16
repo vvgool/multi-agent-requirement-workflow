@@ -1,9 +1,0 @@
-{
-  "requirements_digest": "1f427e6d1b0791c6e34a6d051ebb050319fee2ee696927f2784954419fc87512",
-  "source_baseline": {
-    "shipping.py": "abc3d67d2ba28f897d5c171ea9bf9c04b55c536202597d2b52b5e035620dc248",
-    "checkout.py": "d3f9bce561480c559f0f164b30ce7326554775410a94f7518e48032d58cd19aa"
-  },
-  "task_status_rechecked": true,
-  "approval": "synthetic evaluation fixture only"
-}
