@@ -3,6 +3,8 @@
 
 发起、继续或优化命名需求时，以本项目为工作空间，先读 workflow.lock.yaml。框架缓存为 `.agents/requirement-workflow-cache/<package.sha256>/`；缓存不随 Git 提交，由主会话在派发前按以下步骤补齐。单纯问答/审查/维护不创建需求；用户要求只读或 initialization_probe=true 时不下载、修复或写入，缺环境仅报告阻塞。
 
+用户明确说“新需求”即进入协调接单，未命名时先收集目标并确定名称，再创建状态和产品任务。后续补充沿用原需求上下文，直到用户明确取消、切换需求或要求退出流程；即使修改对象是框架规则、Skill 或模板，也由协调层按阶段派发。上述维护例外仅用于未进入需求流程的独立请求，或用户明确退出流程后要求直接维护；协调层不以维护为由代做需求实现。
+
 1. 锁必须能可靠解析且无重复键，包含 schema_version=1、package{name,version,protocol_version,sha256}、source{kind,location,revision}；包名为 multi-agent-requirement-workflow，协议为1，摘要为64位小写十六进制。已有 `.agents/requirement-workflow.pending.json` 时先读取原计划；有锁时计划包身份/来源须与锁一致。缺锁仅在可信的原安装pending明确来源/身份时按原计划恢复，不重新规划或派发任务；无该计划或锁格式不合法则停止。
 2. 缓存目录完整时先核验下述包身份；目录存在但内容不符、含链接/额外文件时返回 framework_integrity_mismatch，不自动覆盖。完整缓存但缺本机回执时可直接从缓存执行下一步，无需联网。
 3. 缓存不存在且 source.kind=git 时，用已有 Git 能力在独立临时目录从 source.location 获取 source.revision 的完整提交并检出，核实实际 HEAD 一致；不解析最新分支或改锁。URL须为无凭据HTTPS/SSH远程Git来源，拒绝本机路径；revision须为完整提交SHA。只读获取，不执行下载的脚本或安装依赖。manual来源需用户提供同摘要包；标识不能当下载URL。无工具、无网络或无权限时返回 framework_restore_unavailable 及原因，不推进需求。
