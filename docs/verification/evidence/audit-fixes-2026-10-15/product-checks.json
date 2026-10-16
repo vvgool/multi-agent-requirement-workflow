@@ -1,0 +1,24 @@
+{
+  "checks": {
+    "workspace_equals_target": true,
+    "output_inside_target_and_current_run": true,
+    "ready": true,
+    "identity_matches": true,
+    "all_inputs_status_code_unchanged": true,
+    "only_two_output_files_added": true,
+    "artifacts_resolve_within_output": true,
+    "requirements_and_self_check_share_one_document": true,
+    "acceptance_ids_match": true,
+    "no_approval_fabricated": true,
+    "no_questions_or_assumptions": true
+  },
+  "passed": true,
+  "added": [
+    "agent-features/搜索结果空态提示/revisions/v1/runs/run-product-default/outputs/requirements.md",
+    "agent-features/搜索结果空态提示/revisions/v1/runs/run-product-default/outputs/result.yaml"
+  ],
+  "limitations": [
+    "通过通用隔离 Agent 按角色及 Skill 文本执行，不代表 Codex 原生自定义角色注册验证。",
+    "未执行用户审批、开发、测试或完整生命周期。"
+  ]
+}

@@ -1,0 +1,22 @@
+schema_version: 1
+feature_id: null
+requirements_revision: 1
+run_id: null
+role: null # development 或 testing
+framework_root: null # 当前宿主动态解析
+workspace_root: null
+feature_dir: null
+target_project: null
+input_path: null
+requirements_path: null
+approval_digest: null
+development_run_id: null # 测试必填；开发时为空
+development_baseline: null # 测试必填
+defect_report_path: null # 修复任务必填，首次开发可为空
+required_files: [] # 测试按开发产物索引读取方案、计划和自验内容，可合并在同一文档；已有用例一并提供
+output_dir: null
+write_scope:
+  project_paths: [] # 开发明确允许的业务代码范围
+  temporary_paths: [] # 构建/测试缓存等明确范围
+  modify_business_source: false # 开发获授权后才设 true；测试始终 false
+completion_criteria: [] # 按对应角色文件填写，不能为空

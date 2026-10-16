@@ -1,0 +1,9 @@
+# 仅在需要判断绑定或用户明确启用时写入根status的issue_tracking，不单独创建此文件
+policy_override: {} # 仅用户明确指定的binding/sync覆盖；指令保留在input/events
+decision: pending # pending / skipped / bound
+requested_url: null # 用户给出的候选；不等于已核实绑定
+pending_question: null # 首次待答的绑定/评论授权问题，恢复转达原问题
+binding: null # {provider, host, repository, issue_number, url, verified_at}；GitLab可另有project_id
+write_authorization: null # {target: {provider, host, repository, issue_number}, scope: milestone_comments, user_response, confirmed_at, source_session}
+sync_status: disabled # disabled / idle / pending / unknown / blocked；派生摘要
+sync_records: [] # 每项为需求相对路径，指向record.yaml

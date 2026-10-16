@@ -1,0 +1,13 @@
+{
+  "before-hashes.json": "f0f3278e337bafc0025c8b5527ea95aaeea60fc91b33c4070027a1ed47027abf",
+  "task.yaml": "9910b325aaa54ebe0c7d30889ac41c5f7933ed796095f23721f3499c3bbce1cb",
+  "project/checkout.py": "d3f9bce561480c559f0f164b30ce7326554775410a94f7518e48032d58cd19aa",
+  "project/shipping.py": "ec03de735ab8873e501d26a54fee555271bbfc35922bb06058a0aa76c118978f",
+  "project/AGENTS.md": "9abb4b310316a7cd7bc16fba413cd5e257fde81f660c2dd92b3f91e32d4e28d0",
+  "feature/requirements.md": "1f427e6d1b0791c6e34a6d051ebb050319fee2ee696927f2784954419fc87512",
+  "feature/previous-test-cases.md": "a16d20a7ced6dfa2571cf57404c0ac7fd52d94e0ded58d2a0357fe9ef4ae674a",
+  "feature/status.yaml": "3fb52c34825c0e3bfe24aa441a7ef2cac18681c0a362595d18e08921b36136d3",
+  "feature/revisions/v1/runs/run-check/outputs/result.yaml": "1664f95094203b1a1c733dddba8dbb4b22bcb2f8008d30fd3024fa8f6aa10b65",
+  "feature/revisions/v1/runs/run-check/outputs/verification.log": "4607ae4ab43655af8c93a9c9e2ea9471a3390d0746ca2e7a8c94baa19ddf88df",
+  "feature/revisions/v1/runs/run-check/outputs/development.md": "76c802611e7be1f94fe670388ebd340b15684f369b2dedc91babf7defe9affa6"
+}

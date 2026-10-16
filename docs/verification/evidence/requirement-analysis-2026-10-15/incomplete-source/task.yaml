@@ -1,0 +1,21 @@
+schema_version: 1
+feature_id: EVAL-product-incomplete-source
+requirements_revision: 1
+run_id: run-product-check
+role: product
+framework_root: /Users/wiesenwang/Agents/multi-agent-requirement-workflow
+workspace_root: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/product-skill-check-gv_drzdw/incomplete-source
+feature_dir: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/product-skill-check-gv_drzdw/incomplete-source/feature
+target_project: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/product-skill-check-gv_drzdw/incomplete-source/project
+input_path: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/product-skill-check-gv_drzdw/incomplete-source/feature/revisions/v1/input.md
+required_files:
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/product-skill-check-gv_drzdw/incomplete-source/feature/revisions/v1/input.md
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/product-skill-check-gv_drzdw/incomplete-source/project/AGENTS.md
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/product-skill-check-gv_drzdw/incomplete-source/feature/revisions/v1/runs/run-product-check/sources/manifest.yaml
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/product-skill-check-gv_drzdw/incomplete-source/feature/revisions/v1/runs/run-product-check/sources/summary.md
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/product-skill-check-gv_drzdw/incomplete-source/feature/revisions/v1/runs/run-product-check/effective-config.yaml
+output_dir: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/product-skill-check-gv_drzdw/incomplete-source/feature/revisions/v1/runs/run-product-check/outputs
+external_write_scope: []
+completion_criteria:
+- 按产品角色与其Skill完成本轮任务，返回真实状态及证据
+evaluation_fixture: true

@@ -1,0 +1,36 @@
+{
+  "evaluation_only": true,
+  "synthetic_approval": true,
+  "original_workspace": "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-hku9qg2v",
+  "agents": {
+    "baseline": "/root/development_template_baseline",
+    "normal": "/root/development_skill_normal",
+    "resume": "/root/development_skill_resume"
+  },
+  "results": {
+    "normal": {
+      "status": "ready",
+      "artifacts": 7,
+      "identity_preserved": true,
+      "source_baseline_matches": true,
+      "unfilled_document_placeholders": false
+    },
+    "resume": {
+      "status": "blocked",
+      "artifacts": 13,
+      "identity_preserved": true,
+      "source_baseline_matches": true,
+      "unfilled_document_placeholders": false
+    }
+  },
+  "normal_followup": "Corrected artifact entries to kind/path after shared contract clarification; no repeated business tests.",
+  "limitations": [
+    "No native host registration",
+    "No real human approval",
+    "Resume used a prewritten interrupted-state fixture, not actual crash injection",
+    "Offline failure is a synthetic mandatory check; no external service tested",
+    "No product-to-testing end-to-end run",
+    "No Feishu access"
+  ],
+  "template_sources_unchanged": true
+}

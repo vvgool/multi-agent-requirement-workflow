@@ -1,0 +1,21 @@
+schema_version: 1
+feature_id: a72adcad-2928-407d-a84c-1d6eb3820889
+requirements_revision: 1
+run_id: run-980f4e4d852e
+role: product
+status: ready
+summary: 已基于预设场景完成首次需求及 7 条可验证验收标准；未获用户审批，未实现业务代码。
+artifacts:
+- kind: requirements
+  path: requirements.md
+acceptance_ids:
+- AC-001
+- AC-002
+- AC-003
+- AC-004
+- AC-005
+- AC-006
+- AC-007
+questions: []
+assumptions: []
+block_reason: null

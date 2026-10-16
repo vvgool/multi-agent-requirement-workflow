@@ -1,0 +1,128 @@
+schema_version: 1
+state_version: 12
+feature_id: a72adcad-2928-407d-a84c-1d6eb3820889
+title: 任务列表状态筛选
+workspace_root: /private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/agent-workflow-codex-mhbi_t3m
+target_project: /private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/agent-workflow-codex-mhbi_t3m
+requirements_revision: 2
+stage: requirement_review
+execution_status: waiting_user
+coordinator_session: /root/coordinator_smoke
+active_run: null
+pending_review:
+  revision: 2
+  document_digests:
+  - path: revisions/v2/requirements.md
+    sha256: 6d305d91e55397c6804a57c74bc7b06c99ff9a047b69ca25b4f342fd73047b96
+  source_digests:
+  - path: revisions/v2/runs/run-f37298459b42/sources/manifest.yaml
+    sha256: f306b85b98942b7695337e5c1fe3613d282c917f3521216eb7be71e770e4259d
+  config_digest: 35a9de2087779dd72087a2dfffd4861947c7682c42c63276d4c135d1884539e6
+  review_digest: e0a56f677b3cc6d5f92b850933976c21928c257e2b8438ec4b137eb7f6176ce0
+  displayed_at: '2026-10-15T07:08:08.091459+00:00'
+approval: null
+block_reason: null
+development_attempt: 0
+max_development_attempts: 3
+artifacts:
+- kind: input
+  path: revisions/v1/input.md
+  revision: 1
+  run_id: run-980f4e4d852e
+- kind: task
+  path: revisions/v1/runs/run-980f4e4d852e/task.yaml
+  revision: 1
+  run_id: run-980f4e4d852e
+- kind: config
+  path: revisions/v1/runs/run-980f4e4d852e/effective-config.yaml
+  revision: 1
+  run_id: run-980f4e4d852e
+- kind: sources
+  path: revisions/v1/runs/run-980f4e4d852e/sources/manifest.yaml
+  revision: 1
+  run_id: run-980f4e4d852e
+- kind: host
+  path: revisions/v1/runs/run-980f4e4d852e/host.yaml
+  revision: 1
+  run_id: run-980f4e4d852e
+- kind: result
+  path: revisions/v1/runs/run-980f4e4d852e/outputs/result.yaml
+  revision: 1
+  run_id: run-980f4e4d852e
+- kind: requirements
+  path: revisions/v1/runs/run-980f4e4d852e/outputs/requirements.md
+  revision: 1
+  run_id: run-980f4e4d852e
+- kind: quality_check
+  path: revisions/v1/runs/run-980f4e4d852e/quality-check.md
+  revision: 1
+  run_id: run-980f4e4d852e
+- kind: review_requirements
+  path: revisions/v1/requirements.md
+  revision: 1
+  run_id: run-980f4e4d852e
+- kind: review_manifest
+  path: revisions/v1/review-manifest.yaml
+  revision: 1
+  run_id: run-980f4e4d852e
+- kind: review_display
+  path: revisions/v1/review-display.md
+  revision: 1
+  run_id: run-980f4e4d852e
+- kind: resume_check
+  path: revisions/v1/resume-check.yaml
+  revision: 1
+- kind: resume_display
+  path: revisions/v1/resume-display.md
+  revision: 1
+- kind: input
+  path: revisions/v2/input.md
+  revision: 2
+  run_id: run-f37298459b42
+- kind: task
+  path: revisions/v2/runs/run-f37298459b42/task.yaml
+  revision: 2
+  run_id: run-f37298459b42
+- kind: config
+  path: revisions/v2/runs/run-f37298459b42/effective-config.yaml
+  revision: 2
+  run_id: run-f37298459b42
+- kind: sources
+  path: revisions/v2/runs/run-f37298459b42/sources/manifest.yaml
+  revision: 2
+  run_id: run-f37298459b42
+- kind: revision_snapshot
+  path: revisions/v1/status.snapshot.yaml
+  revision: 1
+- kind: preservation_digests
+  path: revisions/v1/pre-v2-digests.yaml
+  revision: 1
+- kind: host
+  path: revisions/v2/runs/run-f37298459b42/host.yaml
+  revision: 2
+  run_id: run-f37298459b42
+- kind: result
+  path: revisions/v2/runs/run-f37298459b42/outputs/result.yaml
+  revision: 2
+  run_id: run-f37298459b42
+- kind: requirements
+  path: revisions/v2/runs/run-f37298459b42/outputs/requirements.md
+  revision: 2
+  run_id: run-f37298459b42
+- kind: quality_check
+  path: revisions/v2/runs/run-f37298459b42/quality-check.md
+  revision: 2
+  run_id: run-f37298459b42
+- kind: review_requirements
+  path: revisions/v2/requirements.md
+  revision: 2
+  run_id: run-f37298459b42
+- kind: review_manifest
+  path: revisions/v2/review-manifest.yaml
+  revision: 2
+  run_id: run-f37298459b42
+- kind: review_display
+  path: revisions/v2/review-display.md
+  revision: 2
+  run_id: run-f37298459b42
+last_event: review content displayed in persisted test transcript; awaiting real user

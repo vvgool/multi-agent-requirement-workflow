@@ -1,0 +1,5 @@
+evaluation_fixture: true
+host_task_id: /root/layout_development
+status: completed
+completed_at: '2026-10-15T11:33:08.684400+00:00'
+mode: isolated_skill_forward_test

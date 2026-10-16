@@ -1,0 +1,49 @@
+{
+  "synthetic_evaluation_only": true,
+  "original_workspace": "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd",
+  "agents": {
+    "normal": "/root/adaptive_skill_small",
+    "resume": "/root/adaptive_skill_large_resume",
+    "consumer": "/root/adaptive_single_doc_consumer"
+  },
+  "results": {
+    "normal": {
+      "status": "ready",
+      "documents": [
+        "development.md"
+      ],
+      "baseline_matches": true,
+      "protected_files_unchanged": true,
+      "artifact_count": 2
+    },
+    "resume": {
+      "status": "blocked",
+      "documents": [
+        "implementation-plan.md",
+        "technical-plan.md",
+        "verification.md"
+      ],
+      "baseline_matches": true,
+      "protected_files_unchanged": true,
+      "artifact_count": 4
+    },
+    "consumer": {
+      "status": "passed",
+      "documents": [
+        "test-report.md"
+      ],
+      "baseline_matches": true,
+      "protected_files_unchanged": true,
+      "artifact_count": 4
+    }
+  },
+  "templates_unchanged": true,
+  "resume_followup": "Updated stale plan table progress in place; no repeated business checks.",
+  "limitations": [
+    "Not native host initialization/registration",
+    "No real user approval",
+    "Prewritten recovery fixture, not crash injection",
+    "Injected offline check, no real gateway accessed",
+    "No complete coordinator/product/development/testing lifecycle"
+  ]
+}

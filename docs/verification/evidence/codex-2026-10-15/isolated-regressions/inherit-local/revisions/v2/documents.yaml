@@ -1,0 +1,10 @@
+documents:
+  feishu:
+    parent_node_url: null
+    write_enabled: false
+  provider: local
+  requirements:
+    access: read
+    path: custom/spec.md
+    provider: local
+    source_revision: 1

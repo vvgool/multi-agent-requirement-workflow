@@ -1,0 +1,24 @@
+schema_version: 1
+feature_id: 02dd476d-921a-41f3-b264-7ed65fa52ec5
+requirements_revision: 1
+run_id: run-product-001
+role: product
+framework_root: /Users/wiesenwang/Agents/multi-agent-requirement-workflow
+workspace_root: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project
+feature_dir: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化
+target_project: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project
+input_path: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化/revisions/v1/input.md
+required_files:
+- /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化/revisions/v1/input.md
+- /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/AGENTS.md
+- /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/workflow.yaml
+- /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化/revisions/v1/runs/run-product-001/effective-config.yaml
+- /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化/revisions/v1/runs/run-product-001/sources/manifest.yaml
+output_dir: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化/revisions/v1/runs/run-product-001/outputs
+external_write_scope: []
+completion_criteria:
+- 读取原始诉求、已有答复和全部必读来源
+- 关键未知规则返回具体问题，不把假设当成事实
+- 完整需求和验收标准落到允许的输出目录
+- 产品完成逐项质量检查，默认写入需求文稿自检段并建立产物索引
+- result.yaml 身份与任务一致，提供真实产物路径

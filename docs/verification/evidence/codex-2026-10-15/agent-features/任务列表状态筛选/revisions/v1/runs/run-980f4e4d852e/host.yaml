@@ -1,0 +1,6 @@
+host: Codex
+host_task_id: /root/coordinator_smoke/product_smoke
+started_at: '2026-10-15T07:01:00.816073+00:00'
+status: completed
+observed_at: '2026-10-15T07:01:00.816242+00:00'
+ended_at: '2026-10-15T07:02:35.061026+00:00'

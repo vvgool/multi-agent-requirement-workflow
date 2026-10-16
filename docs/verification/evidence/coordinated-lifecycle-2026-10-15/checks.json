@@ -1,0 +1,33 @@
+{
+  "actual_host_task_id": "/root/lifecycle_product",
+  "host_mode": "manual_load_prototype",
+  "checks": {
+    "task_result_identity_matches": true,
+    "protected_inputs_unchanged": true,
+    "artifacts_in_current_output": true,
+    "single_requirements_and_self_check": true,
+    "review_copy_matches_product_output": true,
+    "review_manifest_digest_matches": true,
+    "active_run_cleared_after_host_completed": true,
+    "approval_remains_null_at_product_review": true,
+    "no_business_source_implemented_at_product_review": true,
+    "user_response_recorded_after_review": true,
+    "approval_digest_still_matches": true,
+    "six_independent_acceptance_results_passed": true,
+    "development_and_testing_baseline_matches": true,
+    "final_parent_commands_passed": true
+  },
+  "stage": "completed",
+  "execution_status": "idle",
+  "native_role_registration_verified": false,
+  "full_lifecycle_verified": false,
+  "human_approval_verified": true,
+  "prototype_happy_path_verified": true,
+  "failed_test_repair_loop_verified": false,
+  "development_attempt": 1,
+  "host_task_ids": [
+    "/root/lifecycle_product",
+    "/root/lifecycle_development",
+    "/root/lifecycle_testing"
+  ]
+}

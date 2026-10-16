@@ -1,0 +1,27 @@
+schema_version: 1
+feature_id: a72adcad-2928-407d-a84c-1d6eb3820889
+requirements_revision: 2
+run_id: run-f37298459b42
+role: product
+status: ready
+summary: 完成 v2 状态筛选与标题搜索文稿；保留 AC-001 至 AC-007，新增 AC-008 至 AC-013；预设变更非实际用户审批。
+artifacts:
+- kind: requirements
+  path: requirements.md
+acceptance_ids:
+- AC-001
+- AC-002
+- AC-003
+- AC-004
+- AC-005
+- AC-006
+- AC-007
+- AC-008
+- AC-009
+- AC-010
+- AC-011
+- AC-012
+- AC-013
+questions: []
+assumptions: []
+block_reason: null

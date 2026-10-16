@@ -1,0 +1,38 @@
+{
+  "isolated_results": {
+    "revision": {
+      "status": "ready",
+      "documents": [
+        "requirements.md"
+      ],
+      "inputs_preserved": true,
+      "artifacts": [
+        {
+          "kind": "requirements",
+          "path": "requirements.md"
+        },
+        {
+          "kind": "quality_check",
+          "path": "requirements.md"
+        }
+      ]
+    },
+    "clarification": {
+      "status": "needs_input",
+      "documents": [],
+      "inputs_preserved": true,
+      "artifacts": []
+    },
+    "incomplete-source": {
+      "status": "blocked",
+      "documents": [],
+      "inputs_preserved": true,
+      "artifacts": []
+    }
+  },
+  "skill_sources_preserved": true,
+  "host_registration_verified": false,
+  "human_approval_verified": false,
+  "feishu_integration_verified": false,
+  "end_to_end_verified": false
+}

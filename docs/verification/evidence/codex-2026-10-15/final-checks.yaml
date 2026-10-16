@@ -1,0 +1,26 @@
+checked_at: '2026-10-15T07:08:08.129889+00:00'
+actual_product_runs: 4
+all_real_runs_completed: true
+all_approvals_null: true
+artifacts_and_pending_digests_verified: true
+v1_preserved: true
+framework_programmatic_enforcement: false
+states:
+- title: 任务列表状态筛选
+  revision: 2
+  stage: requirement_review
+  execution_status: waiting_user
+  approval: null
+  artifacts_checked: 26
+- title: 任务导出
+  revision: 1
+  stage: requirement_review
+  execution_status: waiting_user
+  approval: null
+  artifacts_checked: 19
+- title: 飞书需求读取阻塞
+  revision: 1
+  stage: draft
+  execution_status: blocked
+  approval: null
+  artifacts_checked: 3

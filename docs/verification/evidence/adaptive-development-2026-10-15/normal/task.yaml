@@ -1,0 +1,25 @@
+schema_version: 1
+feature_id: EVAL-normal
+requirements_revision: 1
+run_id: run-check
+role: development
+framework_root: /Users/wiesenwang/Agents/multi-agent-requirement-workflow
+workspace_root: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/normal
+feature_dir: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/normal/feature
+target_project: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/normal/project
+input_path: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/normal/feature/requirements.md
+requirements_path: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/normal/feature/requirements.md
+approval_digest: 1f427e6d1b0791c6e34a6d051ebb050319fee2ee696927f2784954419fc87512
+required_files:
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/normal/feature/requirements.md
+output_dir: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/normal/feature/revisions/v1/runs/run-check/outputs
+write_scope:
+  project_paths:
+  - /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/normal/project
+  temporary_paths:
+  - /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/normal/project/__pycache__
+  modify_business_source: true
+completion_criteria:
+- All approved acceptance criteria and the required full-feature verification must
+  pass.
+evaluation_fixture: true

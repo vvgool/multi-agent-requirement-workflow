@@ -1,0 +1,24 @@
+shipping_fee(0)=1000
+shipping_fee(1)=1000
+shipping_fee(9999)=1000
+shipping_fee(10000)=0
+shipping_fee(10001)=0
+shipping_fee(1000000000000000000000000000000)=0
+shipping_fee(-1) raises ValueError
+shipping_fee(-10000) raises ValueError
+shipping_fee(-1000000000000000000000000000000) raises ValueError
+M1-T1 / V1 PASS
+checkout_total(0)=1000
+checkout_total(1)=1001
+checkout_total(9999)=10999
+checkout_total(10000)=10000
+checkout_total(10001)=10001
+checkout_total(1000000000000000000000000000000)=1000000000000000000000000000000
+checkout_total(-1) raises ValueError
+checkout_total(-10000) raises ValueError
+checkout_total(-1000000000000000000000000000000) raises ValueError
+M1-T2 / V2 PASS: exhaustive integer regression 0..20000
+M1 / V3 PASS: both source files compile; real import integration passed
+baseline=sha256:4706d146074061ecfbfb5a11fb594f6a1d3ebc4be0c018fe17c45dc13fb3169d
+environment=macOS-26.6.2-arm64-arm-64bit Python 3.9.6
+verified_at=2026-10-15T08:30:36.089970+00:00

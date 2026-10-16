@@ -1,0 +1,25 @@
+{
+  "scope": "Synthetic offline fixture only; not real user approval.",
+  "identity_checks": "feature_id EVAL-normal, revision 1, testing run run-testing-check, active_run and development run-check match task/status/development result",
+  "approval_check": "requirements digest matches task/status: 1f427e6d1b0791c6e34a6d051ebb050319fee2ee696927f2784954419fc87512",
+  "expected_baseline": {
+    "shipping.py": "abc3d67d2ba28f897d5c171ea9bf9c04b55c536202597d2b52b5e035620dc248",
+    "checkout.py": "d3f9bce561480c559f0f164b30ce7326554775410a94f7518e48032d58cd19aa"
+  },
+  "actual_baseline": {
+    "shipping.py": "8a4ba542f46491a8aff7984101d87b5ac9914e0cd14c968b269dbf273c48f631",
+    "checkout.py": "d3f9bce561480c559f0f164b30ce7326554775410a94f7518e48032d58cd19aa"
+  },
+  "mismatches": [
+    "shipping.py"
+  ],
+  "behavioral_tests": "not executed due to baseline mismatch",
+  "input_digests": {
+    "task.yaml": "611588e2b84a52b0b0821cf019313403e200eb38940bf63d68f8973ac7ca1971",
+    "feature/status.yaml": "524c748ab234ec2b8440acefc7316277ea435dd91c240ea67aecca40192810b3",
+    "feature/requirements.md": "1f427e6d1b0791c6e34a6d051ebb050319fee2ee696927f2784954419fc87512",
+    "project/shipping.py": "8a4ba542f46491a8aff7984101d87b5ac9914e0cd14c968b269dbf273c48f631",
+    "project/checkout.py": "d3f9bce561480c559f0f164b30ce7326554775410a94f7518e48032d58cd19aa"
+  },
+  "end_check": "task/status/requirements/source digests unchanged since initial check; original mismatch persists"
+}

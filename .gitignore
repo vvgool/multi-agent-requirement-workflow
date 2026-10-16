@@ -1,0 +1,9 @@
+# Local OS/Python artifacts
+.DS_Store
+__pycache__/
+*.py[cod]
+
+# Local workflow installation (historical evidence directories remain tracked)
+/.agents/requirement-workflow-cache/
+/.agents/requirement-workflow.local.json
+/.agents/requirement-workflow.pending.json

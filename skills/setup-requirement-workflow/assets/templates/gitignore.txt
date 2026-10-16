@@ -1,0 +1,5 @@
+# requirement-workflow-local:begin
+/.agents/requirement-workflow-cache/
+/.agents/requirement-workflow.local.json
+/.agents/requirement-workflow.pending.json
+# requirement-workflow-local:end

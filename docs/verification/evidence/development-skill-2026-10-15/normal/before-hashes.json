@@ -1,0 +1,7 @@
+{
+  "feature/requirements.md": "1f427e6d1b0791c6e34a6d051ebb050319fee2ee696927f2784954419fc87512",
+  "task.yaml": "b259f60926ca18558a1eee223b8deb3761dbc9e467a03ba274adb6eb5c0051d9",
+  "feature/status.yaml": "fcd0bb3f4b1bf08481df547ef5c1607670557a4a6b519ab7c2db50dfb0088218",
+  "project/checkout.py": "d3f9bce561480c559f0f164b30ce7326554775410a94f7518e48032d58cd19aa",
+  "project/shipping.py": "fc30ecb2706596993059a9ead52d36bbc0c36b65dae3e7a4ce8c0b4760430c60"
+}

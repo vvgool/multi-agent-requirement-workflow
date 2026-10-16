@@ -1,0 +1,35 @@
+schema_version: 1
+feature_id: 679f8b18-0adc-43e0-9a46-2f6cf2a4ca31
+requirements_revision: 1
+layout_version: 2
+run_id: run-product-layout-001
+role: product
+framework_root: /Users/wiesenwang/Agents/multi-agent-requirement-workflow
+workspace_root: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/新布局
+  Project With Spaces
+feature_dir: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/新布局
+  Project With Spaces/agent-features/空列表提示
+target_project: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/新布局
+  Project With Spaces
+input_path: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/新布局
+  Project With Spaces/agent-features/空列表提示/revisions/v1/input.md
+required_files:
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/新布局
+  Project With Spaces/AGENTS.md
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/新布局
+  Project With Spaces/workflow.yaml
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/新布局
+  Project With Spaces/agent-features/空列表提示/revisions/v1/input.md
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/新布局
+  Project With Spaces/agent-features/空列表提示/revisions/v1/.workflow/runs/run-product-layout-001/effective-config.yaml
+output_dir: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/新布局
+  Project With Spaces/agent-features/空列表提示/revisions/v1/.workflow/runs/run-product-layout-001/outputs
+result_path: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/新布局
+  Project With Spaces/agent-features/空列表提示/revisions/v1/.workflow/runs/run-product-layout-001/result.yaml
+external_write_scope: []
+completion_criteria:
+- 读取原始诉求、已有答复和全部必读来源
+- 关键未知规则返回具体问题，不把假设当成事实
+- 完整需求和验收标准落到允许的输出目录
+- 产品完成逐项质量检查，默认写入需求文稿自检段并建立产物索引
+- result.yaml 身份与任务一致，提供真实产物路径

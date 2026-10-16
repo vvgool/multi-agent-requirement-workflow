@@ -1,0 +1,9 @@
+{
+  "read_state_version": 13,
+  "stage": "testing",
+  "execution_status": "running",
+  "host_task_id": "/root/lifecycle_testing",
+  "action": "wait_existing_task",
+  "reason": "active_run 非空且当前宿主任务仍在执行，未重复派发",
+  "at": "2026-10-15T11:15:31.986851+00:00"
+}

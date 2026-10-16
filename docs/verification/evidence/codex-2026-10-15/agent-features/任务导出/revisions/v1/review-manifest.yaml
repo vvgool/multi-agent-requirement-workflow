@@ -1,0 +1,11 @@
+feature_id: 2e7a48b3-11d2-44f6-96c5-8ec753c4ef15
+revision: 1
+documents:
+- path: revisions/v1/requirements.md
+  sha256: c3fcbb9912e7a4a50f4f0441c0397456c9ac9e68bbe74e440717b69418abc29c
+sources_manifest:
+  path: revisions/v1/runs/run-f9e40b087d1e/sources/manifest.yaml
+  sha256: f306b85b98942b7695337e5c1fe3613d282c917f3521216eb7be71e770e4259d
+effective_config:
+  path: revisions/v1/runs/run-f9e40b087d1e/effective-config.yaml
+  sha256: 35a9de2087779dd72087a2dfffd4861947c7682c42c63276d4c135d1884539e6

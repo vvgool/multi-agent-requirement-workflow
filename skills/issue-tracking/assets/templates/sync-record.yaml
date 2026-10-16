@@ -1,0 +1,11 @@
+schema_version: 1
+sync_key: null # 实际计算的稳定SHA-256
+feature_id: null
+event: null # 原快照：{event_id, revision, state_version, kind, occurred_at, stage, execution_status, summary, evidence}
+binding: null # 该事件固定的{provider, host, repository, issue_number, url}
+status: pending # pending / sending / unknown / synced / blocked
+body_sha256: null # 同目录comment.md实际字节摘要
+remote_comment_id: null
+remote_comment_url: null
+last_error: null
+attempts: [] # 实际操作与时间、结果；不存凭据，不伪造响应

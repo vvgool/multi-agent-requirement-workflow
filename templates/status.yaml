@@ -1,0 +1,22 @@
+schema_version: 1
+state_version: 1
+feature_id: null # 协调 Agent 新建时填入真实 UUID
+title: null
+workspace_root: null # 本机运行时解析，迁移后重新绑定
+target_project: null # 本机运行时解析，不填写作者目录
+requirements_revision: 1
+layout_version: 2 # 当前修订布局；存量缺字段视为1，不迁移旧审批
+stage: draft
+execution_status: idle
+coordinator_session: null
+active_run: null
+pending_review: null
+approval: null
+block_reason: null
+required_role: null
+issue_tracking: null # 可选，默认不绑定/不评论；启用后用issue-tracking Skill的binding模板
+development_baseline: null
+development_attempt: 0
+max_development_attempts: 3
+artifacts: []
+last_event: null

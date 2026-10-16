@@ -1,0 +1,19 @@
+schema_version: 1
+feature_id: EVAL-product-revision
+requirements_revision: 2
+run_id: run-product-check
+role: product
+status: ready
+summary: 已完成运费展示 v2 文稿及具体自检，保留 AC-001、AC-003，新增 AC-004 替代 AC-002；等待协调层展示并取得 v2 明确确认。
+artifacts:
+  - kind: requirements
+    path: requirements.md
+  - kind: quality_check
+    path: requirements.md
+acceptance_ids:
+  - AC-001
+  - AC-003
+  - AC-004
+questions: []
+assumptions: []
+block_reason: null

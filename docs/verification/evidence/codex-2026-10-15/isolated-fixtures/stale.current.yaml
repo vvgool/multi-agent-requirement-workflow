@@ -1,0 +1,12 @@
+active_run:
+  dispatch_status: running
+  host_task_id: fixture-only-not-real-host-id
+  revision: 2
+  role: product
+  run_id: current-v2
+approval: null
+execution_status: running
+feature_id: fixture-stale
+requirements_revision: 2
+stage: draft
+state_version: 8

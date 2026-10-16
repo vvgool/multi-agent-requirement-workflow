@@ -1,0 +1,31 @@
+schema_version: 1
+feature_id: 02dd476d-921a-41f3-b264-7ed65fa52ec5
+requirements_revision: 1
+run_id: run-development-001
+role: development
+framework_root: /Users/wiesenwang/Agents/multi-agent-requirement-workflow
+workspace_root: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project
+feature_dir: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化
+target_project: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project
+input_path: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化/revisions/v1/input.md
+requirements_path: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化/revisions/v1/review/requirements.md
+approval_digest: 5cac5655804917ba145e88242ff1d1fbdd2e708475f5b11a8c4661da662cf0b6
+development_run_id: null
+development_baseline: null
+defect_report_path: null
+required_files:
+- /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/AGENTS.md
+- /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化/revisions/v1/review/review-manifest.yaml
+- /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化/revisions/v1/review/requirements.md
+output_dir: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化/revisions/v1/runs/run-development-001/outputs
+write_scope:
+  project_paths:
+  - amount.py
+  - tests/
+  temporary_paths:
+  - /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/整数分金额格式化/revisions/v1/runs/run-development-001/outputs/tmp
+  modify_business_source: true
+completion_criteria:
+- 遵循批准 v1 和项目规则，先用真实简版模板写技术方案、可验证模块与小任务及执行顺序
+- 实现 format_amount，覆盖六项验收并完整自验
+- 返回真实文稿、测试证据和相关源码/测试 SHA256 基线，无未解决交付项

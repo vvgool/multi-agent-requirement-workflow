@@ -1,0 +1,26 @@
+schema_version: 1
+feature_id: EVAL-resume
+requirements_revision: 1
+run_id: run-check
+role: development
+framework_root: /Users/wiesenwang/Agents/multi-agent-requirement-workflow
+workspace_root: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-hku9qg2v/resume
+feature_dir: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-hku9qg2v/resume/feature
+target_project: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-hku9qg2v/resume/project
+input_path: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-hku9qg2v/resume/feature/requirements.md
+requirements_path: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-hku9qg2v/resume/feature/requirements.md
+approval_digest: 1f427e6d1b0791c6e34a6d051ebb050319fee2ee696927f2784954419fc87512
+required_files:
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-hku9qg2v/resume/feature/requirements.md
+output_dir: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-hku9qg2v/resume/feature/revisions/v1/runs/run-check/outputs
+write_scope:
+  project_paths: []
+  temporary_paths:
+  - /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-hku9qg2v/resume/project/__pycache__
+  modify_business_source: false
+completion_criteria:
+- All approved acceptance criteria and the required full-feature verification must
+  pass.
+- Run integration_check.py as a required full-feature environment verification. Source
+  files and checks are read-only; do not remove, patch, or bypass this required check.
+evaluation_fixture: true

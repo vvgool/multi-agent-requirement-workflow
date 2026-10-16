@@ -1,0 +1,33 @@
+schema_version: 1
+feature_id: EVAL-normal
+requirements_revision: 1
+run_id: run-testing
+role: testing
+framework_root: /Users/wiesenwang/Agents/multi-agent-requirement-workflow
+workspace_root: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/consumer
+feature_dir: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/consumer/feature
+target_project: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/consumer/project
+input_path: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/consumer/feature/requirements.md
+requirements_path: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/consumer/feature/requirements.md
+approval_digest: 1f427e6d1b0791c6e34a6d051ebb050319fee2ee696927f2784954419fc87512
+required_files:
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/consumer/feature/requirements.md
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/consumer/feature/revisions/v1/runs/run-check/outputs/result.yaml
+- /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/consumer/feature/revisions/v1/runs/run-check/outputs/development.md
+output_dir: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/consumer/feature/revisions/v1/runs/run-testing/outputs
+write_scope:
+  project_paths: []
+  temporary_paths:
+  - /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-faz2h1cd/consumer/project/__pycache__
+  modify_business_source: false
+completion_criteria:
+- All approved acceptance criteria and the required full-feature verification must
+  pass.
+evaluation_fixture: true
+development_run_id: run-check
+development_baseline:
+  type: sha256
+  files:
+    shipping.py: abc3d67d2ba28f897d5c171ea9bf9c04b55c536202597d2b52b5e035620dc248
+    checkout.py: d3f9bce561480c559f0f164b30ce7326554775410a94f7518e48032d58cd19aa
+  evidence: verification.log；覆盖变更源码及实际集成调用方，排除报告、日志及缓存。

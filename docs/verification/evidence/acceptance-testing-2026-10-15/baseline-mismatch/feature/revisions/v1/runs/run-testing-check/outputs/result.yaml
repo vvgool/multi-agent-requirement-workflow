@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "feature_id": "EVAL-normal",
+  "requirements_revision": 1,
+  "run_id": "run-testing-check",
+  "role": "testing",
+  "status": "blocked",
+  "summary": "shipping.py 实际摘要与 task/status/开发交付基线失配，未执行行为验收；仅为合成离线夹具。",
+  "artifacts": [
+    {
+      "kind": "test_report",
+      "path": "test-report.md"
+    },
+    {
+      "kind": "verification_evidence",
+      "path": "baseline-evidence.json"
+    }
+  ],
+  "changed_files": [],
+  "development_run_id": "run-check",
+  "code_baseline": {
+    "type": "sha256",
+    "files": {
+      "shipping.py": "8a4ba542f46491a8aff7984101d87b5ac9914e0cd14c968b269dbf273c48f631",
+      "checkout.py": "d3f9bce561480c559f0f164b30ce7326554775410a94f7518e48032d58cd19aa"
+    },
+    "evidence": "baseline-evidence.json"
+  },
+  "acceptance_results": [
+    {
+      "id": "AC-1",
+      "status": "not_executed",
+      "actual": "接单基线失配，未执行独立行为验收。",
+      "evidence": "test-report.md"
+    },
+    {
+      "id": "AC-2",
+      "status": "not_executed",
+      "actual": "接单基线失配，未执行独立行为验收。",
+      "evidence": "test-report.md"
+    },
+    {
+      "id": "AC-3",
+      "status": "not_executed",
+      "actual": "接单基线失配，未执行独立行为验收。",
+      "evidence": "test-report.md"
+    }
+  ],
+  "defects": [],
+  "questions": [],
+  "unresolved_items": [
+    "重新绑定开发基线后执行 AC-1、AC-2、AC-3 及结算异常回归。",
+    "历史用例 10000 边界预期已在当前输出纠正，待有效基线重测。"
+  ],
+  "block_reason": "BLOCK-1: shipping.py expected abc3d67d2ba28f897d5c171ea9bf9c04b55c536202597d2b52b5e035620dc248; actual 8a4ba542f46491a8aff7984101d87b5ac9914e0cd14c968b269dbf273c48f631; coordinator must rebind current development baseline."
+}

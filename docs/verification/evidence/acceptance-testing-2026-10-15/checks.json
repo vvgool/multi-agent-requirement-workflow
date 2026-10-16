@@ -1,0 +1,75 @@
+{
+  "isolated_results": {
+    "case-correction": {
+      "status": "passed",
+      "documents": [
+        "test-report.md"
+      ],
+      "artifacts": [
+        {
+          "kind": "test_report",
+          "path": "test-report.md"
+        },
+        {
+          "kind": "verification_evidence",
+          "path": "verification.log"
+        },
+        {
+          "kind": "baseline_evidence",
+          "path": "baseline-evidence.json"
+        },
+        {
+          "kind": "test_script",
+          "path": "independent_acceptance.py"
+        }
+      ],
+      "inputs_preserved": true
+    },
+    "implementation-drift": {
+      "status": "failed",
+      "documents": [
+        "test-report.md"
+      ],
+      "artifacts": [
+        {
+          "kind": "test_report",
+          "path": "test-report.md"
+        },
+        {
+          "kind": "verification_evidence",
+          "path": "verification.log"
+        },
+        {
+          "kind": "test_script",
+          "path": "independent-checks.py"
+        },
+        {
+          "kind": "baseline_evidence",
+          "path": "baseline-check.json"
+        }
+      ],
+      "inputs_preserved": true
+    },
+    "baseline-mismatch": {
+      "status": "blocked",
+      "documents": [
+        "test-report.md"
+      ],
+      "artifacts": [
+        {
+          "kind": "test_report",
+          "path": "test-report.md"
+        },
+        {
+          "kind": "verification_evidence",
+          "path": "baseline-evidence.json"
+        }
+      ],
+      "inputs_preserved": true
+    }
+  },
+  "source_templates_preserved": true,
+  "synthetic_approval_only": true,
+  "host_registration_verified": false,
+  "end_to_end_verified": false
+}

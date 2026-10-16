@@ -1,0 +1,49 @@
+schema_version: 1
+feature_id: EVAL-normal
+requirements_revision: 1
+run_id: run-testing-check
+role: testing
+status: failed
+summary: 有效基线下确认 10000 分边界仍收费，违反 AC-1 并导致 AC-3 结算错误；纠正历史错误用例后独立重测。仅合成离线夹具。
+artifacts:
+- kind: test_report
+  path: test-report.md
+- kind: verification_evidence
+  path: verification.log
+- kind: test_script
+  path: independent-checks.py
+- kind: baseline_evidence
+  path: baseline-check.json
+changed_files: []
+development_run_id: run-check
+code_baseline:
+  type: sha256
+  files:
+    shipping.py: ec03de735ab8873e501d26a54fee555271bbfc35922bb06058a0aa76c118978f
+    checkout.py: d3f9bce561480c559f0f164b30ce7326554775410a94f7518e48032d58cd19aa
+acceptance_results:
+- id: AC-1
+  status: failed
+  actual: shipping_fee(10000)=1000，预期 0；其余遍历点通过
+  evidence: 'verification.log: test_ac1_range'
+- id: AC-2
+  status: passed
+  actual: 三个负整数均抛 ValueError
+  evidence: 'verification.log: test_ac2_negative'
+- id: AC-3
+  status: failed
+  actual: checkout_total(10000)=11000，预期 10000；其他抽样和异常传播通过
+  evidence: 'verification.log: test_ac3_actual_checkout, test_checkout_negative_propagation'
+defects:
+- id: D-1
+  acceptance_id: AC-1
+  related_acceptance_ids:
+  - AC-3
+  steps: 直接导入 shipping_fee 和 checkout_total，分别传入 10000；或执行 independent-checks.py
+  expected: shipping_fee=0；checkout_total=10000
+  actual: shipping_fee=1000；checkout_total=11000
+  evidence: verification.log 的两个失败；shipping.py:4 使用 <= 10000
+questions: []
+unresolved_items:
+- D-1 待开发修复并重新绑定基线后回归
+block_reason: null

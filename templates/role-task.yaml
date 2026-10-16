@@ -1,0 +1,25 @@
+schema_version: 1
+feature_id: null
+requirements_revision: 1
+layout_version: 2 # 与当前修订状态一致；旧任务缺字段视为1
+run_id: null
+role: null # development 或 testing
+framework: null # 新锁定安装必填{name,version,protocol_version,sha256}；无锁历史任务保持缺失/null
+framework_root: null # 当前宿主动态解析
+workspace_root: null
+feature_dir: null
+target_project: null
+input_path: null
+requirements_path: null
+approval_digest: null
+development_run_id: null # 测试必填；开发时为空
+development_baseline: null # 测试必填：run_id 与 code_baseline；见 workflow/code-baseline.md
+defect_report_path: null # 修复任务必填，首次开发可为空
+required_files: [] # 测试必含原开发 result 以定位基线来源，再按产物索引读取方案、计划和自验内容，可合并在同一文档；已有用例一并提供
+output_dir: null # 当前run的outputs/，候选文稿与证据
+result_path: null # 布局2必须填当前run/result.yaml；artifacts仍相对output_dir
+write_scope:
+  project_paths: [] # 开发明确允许的业务代码范围
+  temporary_paths: [] # 构建/测试缓存等明确范围
+  modify_business_source: false # 开发获授权后才设 true；测试始终 false
+completion_criteria: [] # 按对应角色文件填写，不能为空

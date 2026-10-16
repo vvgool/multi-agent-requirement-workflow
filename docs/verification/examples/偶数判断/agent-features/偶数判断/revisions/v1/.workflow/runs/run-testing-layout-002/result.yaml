@@ -1,0 +1,46 @@
+schema_version: 1
+feature_id: 4d2c6225-3335-4b70-a88a-c858d8699eb8
+requirements_revision: 1
+run_id: run-testing-layout-002
+role: testing
+status: passed
+summary: B-001 正式交付链接已实测修复；需求、规则与代码/测试基线未变，复用前轮同基线独立功能证据，全部必验项通过。
+artifacts:
+- kind: test_report
+  path: test-report.md
+- kind: verification_evidence
+  path: verification.log
+- kind: code_baseline
+  path: code-baseline.json
+- kind: test_script
+  path: link-regression.py
+changed_files: []
+development_run_id: run-development-layout-001
+code_baseline:
+  type: sha256-files
+  files:
+    parity.py: c8650882975ce0d4112920dbcaf7f333ccf819a51e1b932e316a8a4d54c4aac3
+    tests/test_parity.py: 5ad1f9cde124764c761af8d8768281ad1116885710e45ec9346264a03bbe2648
+  aggregate_sha256: 5e7f67c361e7ef1c9b5701d727710851fd2f639f45b461e7aa07579e83bf7578
+  evidence: code-baseline.json
+acceptance_results:
+- id: AC-001
+  status: passed
+  actual: 引用前轮同基线独立验收：整数边界结果与 bool 类型通过；本轮核对需求/源码/用例未变
+  evidence: ../../run-testing-layout-001/outputs/verification.log
+- id: AC-002
+  status: passed
+  actual: 引用前轮同基线独立验收：批准输入及额外拒绝类型 TypeError 通过；本轮核对规则未变
+  evidence: ../../run-testing-layout-001/outputs/verification.log
+- id: AC-003
+  status: passed
+  actual: 引用前轮同基线 AST 与标准库执行证据；本轮读取源码与项目规则且摘要相同
+  evidence: ../../run-testing-layout-001/outputs/verification.log
+- id: B-001
+  status: passed
+  actual: 本轮实际检查正式与候选文稿各 3 个唯一相对链接可读取，正式/来源索引摘要匹配
+  evidence: verification.log
+defects: []
+questions: []
+unresolved_items: []
+block_reason: null

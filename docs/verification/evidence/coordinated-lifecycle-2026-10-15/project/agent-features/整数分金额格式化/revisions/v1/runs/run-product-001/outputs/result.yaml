@@ -1,0 +1,22 @@
+schema_version: 1
+feature_id: 02dd476d-921a-41f3-b264-7ed65fa52ec5
+requirements_revision: 1
+run_id: run-product-001
+role: product
+status: ready
+summary: 本地必读资料完整，已按真实模板产出需求及逐项自检，6 项验收覆盖格式、精度、类型异常和项目边界；仅提交 v1 用户评审，不代表批准或原生角色注册验证。
+artifacts:
+- kind: requirements
+  path: requirements.md
+- kind: quality_check
+  path: requirements.md
+acceptance_ids:
+- AC-001
+- AC-002
+- AC-003
+- AC-004
+- AC-005
+- AC-006
+questions: []
+assumptions: []
+block_reason: null

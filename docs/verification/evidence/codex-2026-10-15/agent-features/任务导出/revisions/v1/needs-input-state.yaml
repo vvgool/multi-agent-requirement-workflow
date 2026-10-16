@@ -1,0 +1,46 @@
+schema_version: 1
+state_version: 5
+feature_id: 2e7a48b3-11d2-44f6-96c5-8ec753c4ef15
+title: 任务导出
+workspace_root: /private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/agent-workflow-codex-mhbi_t3m
+target_project: /private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/agent-workflow-codex-mhbi_t3m
+requirements_revision: 1
+stage: draft
+execution_status: waiting_user
+coordinator_session: /root/coordinator_smoke
+active_run: null
+pending_review: null
+approval: null
+block_reason: null
+development_attempt: 0
+max_development_attempts: 3
+artifacts:
+- kind: input
+  path: revisions/v1/input.md
+  revision: 1
+  run_id: run-efaae801d73b
+- kind: task
+  path: revisions/v1/runs/run-efaae801d73b/task.yaml
+  revision: 1
+  run_id: run-efaae801d73b
+- kind: config
+  path: revisions/v1/runs/run-efaae801d73b/effective-config.yaml
+  revision: 1
+  run_id: run-efaae801d73b
+- kind: sources
+  path: revisions/v1/runs/run-efaae801d73b/sources/manifest.yaml
+  revision: 1
+  run_id: run-efaae801d73b
+- kind: host
+  path: revisions/v1/runs/run-efaae801d73b/host.yaml
+  revision: 1
+  run_id: run-efaae801d73b
+- kind: result
+  path: revisions/v1/runs/run-efaae801d73b/outputs/result.yaml
+  revision: 1
+  run_id: run-efaae801d73b
+- kind: questions
+  path: revisions/v1/runs/run-efaae801d73b/questions.yaml
+  revision: 1
+  run_id: run-efaae801d73b
+last_event: product ended needs_input; fixture questions persisted

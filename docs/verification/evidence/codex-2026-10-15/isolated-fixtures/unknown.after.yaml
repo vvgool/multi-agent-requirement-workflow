@@ -1,0 +1,13 @@
+active_run:
+  dispatch_status: unknown
+  host_task_id: null
+  revision: 1
+  role: product
+  run_id: fixture-run
+approval: null
+block_reason: 'dispatch_outcome_unknown: no task ID to query; do not redispatch'
+execution_status: blocked
+feature_id: fixture-unknown
+requirements_revision: 1
+stage: draft
+state_version: 2

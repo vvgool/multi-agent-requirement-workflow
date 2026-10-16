@@ -1,0 +1,59 @@
+checked_at: '2026-10-15T07:12:40.441612+00:00'
+method: one-off coordinator file actions and assertions; not runtime enforcement
+new_product_invocations: 0
+normal_business_files_unchanged: true
+approval_recorded: false
+case1:
+  action: freeze existing checked draft only; no new product invocation or approval
+  source: readonly-source/revisions/v1/requirements.md
+  source_before_sha256: f25d0e83266e8d2f246fb58a40f0336a5021186baa1ec6aa7ccde117c17e13a0
+  source_after_sha256: f25d0e83266e8d2f246fb58a40f0336a5021186baa1ec6aa7ccde117c17e13a0
+  original_bytes_backup: readonly-source/original-source.bin
+  review_output: readonly-source/revisions/v1/review/requirements.md
+  review_sha256: 6d305d91e55397c6804a57c74bc7b06c99ff9a047b69ca25b4f342fd73047b96
+  existing_draft_sha256: 6d305d91e55397c6804a57c74bc7b06c99ff9a047b69ca25b4f342fd73047b96
+  passed: true
+case2:
+  reserved_source_before_sha256: 98749b801ef423ac2b66a4b639ce4103147f091669e87dd4c12333c191785120
+  reserved_source_after_sha256: 98749b801ef423ac2b66a4b639ce4103147f091669e87dd4c12333c191785120
+  symlink_source_before_sha256: eb11801dd030201d14bf860623ab139e9a85027f5458235dedd9a37b09760144
+  symlink_source_after_sha256: eb11801dd030201d14bf860623ab139e9a85027f5458235dedd9a37b09760144
+  resolved_paths_equal: true
+  both_blocked_before_input_or_dispatch: true
+  passed: true
+case3:
+  workspace_default_provider: local
+  v1_documents_sha256: a04d6db39936a959b048ed583707eee1378ecf09081371b1cc603720a08fe7c6
+  v2_documents_sha256: a04d6db39936a959b048ed583707eee1378ecf09081371b1cc603720a08fe7c6
+  inherited_documents:
+    provider: local
+    feishu:
+      parent_node_url: null
+      write_enabled: false
+    requirements:
+      provider: feishu
+      url: https://example.feishu.cn/wiki/example
+      access: read
+  effective_requirements_provider: feishu
+  execution_status: blocked
+  network_requests: 0
+  local_fallback: false
+  passed: true
+case4:
+  source_before_sha256: 92b81a35a241cb3f375da54ddb4f2b7bb244fb241b67491d52c64e021996a205
+  source_after_sha256: 92b81a35a241cb3f375da54ddb4f2b7bb244fb241b67491d52c64e021996a205
+  inherited_documents:
+    feishu:
+      parent_node_url: null
+      write_enabled: false
+    provider: local
+    requirements:
+      access: read
+      path: custom/spec.md
+      provider: local
+      source_revision: 1
+  resolved_source: /private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/agent-workflow-codex-mhbi_t3m/isolated-regressions/inherit-local/revisions/v1/custom/spec.md
+  source_snapshot_sha256: 92b81a35a241cb3f375da54ddb4f2b7bb244fb241b67491d52c64e021996a205
+  wrong_v2_source_created: false
+  source_identity_preserved: true
+  passed: true

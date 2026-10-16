@@ -1,0 +1,12 @@
+schema_version: 1
+feature_id: null
+requirements_revision: 1
+run_id: null
+role: product
+status: null # ready、needs_input、blocked 或 stale_task（处置见 workflow/execution-contract.md）
+summary: null # 当前目标/范围理解及本轮变化；推荐不等于用户确认
+artifacts: [] # 每项为 kind 和 path，path 相对当前 run 的 outputs/；requirements 与 quality_check 可指向同一文稿
+acceptance_ids: []
+questions: [] # 每项必含 question/impact；可选 id、options（选项列表）、recommendation（推荐及依据），旧格式仍有效
+assumptions: [] # 每项为 statement 和 confirmed
+block_reason: null

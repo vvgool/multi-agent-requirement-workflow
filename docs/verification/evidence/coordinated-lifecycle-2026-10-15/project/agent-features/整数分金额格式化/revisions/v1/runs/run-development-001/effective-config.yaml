@@ -1,0 +1,10 @@
+schema_version: 1
+workspace:
+  features_dir: agent-features
+documents:
+  provider: local
+  feishu:
+    parent_node_url: null
+    write_enabled: false
+approval:
+  channel: coordinator

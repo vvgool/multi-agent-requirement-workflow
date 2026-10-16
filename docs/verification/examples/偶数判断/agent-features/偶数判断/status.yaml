@@ -1,0 +1,56 @@
+schema_version: 1
+state_version: 5
+feature_id: 4d2c6225-3335-4b70-a88a-c858d8699eb8
+title: 偶数判断
+workspace_root: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/examples/偶数判断
+target_project: /Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/examples/偶数判断
+requirements_revision: 1
+layout_version: 2
+stage: completed
+execution_status: idle
+coordinator_session: null
+active_run: null
+pending_review: null
+approval:
+  evaluation_fixture: true
+  feature_id: 4d2c6225-3335-4b70-a88a-c858d8699eb8
+  revision: 1
+  review_digest: 97a50bbf57867b0f3926e3d9dcb5d0e33c54dbebb5d4a38ccdf53197947b2e65
+  user_response: 合成评估审批，仅供协议验证
+  confirmed_at: null
+  source_session: null
+block_reason: null
+required_role: null
+development_baseline:
+  run_id: run-development-layout-001
+  code_baseline:
+    type: sha256-files
+    evidence: code-baseline.json
+    aggregate_sha256: 5e7f67c361e7ef1c9b5701d727710851fd2f639f45b461e7aa07579e83bf7578
+    files:
+      parity.py: c8650882975ce0d4112920dbcaf7f333ccf819a51e1b932e316a8a4d54c4aac3
+      tests/test_parity.py: 5ad1f9cde124764c761af8d8768281ad1116885710e45ec9346264a03bbe2648
+  evidence_path: revisions/v1/.workflow/runs/run-development-layout-001/result.yaml
+development_attempt: 1
+max_development_attempts: 3
+artifacts:
+- kind: development_record
+  path: revisions/v1/documents/development.md
+  revision: 1
+  run_id: run-development-layout-001
+  sha256: 3ac2786a179ca40c47fff9333025e68989c86acebb62b1fc86fab4f8675766e2
+  source_path: revisions/v1/.workflow/runs/run-development-layout-001/outputs/development.md
+  source_sha256: 25b4fb17c8426318e446c6778df4749c074647cbef53076f51dc110340704d1f
+- kind: test_report
+  path: revisions/v1/documents/test-report.md
+  revision: 1
+  run_id: run-testing-layout-002
+  sha256: 554eba15a7936cb4fd08d78856a66f822694b600137ac1684c32411968081d0a
+  source_path: revisions/v1/.workflow/runs/run-testing-layout-002/outputs/test-report.md
+  source_sha256: bc95ad382e9c6fd25118fdd8243f5d10bd90ed0e5084af7b82661f5834646484
+- kind: feature_index
+  path: README.md
+  sha256: 7f5af50ba7aa67d8dd58e244a8d795d98b22decf0f70744d7d445c70f0681b04
+  revision: 1
+last_event: 示例归档到 verification；重绑当前工作空间，历史任务/日志和审批保持原样
+evaluation_fixture: true

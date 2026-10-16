@@ -1,0 +1,10 @@
+schema_version: 1
+package:
+  name: multi-agent-requirement-workflow
+  version: null # 从真实framework.yaml读取
+  protocol_version: 1
+  sha256: null # 真实包内容清单的SHA256
+source:
+  kind: manual # manual / git
+  location: null # manual为包名@版本；git为明确的远程仓库地址，不写本机路径/凭据
+  revision: null # git须完整提交哈希；manual为null

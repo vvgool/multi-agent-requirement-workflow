@@ -1,0 +1,86 @@
+{
+  "counts": {
+    "files": 421,
+    "yaml": 124,
+    "jsonl": 4,
+    "json": 29,
+    "toml": 18,
+    "symlinks": 7
+  },
+  "core_files": 45,
+  "core_links": 87,
+  "core_broken_links": [],
+  "all_broken_markdown_links": [],
+  "parse_or_integrity_errors": [],
+  "skill_validation": [
+    {
+      "skill": "acceptance-testing",
+      "exit": 0,
+      "output": "Skill is valid!"
+    },
+    {
+      "skill": "feature-development",
+      "exit": 0,
+      "output": "Skill is valid!"
+    },
+    {
+      "skill": "requirement-analysis",
+      "exit": 0,
+      "output": "Skill is valid!"
+    },
+    {
+      "skill": "setup-requirement-workflow",
+      "exit": 0,
+      "output": "Skill is valid!"
+    }
+  ],
+  "installation_snapshots": [
+    {
+      "manifest": "docs/verification/evidence/codex-initialization-2026-10-15/搬迁 Project With Spaces/.agents/requirement-workflow/installation.json",
+      "owned_files": 48,
+      "mismatch": [],
+      "native_role_invocation": "pending",
+      "end_to_end": "pending"
+    },
+    {
+      "manifest": "docs/verification/evidence/codex-initialization-2026-10-15/clean-project/.agents/requirement-workflow/installation.json",
+      "owned_files": 48,
+      "mismatch": [],
+      "native_role_invocation": "pending",
+      "end_to_end": "pending"
+    }
+  ],
+  "isolated_reruns": [
+    {
+      "fixture": "case-correction",
+      "exit": 0,
+      "matches_expected": true,
+      "output_tail": [
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 5 tests in 0.011s",
+        "",
+        "OK"
+      ]
+    },
+    {
+      "fixture": "implementation-drift",
+      "exit": 1,
+      "matches_expected": true,
+      "output_tail": [
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 4 tests in 0.075s",
+        "",
+        "FAILED (failures=2)"
+      ]
+    }
+  ],
+  "default_path_conflict": {
+    "workspace_equals_target_project": true,
+    "output_within_feature": true,
+    "output_within_target_project": true,
+    "legacy_forbidden_target_clause_present": false
+  },
+  "temp_evidence": "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/requirement-workflow-audit-sa_k7rb0"
+}

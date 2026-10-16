@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "feature_id": "EVAL-resume",
+  "requirements_revision": 1,
+  "run_id": "run-check",
+  "role": "development",
+  "status": "blocked",
+  "summary": "Recovered current code; M01/M02/I01 pass. Required I02 fails offline. No source/check modifications.",
+  "artifacts": [
+    {
+      "kind": "technical_plan",
+      "path": "technical-plan.md"
+    },
+    {
+      "kind": "implementation_plan",
+      "path": "implementation-plan.md"
+    },
+    {
+      "kind": "changes",
+      "path": "changes.md"
+    },
+    {
+      "kind": "verification",
+      "path": "verification.md"
+    },
+    {
+      "kind": "checkpoint",
+      "path": "checkpoints/M01.md"
+    },
+    {
+      "kind": "code_baseline",
+      "path": "code-baseline.json"
+    },
+    {
+      "kind": "evidence",
+      "path": "evidence/M01.json"
+    },
+    {
+      "kind": "evidence",
+      "path": "evidence/M02.json"
+    },
+    {
+      "kind": "evidence",
+      "path": "evidence/I01.json"
+    },
+    {
+      "kind": "evidence",
+      "path": "evidence/I02.json"
+    },
+    {
+      "kind": "evidence",
+      "path": "evidence/final-state-check.json"
+    },
+    {
+      "kind": "history",
+      "path": "history/implementation-plan.before-resume.md"
+    },
+    {
+      "kind": "history",
+      "path": "history/M01.before-resume.md"
+    }
+  ],
+  "changed_files": [],
+  "development_run_id": null,
+  "code_baseline": {
+    "id": "13a2b905dc7dfab066935c52f66fb8821b6385ca152d81abf64f85da64fa5215",
+    "evidence": "code-baseline.json",
+    "coverage": [
+      "checkout.py",
+      "integration_check.py",
+      "shipping.py"
+    ]
+  },
+  "acceptance_results": [],
+  "defects": [],
+  "questions": [],
+  "unresolved_items": [
+    "I02 offline failure; restore environment and rerun original check."
+  ],
+  "block_reason": "Required integration_check.py failed exit 1: required integration environment is offline; fixture must not bypass this check."
+}

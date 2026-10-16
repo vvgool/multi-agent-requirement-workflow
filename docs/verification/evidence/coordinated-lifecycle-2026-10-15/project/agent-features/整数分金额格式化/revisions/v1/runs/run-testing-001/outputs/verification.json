@@ -1,0 +1,35 @@
+[
+  {
+    "check": "independent-acceptance",
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+      "-B",
+      "-I",
+      "-S",
+      "/Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project/agent-features/\u6574\u6570\u5206\u91d1\u989d\u683c\u5f0f\u5316/revisions/v1/runs/run-testing-001/outputs/acceptance-check.py",
+      "/Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project"
+    ],
+    "cwd": "/Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project",
+    "returncode": 0,
+    "stdout": "{\n  \"python\": \"3.9.6 (default, Aug 25 2026, 21:26:21) \\n[Clang 21.0.0 (clang-2100.3.34.2)]\",\n  \"site_disabled\": 1,\n  \"isolated\": 1,\n  \"bytecode_disabled\": true,\n  \"results\": [\n    {\n      \"id\": \"AC-001\",\n      \"status\": \"passed\",\n      \"cases\": 4\n    },\n    {\n      \"id\": \"AC-002\",\n      \"status\": \"passed\",\n      \"cases\": 4\n    },\n    {\n      \"id\": \"AC-003\",\n      \"status\": \"passed\",\n      \"cases\": 2\n    },\n    {\n      \"id\": \"AC-004\",\n      \"status\": \"passed\",\n      \"cases\": 3\n    },\n    {\n      \"id\": \"AC-005\",\n      \"status\": \"passed\",\n      \"cases\": 7\n    },\n    {\n      \"id\": \"AC-006\",\n      \"status\": \"passed\",\n      \"actual\": \"-I -S stdlib-only interpreter, explicit local import and AST constraints passed\"\n    },\n    {\n      \"id\": \"REG-001\",\n      \"status\": \"passed\",\n      \"cases\": 1029\n    },\n    {\n      \"id\": \"REG-002\",\n      \"status\": \"passed\",\n      \"cases\": 8\n    }\n  ]\n}\n",
+    "stderr": ""
+  },
+  {
+    "check": "development-tests-regression",
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+      "-B",
+      "-S",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-v"
+    ],
+    "cwd": "/Users/wiesenwang/Agents/multi-agent-requirement-workflow/docs/verification/evidence/coordinated-lifecycle-2026-10-15/project",
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "test_ac001_examples (test_amount.AmountTests) ... ok\ntest_ac002_boundaries (test_amount.AmountTests) ... ok\ntest_ac003_precision (test_amount.AmountTests) ... ok\ntest_ac004_negative_integers (test_amount.AmountTests) ... ok\ntest_ac005_non_integer_inputs (test_amount.AmountTests) ... ok\ntest_ac006_imported_function (test_amount.AmountTests) ... ok\ntest_chunk_boundaries_and_very_large_integer (test_amount.AmountTests) ... ok\ntest_small_range_regression (test_amount.AmountTests) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.009s\n\nOK\n"
+  }
+]

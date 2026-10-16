@@ -1,0 +1,6 @@
+documents:
+  provider: local
+  requirements:
+    provider: local
+    path: requirements.md
+    access: read

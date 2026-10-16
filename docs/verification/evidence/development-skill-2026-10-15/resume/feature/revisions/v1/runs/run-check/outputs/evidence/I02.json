@@ -1,0 +1,14 @@
+{
+  "check": "I02",
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "-B",
+    "integration_check.py"
+  ],
+  "cwd": "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-hku9qg2v/resume/project",
+  "time": "2026-10-15T08:30:56.670620+00:00",
+  "baseline": "13a2b905dc7dfab066935c52f66fb8821b6385ca152d81abf64f85da64fa5215",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/development-skill-check-hku9qg2v/resume/project/integration_check.py\", line 1, in <module>\n    raise RuntimeError(\"required integration environment is offline; fixture must not bypass this check\")\nRuntimeError: required integration environment is offline; fixture must not bypass this check\n"
+}

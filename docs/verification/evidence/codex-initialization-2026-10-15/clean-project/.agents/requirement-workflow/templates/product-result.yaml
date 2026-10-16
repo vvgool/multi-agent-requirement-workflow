@@ -1,0 +1,12 @@
+schema_version: 1
+feature_id: null
+requirements_revision: 1
+run_id: null
+role: product
+status: null # ready、needs_input 或 blocked
+summary: null
+artifacts: [] # 每项为 kind 和 path，path 相对当前 run 的 outputs/；requirements 与 quality_check 可指向同一文稿
+acceptance_ids: []
+questions: [] # 每项为 question 和 impact
+assumptions: [] # 每项为 statement 和 confirmed
+block_reason: null

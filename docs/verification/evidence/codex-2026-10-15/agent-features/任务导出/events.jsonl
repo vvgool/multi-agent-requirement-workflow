@@ -1,0 +1,9 @@
+{"time": "2026-10-15T07:02:46.114309+00:00", "state_version": 2, "event": "run prepared"}
+{"time": "2026-10-15T07:02:46.118051+00:00", "state_version": 3, "event": "native dispatch about to be invoked"}
+{"time": "2026-10-15T07:03:15.904891+00:00", "state_version": 4, "event": "native agent ID received"}
+{"time": "2026-10-15T07:03:44.654630+00:00", "state_version": 5, "event": "product ended needs_input; fixture questions persisted"}
+{"time": "2026-10-15T07:03:44.667603+00:00", "state_version": 6, "event": "run prepared"}
+{"time": "2026-10-15T07:03:44.674071+00:00", "state_version": 7, "event": "native dispatch about to be invoked"}
+{"time": "2026-10-15T07:04:05.714161+00:00", "state_version": 8, "event": "native agent ID received"}
+{"time": "2026-10-15T07:05:32.217343+00:00", "state_version": 9, "event": "review content displayed in persisted test transcript; awaiting real user"}
+{"time": "2026-10-15T07:06:18.341544+00:00", "state_version": 10, "event": "indexed preserved clarification state evidence"}

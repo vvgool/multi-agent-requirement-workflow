@@ -1,0 +1,5 @@
+documents:
+  requirements:
+    provider: local
+    path: source.md
+    access: read

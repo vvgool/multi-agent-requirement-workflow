@@ -1,0 +1,4 @@
+documents:
+  requirements:
+    access: read
+    provider: feishu

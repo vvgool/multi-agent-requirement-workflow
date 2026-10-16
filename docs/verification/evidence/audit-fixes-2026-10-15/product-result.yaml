@@ -1,0 +1,20 @@
+schema_version: 1
+feature_id: 287a309b-cd6a-406e-9769-cc32a155e7f4
+requirements_revision: 1
+run_id: run-product-default
+role: product
+status: ready
+summary: 四种搜索结果状态的已确认规则已形成单份需求与自检，待协调层展示并取得用户确认。
+artifacts:
+- kind: requirements
+  path: requirements.md
+- kind: quality_check
+  path: requirements.md
+acceptance_ids:
+- AC-001
+- AC-002
+- AC-003
+- AC-004
+questions: []
+assumptions: []
+block_reason: null

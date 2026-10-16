@@ -1,0 +1,22 @@
+schema_version: 1
+feature_id: 679f8b18-0adc-43e0-9a46-2f6cf2a4ca31
+requirements_revision: 1
+run_id: run-product-layout-001
+role: product
+status: ready
+summary: 已根据完整本地输入生成需求及六项可验证验收，完成具体产品自检；仅可提交评审，未获用户审批。
+artifacts:
+- kind: requirements
+  path: requirements.md
+- kind: quality_check
+  path: requirements.md
+acceptance_ids:
+- AC-001
+- AC-002
+- AC-003
+- AC-004
+- AC-005
+- AC-006
+questions: []
+assumptions: []
+block_reason: null

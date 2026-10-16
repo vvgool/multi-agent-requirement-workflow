@@ -1,0 +1,22 @@
+schema_version: 1
+state_version: 1
+feature_id: EVAL-normal
+requirements_revision: 1
+stage: testing
+execution_status: running
+approval:
+  review_digest: 1f427e6d1b0791c6e34a6d051ebb050319fee2ee696927f2784954419fc87512
+  evaluation_fixture: true
+active_run:
+  run_id: run-testing-check
+  role: testing
+  revision: 1
+  dispatch_status: running
+  host_task_id: evaluation-fixture
+development_baseline:
+  run_id: run-check
+  code_baseline:
+    type: sha256
+    files:
+      shipping.py: ec03de735ab8873e501d26a54fee555271bbfc35922bb06058a0aa76c118978f
+      checkout.py: d3f9bce561480c559f0f164b30ce7326554775410a94f7518e48032d58cd19aa

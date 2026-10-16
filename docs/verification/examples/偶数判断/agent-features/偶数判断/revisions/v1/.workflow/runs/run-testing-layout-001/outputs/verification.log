@@ -1,0 +1,36 @@
+Baseline precheck: PASS; synthetic approval fixture only.
+Python: 3.9.6 (default, Aug 25 2026, 21:26:21) 
+[Clang 21.0.0 (clang-2100.3.34.2)]
+cwd: /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development
+Command: /Applications/Xcode.app/Contents/Developer/usr/bin/python3 -B -m unittest discover -s tests -v
+test_integer_parity_and_boolean_result (test_parity.ParityTests) ... ok
+test_rejects_non_integer_types_without_conversion (test_parity.ParityTests) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+
+Exit code: 0
+Command: /Applications/Xcode.app/Contents/Developer/usr/bin/python3 -B /var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-testing-layout-001/outputs/acceptance-check.py
+AC-001 0 => True PASS
+AC-001 2 => True PASS
+AC-001 -2 => True PASS
+AC-001 1 => False PASS
+AC-001 -1 => False PASS
+AC-001 1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 => True PASS
+AC-001 -1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001 => False PASS
+AC-002 True => TypeError PASS
+AC-002 False => TypeError PASS
+AC-002 1.0 => TypeError PASS
+AC-002 '2' => TypeError PASS
+AC-002 None => TypeError PASS
+AC-002 [] => TypeError PASS
+AC-002 {} => TypeError PASS
+AC-002 2j => TypeError PASS
+AC-003 static source inspection: pure function, no imports, CLI, network or third-party dependency PASS
+Independent acceptance: PASS
+
+Exit code: 0
+Development formal-document links: [{"document": "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/documents/development.md", "link": "../../../../../../../../../../../../private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/documents/requirements.md", "resolved": "/private/private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/documents/requirements.md"}, {"document": "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/documents/development.md", "link": "../../../../../../../../../../../../private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-development-layout-001/outputs/verification.log", "resolved": "/private/private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-development-layout-001/outputs/verification.log"}, {"document": "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/documents/development.md", "link": "../../../../../../../../../../../../private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-development-layout-001/outputs/code-baseline.json", "resolved": "/private/private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-development-layout-001/outputs/code-baseline.json"}]
+Final identity, approval, task, code and protected-input recheck: PASS; unchanged.

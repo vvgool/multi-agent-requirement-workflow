@@ -1,0 +1,142 @@
+# Multi-Agent Requirement Workflow
+
+由协调 Agent 在宿主会话内按状态调用产品、开发、测试 Agent，完成需求澄清、用户确认、实现、独立验收和修复。使用宿主原生能力，不提供工作流 CLI 或后台调度服务，不自动执行生产发布。
+
+## 快速开始
+
+支持 Codex、Claude Code 和 OpenCode。需要宿主具备项目文件读写、Git 获取及原生子 Agent 派发能力；初始化不需要独立工作流 CLI 或全局插件。
+
+在**目标业务项目**中打开 Agent 会话，发送：
+
+```text
+请从 https://github.com/vvgool/multi-agent-requirement-workflow 获取需求协作框架。
+在临时目录获取代码，读取其中 skills/setup-requirement-workflow/SKILL.md，
+为当前项目初始化，使用当前宿主的适配。
+首次安装解析仓库默认分支并固定实际完整提交 SHA 和包摘要；
+已有 workflow.lock.yaml 时按锁恢复，不自动升级。
+保留项目已有规则和配置，不提交完整框架缓存。
+分别报告文件安装、原生角色激活和未完成项。
+```
+
+这是由宿主 Agent 获取仓库并执行初始化 Skill，URL 本身不会自动注册角色，也不是原生插件安装命令。私有仓库需要当前环境已有访问权限；使用现有 Git/GitHub 登录，不把令牌写进 URL 或配置。
+
+第一次安装默认取当时的默认分支，随后锁定实际提交。团队需要统一版本时，在提示中指定完整提交 SHA 或 tag；tag 也必须解析成完整 SHA 后入锁。安装步骤见 [初始化 Skill](skills/setup-requirement-workflow/SKILL.md) 和 [Git 获取规则](skills/setup-requirement-workflow/references/installation.md#githubgit-url-获取)。
+
+### 初始化后会产生什么
+
+| 内容 | 是否提交 |
+| --- | --- |
+| workflow.yaml：项目策略 | 是 |
+| workflow.lock.yaml：Git URL、完整提交、版本和包摘要 | 是 |
+| AGENTS.md 中的短入口、当前宿主的三个薄角色、.gitignore 区块 | 是 |
+| Claude Code 的 CLAUDE.md 短桥接 | 使用 Claude Code 时提交 |
+| .agents/requirement-workflow-cache/、本机回执和中断记录 | 否 |
+
+全新项目 Codex/OpenCode 默认涉及 7 个文件，Claude Code 8 个；已有文件保留原文，只添加受管区块。三个宿主可按需增量安装，共用一个版本锁，不必一次生成全部宿主文件。
+
+协调 Agent **运行在主会话**：宿主读取项目 AGENTS.md 后，按版本锁定位缓存，再加载 agents/coordinator-agent.md 和状态路由规则。因此只注册产品、开发、测试三个原生子 Agent。入口详见 [宿主适配](workflow/host-adapters.md)。
+
+### 验证并使用
+
+安装后开启新会话或使用宿主已支持的重载方式，发送：
+
+```text
+按项目 AGENTS.md 加载需求协作入口。
+只读核对框架版本，并实际验证产品、开发、测试三个原生角色是否可调用。
+不创建需求，不执行开发。
+```
+
+角色可用后，直接提出需求：
+
+```text
+按需求协作流程处理“用户签到奖励”：
+每账号每天首次签到奖励10积分，北京时间零点刷新。
+先澄清需求，当前修订经我确认后再开发。
+```
+
+继续已有需求：`继续“用户签到奖励”，先核对状态和活动任务。`
+
+### 团队、换机与升级
+
+同事克隆业务项目后，发送：
+
+```text
+按当前项目 workflow.lock.yaml 获取并核验固定提交的框架，
+补齐当前宿主的本机需求协作环境。保留版本和已有文件，不自动升级。
+```
+
+初始仓库 URL 用于找到框架；后续以项目锁为准。升级需要明确提出，并确认旧活动任务结束。旧快照或 manual 锁不会因为仓库上线而自动换源。
+
+无法联网时，可先在有权限的机器获取相同提交的代码，再向 Agent 提供本地包目录；已有 Git 锁须核实该目录确实对应锁定提交，无法证明时停止，不能改成 manual 绕过。无锁的新项目仍可按手动包安装。
+
+三个宿主的文件初始化已有隔离验证；**真实原生角色激活及完整需求闭环仍待验证**。无原生选择能力时记录 pending，不使用通用 Agent 冒充通过。完整开发仓库中的 [验证索引](https://github.com/vvgool/multi-agent-requirement-workflow/tree/main/docs/verification) 记录实际边界；该目录不随核心包安装。
+
+## 角色与流程
+
+| 角色 | 职责 | 工作流入口 |
+| --- | --- | --- |
+| [协调](agents/coordinator-agent.md) | 状态路由、宿主派发、交接、用户确认和成果索引 | [协调路由](workflow/routing.md)；按条件加载 Issue 支持 Skill |
+| [产品](agents/product-agent.md) | 澄清业务规则，整理需求与验收标准 | [requirement-analysis](skills/requirement-analysis/SKILL.md) |
+| [开发](agents/development-agent.md) | 技术设计、模块/任务规划、实现、完整功能自验及基线 | [feature-development](skills/feature-development/SKILL.md) |
+| [测试](agents/testing-agent.md) | 核对需求/实现/用例偏离，独立验收、回归和缺陷报告 | [acceptance-testing](skills/acceptance-testing/SKILL.md) |
+
+阶段为 draft → requirement_review → development → testing → completed；测试失败回开发。开发前必须取得当前修订的真实用户确认；同名续改按 [修订规则](workflow/revisions.md) 保留历史，新版重新确认。恢复先核对活动任务，不能重复派发未知调用。
+
+阶段 Agent 自行加载所属 Skill 和落盘模板。产品先核实事实、再按关键决策分轮澄清；小需求默认需求稿、开发记录和测试报告三份。复杂开发才展开技术方案、按依赖排序的大模块与小任务计划、整体自验；普通/长任务按模块选择。开发优先遵循项目规则，缺少架构约定时按 Clean Architecture 原则做最小设计。
+
+## 工作空间与人工入口
+
+```text
+目标工作空间/
+  workflow.yaml                   # 项目策略
+  workflow.lock.yaml              # 框架来源、固定版本与摘要
+  AGENTS.md                       # 简短主会话入口
+  .codex/、.claude/或.opencode/    # 只生成当前宿主的三个薄角色
+  .agents/requirement-workflow-cache/<sha256>/ # 本地缓存，Git忽略
+  agent-features/<需求名称>/
+    README.md                      # 人工入口：进度、有效文稿、待办及 Issue 同步提示
+    status.yaml
+    events.jsonl
+    revisions/vN/
+      input.md
+      documents.yaml               # 有文档覆盖策略时才创建
+      documents/                   # 正式需求稿、开发记录、测试报告
+      .workflow/
+        review-manifest.yaml
+        runs/<run_id>/             # 任务、结果、候选文稿及必要证据
+        issue-sync/<sync_key>/     # 启用且有获授权事件时才创建
+```
+
+用户使用需求名称，内部 feature_id 稳定不变。配置与需求目录相对用户指定的工作空间解析；锁定包按摘要从本地缓存定位，框架来源目录不是默认工作空间。详情见 [配置](workflow/config.md)、[成果目录](workflow/output-layout.md) 和 [共享与路径定位](workflow/portability.md)。旧布局按原索引读取，不搬迁已批准文稿或重算审批。
+
+人工日常只需看需求根 README；评审看当前 requirements.md，交付看 test-report.md 和实际功能。执行记录仅在排查或恢复时展开。
+
+## 文档来源与 Issue 留痕
+
+[workflow.yaml](workflow.yaml) 提供本地/飞书文档策略。修订内 documents.yaml 仅覆盖文档来源；Issue 的需求级策略保存在根状态。飞书受控写回目前仅覆盖产品需求正文，技术方案和测试报告仍输出本地文稿。权限和来源校验见 [文档规则](workflow/documents.md)。
+
+Issue 默认关闭：
+
+```yaml
+issue_tracking:
+  binding: "off"   # off / optional / required
+  sync: "off"      # off / milestones
+```
+
+optional 在首次派发前选择绑定或跳过；required 在业务派发前要求绑定。sync=milestones 且用户明确授权目标后，协调主会话通过 [issue-tracking](skills/issue-tracking/SKILL.md) 在评审、确认、开发交付、测试失败、阻塞及完成等节点评论。选择和授权跨本需求修订保存，也可只对单个需求启用。
+
+首版只关联已有 GitHub/GitLab Issue，不创建/关闭 Issue，不改标签或负责人。评论失败独立记录，不回退业务；未知写入先核实，不盲目重发。使用宿主已有连接能力。详细身份、授权及恢复语义见 [Issue 规则](workflow/issue-tracking.md)。
+
+## 验证与维护
+
+初始化区分文件安装、当前宿主原生激活和完整需求闭环，具体以本项目本机回执为准。共享框架的开发验证入口为完整目录中的 docs/verification/README.md；历史手动加载正常闭环及旧快照证据不能作为当前三宿主原生通过的证明。真实飞书和Issue平台联调仍需独立完成。
+
+共享发布包包含framework.yaml、AGENTS.md、README.md、workflow.yaml、agents/、skills/、workflow/、templates/。docs/和本框架自身agent-features/不默认安装到业务项目。三个宿主不需要使用相同插件格式；插件只作为可选分发方式。
+
+业务项目通常只需提交workflow.yaml、workflow.lock.yaml、入口和当前宿主的三个薄角色，以及精确的.gitignore区块；Claude Code按需多一份CLAUDE.md短桥接。完整包缓存和本机探测回执不提交。换机按锁重建环境，显式升级项目绑定；用户修改的入口不覆盖，旧包和需求证据不自动清理。详情见 [包与版本规则](workflow/package.md)。
+
+旧 `.agents/requirement-workflow/installation.json` 快照安装保持原状，不自动迁移。本框架不新增后台服务或跨会话锁，同一需求仅一个协调会话推进。升级/换宿主前确认旧任务结束；审批、开发基线和历史run不得改写。更完整的目标和职责说明位于开发目录docs/planning/。
+
+## 仓库与安装来源
+
+源码：https://github.com/vvgool/multi-agent-requirement-workflow。推荐使用 Git 来源；锁定提交和实际包摘要共同确定安装身份。共享核心包含哪些文件、如何计算摘要以及旧版兼容，见 [包与版本规则](workflow/package.md)。

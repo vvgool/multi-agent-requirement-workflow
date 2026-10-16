@@ -1,0 +1,33 @@
+{
+  "type": "sha256-files",
+  "files": {
+    "parity.py": "c8650882975ce0d4112920dbcaf7f333ccf819a51e1b932e316a8a4d54c4aac3",
+    "tests/test_parity.py": "5ad1f9cde124764c761af8d8768281ad1116885710e45ec9346264a03bbe2648"
+  },
+  "aggregate_sha256": "5e7f67c361e7ef1c9b5701d727710851fd2f639f45b461e7aa07579e83bf7578",
+  "evidence": "code-baseline.json",
+  "protected_input_sha256": {
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-testing-layout-002/task.yaml": "ccc8aeb82bb8151373bc75a657d34950fc8c2edc7e4a6e3c5f9725b0d7a4e3ed",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/status.yaml": "a147b98c2d64dfd1f8c2b46af87904d5919a0d281eb4e48792803ce4d10912a4",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/documents/requirements.md": "d91565dbdfc440d5c55279186af6640a404cff7a8fa65b244776c807342b96fc",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/AGENTS.md": "02358047c527c3d78d7bc9a7bc772b87afc1bbb50803b276bf7b643e20405799",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/review-manifest.yaml": "97a50bbf57867b0f3926e3d9dcb5d0e33c54dbebb5d4a38ccdf53197947b2e65",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/documents/development.md": "3ac2786a179ca40c47fff9333025e68989c86acebb62b1fc86fab4f8675766e2",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-development-layout-001/result.yaml": "2d0f8d9c376cff6947b4e9e9c190f07d802cf0f95269752399b0e4ad08fcdc53",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-development-layout-001/outputs/development.md": "25b4fb17c8426318e446c6778df4749c074647cbef53076f51dc110340704d1f",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-development-layout-001/outputs/verification.log": "ab4989d713c745de8e785d86b96afd3cb31ff6655585c7d22bfbba893bd54e43",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-development-layout-001/outputs/code-baseline.json": "9646003dad427c2750ae88fc7bf9090910e90bb171d30bcb203aeba48aae7ba6",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/parity.py": "c8650882975ce0d4112920dbcaf7f333ccf819a51e1b932e316a8a4d54c4aac3",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/tests/test_parity.py": "5ad1f9cde124764c761af8d8768281ad1116885710e45ec9346264a03bbe2648",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-development-layout-001/effective-config.yaml": "35a9de2087779dd72087a2dfffd4861947c7682c42c63276d4c135d1884539e6",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-testing-layout-001/result.yaml": "6d15ff33b321096ab9fe308d0839fcda2de9744b5dca1e71377f89aa5f4d4800",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-testing-layout-001/outputs/acceptance-check.py": "7cd3c47a4959503036bd708fdc71e154397010694a0fae686d2aedcf29124213",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-testing-layout-001/outputs/verification.log": "f4a6aee2a6ec1cf939a1b0fd3ef8363716dd2ef093aff114b744e259964c2f3a",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-testing-layout-001/outputs/code-baseline.json": "dfe8dd281176aa24ce918e0031ecf2d0e4a3b935d582ba7b96aa5669a395861f",
+    "/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/layout-validation-uu8xvdpr/development/agent-features/偶数判断/revisions/v1/.workflow/runs/run-testing-layout-001/outputs/test-report.md": "21b2fe55d14a1f92469551d8f0f6edf375d0b7cc172ad579d2f4d80c6e46747c"
+  },
+  "precheck": "passed",
+  "postcheck": "passed",
+  "prior_functional_evidence": "../../run-testing-layout-001/outputs/verification.log",
+  "prior_evidence_sha256": "f4a6aee2a6ec1cf939a1b0fd3ef8363716dd2ef093aff114b744e259964c2f3a"
+}

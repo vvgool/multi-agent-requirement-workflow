@@ -1,0 +1,11 @@
+test_ac1_nonnegative_fee (__main__.Acceptance) ... ok
+test_ac2_negative (__main__.Acceptance) ... ok
+test_ac3_checkout_integration (__main__.Acceptance) ... ok
+test_negative_propagation (__main__.Acceptance) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.017s
+
+OK
+
+exit_code=0
