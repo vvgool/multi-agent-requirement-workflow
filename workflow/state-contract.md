@@ -26,7 +26,8 @@
 | 当前阶段 | 条件 | 下一状态 |
 | --- | --- | --- |
 | draft | 信息不足，产品返回具体问题 | draft/waiting_user，active_run 清空，问题及结果保留 |
-| draft | 输入完整且已调用产品 | draft/running，保存真实宿主任务标识 |
+| draft | 无活动任务，仍有有效未决问题且无待处理变化/分析/产稿，仅部分答复、无新信息或已有选项解释 | draft/waiting_user，仅记录答复与决策，不创建 run |
+| draft | 首次需求整理、需新分析或答齐整理文稿，且已实际调用产品 | draft/running，保存真实宿主任务标识 |
 | draft | 产品返回 ready、质量检查记录及必要产物齐全，评审内容已展示 | requirement_review/waiting_user |
 | requirement_review | 用户对当前展示版本明确确认，摘要仍一致 | development/idle，检查开发角色并派发；角色缺失则 development/blocked、role_not_available |
 | development | 有效审批，开发 ready 且报告/代码基线交接完整 | testing/idle，检查测试角色并派发；角色缺失则 testing/blocked、role_not_available |
@@ -48,3 +49,13 @@
 6. 任一步中断恢复时核对根状态、run 文件和事件。事件缺失但状态已写入，核查后补记 recovery 事件；需 Issue 留痕的事实若有持久证据可还原原业务版本和事件内容，另按原 event_id 补齐一次原业务事件，recovery 仅引用它；无法还原时保留待核查，不从当前阶段猜造旧事件；发生矛盾则阻塞，不通过“补全历史”伪造成功。
 
 发现未知或旧字段时先读已有记录说明，迁移只在确定语义且无活动任务时进行。恢复不因为 schema 存量差异而删除历史信息。
+
+## 无新 run 的澄清更新
+
+draft 阶段的答复按 [产品路由](routing.md#产品澄清答复) 处理；记录格式与累计交接见 [交接](handoff.md#澄清记录与再次派发)。没有新调用仍须使动作可追踪：input.md 追加真实答复和决策依据；仍有有效未决问题且无待处理变化/分析/产稿时，根状态保持 draft/waiting_user，active_run=null，last_event 记 clarification_recorded 或 clarification_waiting；events.jsonl 引用输入记录及来源 run/result，记录动作、原因、未决问题与待处理答复位置。事件可关联来源 run，但不得伪称发生新调用或创建空 run。
+
+存在 active_run 时保留其身份、dispatch_status 和当前真实执行状态，追加新答复并以 clarification_pending 标记待处理，不清除任务、不改为无任务等待。确认原调用结束且结果交接核对后，再将累计答复和结果一并按路由重新决策，处理完成追加处理记录；真实 host 结束信息按原交接保存。
+
+上述持久化更新全部遵循“每次更新”：读取及再次比较 state_version、递增、回读、入口同步、同版本事件与冲突即停；不以只写 input.md 代替状态协议。恢复时先从状态、input.md、事件及来源结果重建当前有效问题、累计答复和待处理项，优先恢复未完成的分析/产稿决策；最新消息为空、重复或“继续”不能清除已保存的待处理动作。无活动任务但尚待分析/产稿时保留 clarification_pending 及对应输入引用，按路由继续；仅保存输入或准备派发不记为处理完成。已处理记录须关联覆盖这些输入的真实 run/适用结果；已有调用先核实，已有适用结果接续交接，不重复执行旧动作；状态已写而事件缺失按原恢复规则核查补记，矛盾时阻塞，不靠重派消除矛盾。无新答复的重复展示可以引用已有记录，不凭空产生答复或 run。
+
+澄清选择不写 approval/pending_review；产品 ready 后仍按文档规则展示并取得本版明确审批。已批准内容变化按修订规则保留历史并重新评审。
