@@ -4,13 +4,13 @@
 
 ## 包与内容身份
 
-框架包包含根 framework.yaml、AGENTS.md、README.md、workflow.yaml，以及 agents/、skills/、workflow/、templates/ 内的全部普通文件。排除 docs/、agent-features/、Git 元数据、宿主安装目录及本机回执。包内不接受符号链接或特殊文件，未知根文件不纳入包，不让整个开发仓库扫描成为安装步骤。
+框架包包含根 framework.yaml、AGENTS.md、README.md、workflow.yaml、LICENSE（存在时必须纳入），以及 agents/、skills/、workflow/、templates/ 内的全部普通文件。排除 docs/、agent-features/、Git 元数据、宿主安装目录及本机回执。包内不接受符号链接或特殊文件，未知根文件不纳入包，不让整个开发仓库扫描成为安装步骤。
 
 framework.yaml 仅含 schema_version=1、name、非空 version、protocol_version=1；它声明版本而非已发布事实。包名固定为 multi-agent-requirement-workflow。使用宿主文件/计算工具实际生成清单：所有包文件按相对 POSIX 路径升序，取 `[相对路径,原字节SHA256]`，将全部条目编码为 UTF-8 紧凑 JSON 数组（ensure_ascii=false、无额外空格），整体 SHA-256 为 package.sha256。framework.yaml 自身也参与，不在其中存自引用摘要。文本不转换换行；同名同版本不同字节按不同内容身份处理，不能自动接受。
 
 ## GitHub URL 与固定提交
 
-官方源码：https://github.com/vvgool/multi-agent-requirement-workflow。新项目可以直接向宿主提供仓库 URL；初始化按 [Git 获取步骤](../skills/setup-requirement-workflow/references/installation.md#githubgit-url-获取) 取得完整代码并解析实际提交。未指定版本时仅首次安装解析默认分支，最终锁中保存完整提交 SHA，后续恢复固定该提交，不跟随分支。私有仓库需要当前环境已有读取权限。仓库 URL 不是插件协议或工作流执行入口；仍须读取 setup Skill 并完成当前宿主适配。
+官方源码：https://github.com/vvgool/multi-agent-requirement-workflow。新项目可以直接向宿主提供仓库 URL；初始化按 [Git 获取步骤](../skills/setup-requirement-workflow/references/installation.md#githubgit-url-获取) 取得完整代码并解析实际提交。未指定版本时仅首次安装解析默认分支，最终锁中保存完整提交 SHA，后续恢复固定该提交，不跟随分支。官方仓库公开，可匿名读取；用户自行使用的私有来源仍需已有权限。仓库 URL 不是插件协议或工作流执行入口；仍须读取 setup Skill 并完成当前宿主适配。
 
 ## 项目内的两类文件
 
@@ -20,7 +20,7 @@ framework.yaml 仅含 schema_version=1、name、非空 version、protocol_versio
 
 锁文件使用 [模板](../skills/setup-requirement-workflow/assets/templates/workflow.lock.yaml)，只含 schema_version、package、source。package.name/version/protocol_version 必须与真实包一致，sha256 为64位小写十六进制。source.kind 为 git/manual：git 的 location 是用户明确的 HTTPS/SSH Git 地址、revision 是完整提交哈希，拒绝嵌入口令/令牌和本机路径；manual 的 location 是 `包名@版本` 分发标识、revision=null。手动包由同事提供或用户另行下载，标识不能自动解析为下载地址。没有真实仓库信息时使用 manual，不编造 Git URL/tag。Git 来源须从指定提交实际取包并复核内容，不将当前脏工作树冒称为该提交。
 
-锁文件是跨机器绑定；本机绝对路径只进入任务/回执，不写锁文件或薄角色。另一个人拉项目后按锁定来源取得包、核对摘要并本地初始化；提交配置不等于其机器已经安装。缺包返回 framework_not_installed，不自动使用最新全局包或其他项目的包。
+锁文件是跨机器绑定；本机绝对路径只进入任务/回执，不写锁文件或薄角色。另一个人拉项目后按锁定来源取得包、核对摘要并本地初始化；提交配置不等于其机器已经安装。缺包时主会话先按 [启动恢复](bootstrap.md) 从锁定来源恢复并核验；子角色直接返回 framework_not_installed。无法恢复则阻塞，不自动使用最新全局包或其他项目的包。
 
 ## 运行与版本
 

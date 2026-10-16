@@ -19,7 +19,7 @@
 分别报告文件安装、原生角色激活和未完成项。
 ```
 
-这是由宿主 Agent 获取仓库并执行初始化 Skill，URL 本身不会自动注册角色，也不是原生插件安装命令。私有仓库需要当前环境已有访问权限；使用现有 Git/GitHub 登录，不把令牌写进 URL 或配置。
+这是由宿主 Agent 获取仓库并执行初始化 Skill，URL 本身不会自动注册角色，也不是原生插件安装命令。官方仓库公开，读取和安装无需 GitHub 登录；自行使用私有来源时使用已有认证，不把令牌写进 URL 或配置。
 
 第一次安装默认取当时的默认分支，随后锁定实际提交。团队需要统一版本时，在提示中指定完整提交 SHA 或 tag；tag 也必须解析成完整 SHA 后入锁。安装步骤见 [初始化 Skill](skills/setup-requirement-workflow/SKILL.md) 和 [Git 获取规则](skills/setup-requirement-workflow/references/installation.md#githubgit-url-获取)。
 
@@ -63,7 +63,13 @@
 
 ### 团队、换机与升级
 
-同事克隆业务项目后，发送：
+同事克隆业务项目后，直接发起或继续需求即可：主会话从已提交的 AGENTS.md 读取自包含入口，缓存缺失时从版本锁指定的完整提交获取核心，先核验摘要，再补本机缓存和回执；成功后才加载协调规则。缓存已完整时可以离线启动。Git缺失、离线且无缓存、提交不可得、摘要或入口不符时明确阻塞，不改锁或需求状态。
+
+自动恢复仅限本地缓存/回执，不会自动升级、生成新宿主角色或覆盖用户修改。只读检查不会触发下载或修复。原生角色仍需当前宿主实际支持；恢复文件不代表激活完成。详细步骤见 [启动与恢复](workflow/bootstrap.md)。
+
+也可以单独要求补环境：
+
+
 
 ```text
 按当前项目 workflow.lock.yaml 获取并核验固定提交的框架，
@@ -136,7 +142,7 @@ optional 在首次派发前选择绑定或跳过；required 在业务派发前�
 
 初始化区分文件安装、当前宿主原生激活和完整需求闭环，具体以本项目本机回执为准。验证范围见 docs/verification/README.md；历史手动加载正常闭环及旧快照证据不能作为当前三宿主原生通过的证明。真实飞书和Issue平台联调仍需独立完成。
 
-共享发布包包含framework.yaml、AGENTS.md、README.md、workflow.yaml、agents/、skills/、workflow/、templates/。docs/不默认安装到业务项目。框架自身agent-features/、早期docs/superpowers/、完整验证夹具及运行记录仅保留本地，不进入当前仓库版本。三个宿主不需要使用相同插件格式；插件只作为可选分发方式。
+共享发布包包含framework.yaml、LICENSE、AGENTS.md、README.md、workflow.yaml、agents/、skills/、workflow/、templates/。docs/不默认安装到业务项目。框架自身agent-features/、早期docs/superpowers/、完整验证夹具及运行记录仅保留本地，不进入当前仓库版本。三个宿主不需要使用相同插件格式；插件只作为可选分发方式。
 
 业务项目通常只需提交workflow.yaml、workflow.lock.yaml、入口和各目标宿主的三个薄角色，以及精确的.gitignore区块；Claude Code按需多一份CLAUDE.md短桥接。完整包缓存和本机探测回执不提交。换机按锁重建环境，显式升级项目绑定；用户修改的入口不覆盖，旧包和需求证据不自动清理。详情见 [包与版本规则](workflow/package.md)。
 
@@ -157,3 +163,7 @@ templates/           # 交接及状态模板
 docs/planning/       # 当前目标与职责
 docs/verification/README.md  # 精简验证摘要
 ```
+
+## 开源许可
+
+本项目使用 [MIT License](https://github.com/vvgool/multi-agent-requirement-workflow/blob/main/LICENSE)。分发核心包时保留LICENSE；早期无LICENSE的包按其原清单校验，版本锁不会因仓库公开而自动迁移。

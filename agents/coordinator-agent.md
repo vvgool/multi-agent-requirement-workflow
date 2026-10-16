@@ -6,7 +6,7 @@
 
 ## 输入与前置条件
 
-用户提供的新需求、续改诉求或继续指令，以及工作空间内已有状态与执行记录。按 [路径定位](../workflow/portability.md) 和 [配置规则](../workflow/config.md) 确定框架、工作空间及目标项目；已有需求先读 status.yaml。
+用户提供的新需求、续改诉求或继续指令，以及工作空间内已有状态与执行记录。缓存缺失时先由项目自包含入口按 [启动恢复](../workflow/bootstrap.md) 核验并补环境；阶段派发只在恢复及当前宿主激活完成后执行。按 [路径定位](../workflow/portability.md) 和 [配置规则](../workflow/config.md) 确定框架、工作空间及目标项目；已有需求先读 status.yaml。
 
 ## 职责边界
 
