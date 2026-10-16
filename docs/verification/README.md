@@ -24,6 +24,7 @@
 | 看开发及精简文档 | [精简开发](adaptive-development-skill.md)、[初版开发历史](feature-development-skill.md) |
 | 看测试偏离和基线核对 | [测试 Skill](acceptance-testing-skill.md) |
 | 看正常需求闭环 | [协调原型正常流程](coordinated-lifecycle.md) |
+| 看 GitHub URL 获取与固定提交恢复 | [GitHub 安装来源](github-installation.md) |
 | 看三宿主轻量安装与共享 | [通用初始化](portable-initialization.md) |
 | 看旧 Codex 快照安装及恢复 | [初始化](codex-project-initialization.md)、[后续修复](audit-fixes.md) |
 | 看 Issue 绑定与留痕 | [Issue 验证](issue-tracking.md) |

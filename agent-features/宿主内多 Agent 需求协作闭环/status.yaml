@@ -1,5 +1,5 @@
 schema_version: 1
-state_version: 26
+state_version: 27
 feature_id: REQ-001
 title: 宿主内多 Agent 需求协作闭环
 stage: draft
@@ -20,7 +20,7 @@ artifacts:
 - kind: feature_index
   path: README.md
   revision: 1
-  sha256: b5a882dc3e6994df571fbd77c139a1490e5c64be9b8a238c67fdb3fa780dd1f4
+  sha256: 2d4908229af176d4c83c93811a028870df7b1b204f14e63b84e3a7badf3590cc
 - kind: output_layout_verification
   base: workspace
   path: docs/verification/output-layout.md
@@ -153,7 +153,10 @@ artifacts:
 - kind: portable_initialization_verification
   base: workspace
   path: docs/verification/portable-initialization.md
-last_event: 通用包与版本锁、三宿主薄入口已实现并隔离验证；真实原生调用和完整闭环待验
+- kind: github_installation_verification
+  base: workspace
+  path: docs/verification/github-installation.md
+last_event: 已上传GitHub私有仓库并提供URL初始化；实际远程获取、固定提交恢复与字节核对通过，原生激活待验
 implementation_review:
   status: accepted
   user_response: 可以
@@ -288,3 +291,12 @@ milestones:
     native_role_registration_verified: false
     end_to_end_verified: false
     existing_business_installation_modified: false
+  github_source:
+    status: remote_fetch_and_locked_commit_restore_verified
+    evidence: docs/verification/github-installation.md
+    repository: https://github.com/vvgool/multi-agent-requirement-workflow
+    visibility: private
+    package_version: 0.2.1
+    package_sha256: c8eabcfd018d228c7bdb65f33ecbf541366fd850f1a35b6bef529c0fb02ad5bb
+    native_role_registration_verified: false
+    end_to_end_verified: false
