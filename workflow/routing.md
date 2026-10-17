@@ -12,7 +12,7 @@
 ## 决策顺序
 
 1. 核对需求身份、版本和状态。已有状态缺失、未知或矛盾时阻塞核查。
-2. active_run 非空先查询、等待或重连。prepared/unknown 先核实调用是否发生，即使 execution_status=idle 也不能重复派发。
+2. active_run 非空先查询、等待或重连；期间可按 [协调消费](execution-contract.md#协调消费) 处理同 run 的开发方案通知，仅展示已核对完整版本，不将其视为最终结果、不清任务或增加调用次数。prepared/unknown 先核实调用是否发生，即使 execution_status=idle 也不能重复派发。
 3. waiting_user 先处理原问题或 pending_review；只有对应当前评审的明确回复才算批准。
 4. blocked 先验证解除条件，普通“继续”不能清除阻塞。
 5. 无活动任务且每次业务派发前（或用户明确改变关联策略时），按 [Issue 规则](issue-tracking.md) 处理前置绑定。已有选择按策略复用；required 未满足时不派发业务角色，保留当前 stage。同步失败不作为业务 blocked 条件。

@@ -1,0 +1,18 @@
+schema_version: 1
+feature_id: null
+requirements_revision: 1
+run_id: null
+role: development
+framework: null # 与task一致；无锁历史任务保持原实际身份，不伪造包
+kind: plan_ready # 完整首稿plan_ready，完整后续plan_updated；真实部分稿plan_partial，仅needs_input/blocked；不是最终result
+document_version: 1
+document_mode: full # simple或full
+artifacts: [] # 每项kind/path/sha256；path相对output_dir，实际原字节SHA256，禁止..和链接
+missing_artifacts: [] # full部分稿列尚缺technical_plan/implementation_plan；与已有稿互斥；完整稿为空
+execution:
+  status: running # running/needs_input/blocked；最终ready仍由result交接
+  summary: null
+  questions: []
+  block_reason: null
+previous_manifest_sha256: null # 首次null，后续为上一个完整清单原字节摘要
+# 更新意图development-progress.pending.yaml及原子提交/双读/编辑保护见workflow/execution-contract.md

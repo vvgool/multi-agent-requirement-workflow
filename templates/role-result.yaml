@@ -5,7 +5,8 @@ run_id: null
 role: null
 status: null # development: ready/needs_input/blocked；testing: passed/failed/blocked；双方均可 stale_task
 summary: null
-artifacts: [] # 每项含 kind 和 path；path 相对本 run outputs/。按实际内容索引，允许简版一份文档包含方案/任务/自验
+artifacts: [] # 每项含 kind 和 path；有末次通知的文稿还须 sha256，与通知原字节一致；path 相对本 run outputs/。按实际内容索引，允许简版一份文档包含方案/任务/自验
+development_progress: null # 可选{path,document_version,sha256}，path相对output_dir；开发末次已提交通知，ready须完整稿；最终链接/清单/result按execution-contract收敛后才交接；旧任务缺失兼容，最终artifacts字节须一致
 changed_files: [] # 开发改动路径相对目标项目
 development_run_id: null # 测试结果必须关联待测开发 run
 code_baseline: null # ready/passed/failed 必填；格式及存量兼容见 workflow/code-baseline.md

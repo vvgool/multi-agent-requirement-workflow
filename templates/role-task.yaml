@@ -17,6 +17,7 @@ development_baseline: null # 测试必填：run_id 与 code_baseline；见 workf
 defect_report_path: null # 修复任务必填，首次开发可为空
 required_files: [] # 测试必含原开发 result 以定位基线来源，再按产物索引读取方案、计划和自验内容，可合并在同一文档；已有用例一并提供
 output_dir: null # 当前run的outputs/，候选文稿与证据
+progress_path: null # 新开发任务填output_dir/development-progress.yaml；仅授权本run进度清单，不扩权；旧任务缺字段按output_dir定位，无历史通知不伪造
 result_path: null # 布局2必须填当前run/result.yaml；artifacts仍相对output_dir
 write_scope:
   project_paths: [] # 开发明确允许的业务代码范围
