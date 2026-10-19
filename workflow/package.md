@@ -24,11 +24,17 @@ framework.yaml 仅含 schema_version=1、name、非空 version、protocol_versio
 
 ## 运行与版本
 
-新轻量安装的框架根目录固定为项目根下 `.agents/requirement-workflow-cache/<锁定sha256>`；每次派发校验包清单、当前宿主薄角色与入口及其实际生效状态。缓存或薄角色被修改返回 framework_integrity_mismatch/adapter_modified。读取不同宿主的回执不能证明当前宿主生效。初始化 pending 存在时先恢复，不能运行半安装结果。
+新轻量安装的框架根目录固定为项目根下 `.agents/requirement-workflow-cache/<锁定sha256>`；首次进入当前会话时完整校验包清单、当前宿主薄角色与入口及其实际生效状态；后续按下节复用未变化的环境核验。缓存或薄角色被修改返回 framework_integrity_mismatch/adapter_modified。读取不同宿主的回执不能证明当前宿主生效。初始化 pending 存在时先恢复，不能运行半安装结果。
 
-新 task 携带 framework={name,version,protocol_version,sha256} 和当机 framework_root。根状态 active_run 同时保存这份绑定；run 下保存 framework-lock.yaml 快照，供恢复审计。子角色核对 task、active_run 和真实包身份；新初始化但无绑定的任务不能视为旧任务。旧快照安装和无锁的历史任务按原契约读取，不回写身份或重新计算旧审批。
+新 task 携带 framework={name,version,protocol_version,sha256} 和当机 framework_root。根状态 active_run 同时保存这份绑定；锁原字节按SHA256保存到本修订 .workflow/snapshots/framework-<锁文件摘要>.yaml，相同内容只保存一份，复用前核对普通文件、无链接及原字节摘要，已有快照不符则阻塞而不覆盖；task.framework_lock记录相对feature_dir的path及真实sha256，恢复时核对内容与task.framework及来源。旧run的framework-lock.yaml保持原索引。子角色核对 task、active_run 和真实包身份；新初始化但无绑定的任务不能视为旧任务。旧快照安装和无锁的历史任务按原契约读取，不回写身份或重新计算旧审批。
 
 已有 active_run 先查询原宿主任务，即使本机缺包也不能重复派发。旧任务未证实结束前禁止升级、换宿主继续执行或换绑框架。缺原包时可按原锁快照重建，无法核实则 blocked，不套用新版本。已有审批配置快照保持原字节；纯框架补丁升级不改业务评审对象，但协议/模板语义不兼容时暂停评估，不自动迁移已批准内容。
+
+## 会话内核验复用
+
+各原生会话在相同工作空间、宿主和锁定包下，自行完整校验后可在自己的上下文保留结果及文件变化快照（路径、类型、大小、纳秒级mtime/ctime），不新增回执字段或报告。同一角色的初始化探测与后续业务任务也适用；主会话或其他角色的结论不替代本角色首次核验。后续调用仍重读锁、检查安装pending，并核对包及受管入口/角色的文件集合与变化快照；未变时复用完整校验和当前宿主激活证据，不重复逐文件哈希、restore或原生探测。元数据比较仅用于可信本机只读缓存的性能优化，不作为抗恶意并写保证；无法可靠取得变化信息时完整校验。
+
+新会话、上下文丢失、换机/换宿主、锁或受管文件变化、安装/升级/恢复后，以及任何内容或并写疑点，均使复用失效：重新完整核验，发现修改仍按完整性规则阻塞，不将变化快照直接认作新合法内容。业务status、活动任务、审批和代码基线每次按原契约核对，不复用环境结论替代它们。
 
 ## 升级、离线与旧安装
 

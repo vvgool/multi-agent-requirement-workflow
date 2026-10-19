@@ -1,7 +1,7 @@
 <!-- requirement-workflow:begin -->
 ## 需求协作入口
 
-发起、继续或优化命名需求时，以本项目为工作空间，先读 workflow.lock.yaml。框架缓存为 `.agents/requirement-workflow-cache/<package.sha256>/`；缓存不随 Git 提交，由主会话在派发前按以下步骤补齐。单纯问答/审查/维护不创建需求；用户要求只读或 initialization_probe=true 时不下载、修复或写入，缺环境仅报告阻塞。
+发起、继续或优化命名需求时，以本项目为工作空间，先读 workflow.lock.yaml。框架缓存为 `.agents/requirement-workflow-cache/<package.sha256>/`；缓存不随 Git 提交，由主会话在会话首次进入时按以下步骤核验并按需补齐；同会话后续派发按已核实包内 workflow/package.md 的会话复用规则检查变化，变化或上下文丢失时重新完整核验。单纯问答/审查/维护不创建需求；用户要求只读或 initialization_probe=true 时不下载、修复或写入，缺环境仅报告阻塞。
 
 用户明确说“新需求”即进入协调接单，未命名时先收集目标并确定名称，再创建状态和产品任务。后续补充沿用原需求上下文，直到用户明确取消、切换需求或要求退出流程；即使修改对象是框架规则、Skill 或模板，也由协调层按阶段派发。上述维护例外仅用于未进入需求流程的独立请求，或用户明确退出流程后要求直接维护；协调层不以维护为由代做需求实现。
 

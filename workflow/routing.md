@@ -12,10 +12,10 @@
 ## 决策顺序
 
 1. 核对需求身份、版本和状态。已有状态缺失、未知或矛盾时阻塞核查。
-2. active_run 非空先查询、等待或重连；期间可按 [协调消费](execution-contract.md#协调消费) 处理同 run 的开发方案通知，仅展示已核对完整版本，不将其视为最终结果、不清任务或增加调用次数。prepared/unknown 先核实调用是否发生，即使 execution_status=idle 也不能重复派发。
+2. active_run 非空先查询、等待或重连；期间可按 [协调消费](execution-contract.md#开发中方案通知) 处理同 run 的开发方案通知，仅展示已核对完整版本，不将其视为最终结果、不清任务或增加调用次数。prepared/unknown 先核实调用是否发生，即使 execution_status=idle 也不能重复派发。
 3. waiting_user 先处理原问题或 pending_review；只有对应当前评审的明确回复才算批准。
 4. blocked 先验证解除条件，普通“继续”不能清除阻塞。
-5. 无活动任务且每次业务派发前（或用户明确改变关联策略时），按 [Issue 规则](issue-tracking.md) 处理前置绑定。已有选择按策略复用；required 未满足时不派发业务角色，保留当前 stage。同步失败不作为业务 blocked 条件。
+5. Issue默认关闭且无历史待处理记录时跳过；已启用、用户明确改变关联策略或需恢复既有记录时，才读 [Issue规则](issue-tracking.md)，在无活动任务的派发前处理前置绑定。已有选择按策略复用；required 未满足时不派发业务角色，保留当前 stage。同步失败不作为业务 blocked 条件。
 6. 无活动任务且允许继续时按下表执行。每次状态变化后重读并重新决策。
 
 | stage | 动作 | 角色 |
@@ -26,7 +26,7 @@
 | testing | 派发验收，携带已批准需求和待测开发基线 | [测试](../agents/testing-agent.md) |
 | completed | 展示完成证据；优化按修订规则创建新版 | 无派发 |
 
-派发前按 [包规则](package.md) 核对锁定版本、缓存、初始化pending及当前宿主真实激活，再按 [适配映射](host-adapters.md) 检查实际角色文件和宿主能力，缺失分别记录 role_not_available（含 required_role）或 host_delegation_unavailable。development/testing 须有本版有效审批，testing 还须有开发基线。审批已保存但阶段迁移中断时，核对有效性后补完迁移。
+派发前按 [包规则](package.md#会话内核验复用) 核对锁定版本、缓存、初始化pending及当前宿主真实激活；符合条件时复用本会话已核实的环境结果，再按 [适配映射](host-adapters.md) 检查实际角色文件和宿主能力，缺失分别记录 role_not_available（含 required_role）或 host_delegation_unavailable。development/testing 须有本版有效审批，testing 还须有开发基线。审批已保存但阶段迁移中断时，核对有效性后补完迁移。
 
 ## 产品澄清答复
 
@@ -54,12 +54,22 @@
 | 用户批准当前评审 | development/idle |
 | 开发 ready | 保存角色提供的 development_baseline，testing/idle |
 | 开发 needs_input | development/waiting_user，转达决策问题 |
-| 测试 passed | completed/idle，归档报告和证据 |
+| 测试 passed，全部验收完成、无未解决缺陷且基线一致 | completed/idle，归档报告和证据，不自动发布 |
 | 测试 failed | development/idle，携带失败报告；次数用尽则 blocked |
-| 任一角色 blocked | 保持当前阶段并记录原因、解除条件 |
+| 任一角色 blocked，或调用/权限/身份/必要证据异常 | 保持当前阶段，execution_status=blocked并记录原因、解除条件 |
 | 任一角色 stale_task | 按 [执行契约](execution-contract.md) 处置过期来件，不推进当前阶段 |
 
-协调层先按 [成果目录](output-layout.md) 定位结果，检查真实任务结束、结果身份及版本、必要字段和产物存在、授权路径及测试基线匹配。角色负责本阶段内容真实性和完成判断；缺少必要报告、证据或结果字段时阻塞，不凭 declared status 推进。交接通过后才按目录规则固化文稿、更新入口及阶段。旧版或旧 run 结果仅留存，不能清除新 active_run。
+## 交接核对
+
+旧修订/run来件或stale_task先按 [过期任务](execution-contract.md#过期任务) 留存处置，不套用当前交付门槛，不清除其他活动任务；旧无锁/旧布局仍按原契约核对。
+
+协调层在宿主确已结束后，读取原task、host及result，一次核对：当前身份/修订/run和框架绑定一致；开发/测试的本版审批有效；必需字段、文稿及证据存在且路径授权、摘要与内容一致；结果状态和所声明完成项无矛盾。结果状态要求基线时，按 [基线契约](code-baseline.md) 核对本轮实际文件未变；测试另核对原开发绑定。产品正文和质量检查完整性按 [产品结果](handoff.md#产品结果) 核对。
+
+内容质量由执行角色负责：产品判断需求/验收质量，开发判断方案与自验，测试独立执行验收。协调实际读取交接材料以核对上述条件、转达用户并固化文稿，不重复业务分析、逐条质量自检或重跑测试，也不为交接另写审查报告。缺项、矛盾、摘要/基线变化时保留现场，交责任角色补证或修正；不能仅凭declared status推进，也不能替角色补写通过结论。
+
+同一次交接中已核对且未变的材料可直接用于固化和状态更新，不在各步骤重复执行完整检查；写入前的拥有摘要/状态版本检查仍执行。中断恢复、文件/源码变化或上下文丢失时重新核对，不把复用记录当新证据。旧版或旧run结果仅留存，不能清除新active_run。
+
+范围变化须先确认旧任务结束，再按修订规则归档旧版并进入新版draft/idle，重新评审；completed的历史记录保留。
 
 需求决策阻塞时，协调层转达原问题并记录实际答复；仅引用已批准内容即可解除的，核实后恢复原阶段。需要补充或改变已批准正文/验收时按修订规则建新版 draft，重新由产品整理评审；不把未批准的新规则交给开发或测试继续执行。
 
@@ -69,4 +79,4 @@
 
 开发次数按修订版累计，默认 max_development_attempts=3，包含首次。实际发起新开发调用前增加一次并绑定 run；角色/宿主缺失不增加，未知调用恢复不重复计数。达到上限后 development/blocked、development_attempt_limit，等待用户调整或决策。
 
-同一宿主 Agent 只在同一角色内复用。每次决策记录所读状态版本、阶段、执行状态、动作和原因。状态、历史、审批和范围变更分别遵循 [状态规则](state-contract.md)、[修订规则](revisions.md) 和 [文档规则](documents.md)。
+同一宿主 Agent 只在同一角色内复用。有新输入、状态变化、真实调用或交接时，在已有记录保存动作与依据；无变化的轮询和重复展示不新建决策记录。状态、历史、审批和范围变更分别遵循 [状态规则](state-contract.md)、[修订规则](revisions.md) 和 [文档规则](documents.md)。

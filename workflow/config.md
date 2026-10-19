@@ -52,7 +52,7 @@ issue_tracking:
 
 读链接不授予写权限。更新已有飞书正文要求有效配置 write_enabled=true、文档 access=read_write 和实际宿主权限同时满足；创建还需父节点。一般参考文档只读。正文写入范围限于当前需求授权的产物，不自动评论、发消息或修改其他文档。
 
-每次派发保存 `effective-config.yaml` 并记录其内容摘要。配置改变后重新读取、检查并展示影响；影响正文来源或评审摘要时待审批记录失效。仅改变 Issue 绑定/同步策略不改变业务评审对象，不撤销审批；保留既有配置快照并单独记录新的有效关联策略。改变 features_dir 不自动迁移资料，旧新目录冲突时先解决冲突。改动需求范围的处理见 [revisions.md](revisions.md)，正文与审批见 [documents.md](documents.md)。
+首次派发或有效配置变化时，将有效配置原字节按SHA256保存到本修订 `.workflow/snapshots/config-<摘要>.yaml`；相同内容复用一份，不覆盖原快照。每次task.effective_config记录相对feature_dir的path及sha256，接单按执行契约读取该引用，不在required_files重复列入。快照必须位于本需求的.workflow/snapshots内、为普通文件且无链接越界；复用前核对摘要，缺失或变化则blocked，不拿当前配置替代历史。旧任务缺字段时沿run下effective-config.yaml及原索引读取，不迁移审批。配置改变后重新读取、检查并展示影响；影响正文来源或评审摘要时待审批记录失效。仅改变 Issue 绑定/同步策略不改变业务评审对象，不撤销审批；保留既有配置快照并单独记录新的有效关联策略。改变 features_dir 不自动迁移资料，旧新目录冲突时先解决冲突。改动需求范围的处理见 [revisions.md](revisions.md)，正文与审批见 [documents.md](documents.md)。
 
 ## 路径例子
 

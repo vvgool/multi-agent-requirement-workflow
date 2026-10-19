@@ -19,12 +19,12 @@
       development.md                # 简版；完整版改为方案/计划/自验三份
       test-report.md
     .workflow/
+      snapshots/                    # 锁/配置按内容摘要复用，首次或变化时保存
       review-manifest.yaml
       issue-sync/<sync_key>/        # 可选：关键事件的record.yaml与comment.md
       runs/<run_id>/
         task.yaml
         host.yaml
-        effective-config.yaml
         result.yaml
         outputs/                    # 候选文稿、必要脚本及执行证据
         sources/                    # 有必需外部来源时创建
@@ -47,7 +47,7 @@
 
 ## 固化正式成果
 
-1. 任务确已结束，协调层核对身份、当前版本/run、必要结果、产物边界及适用代码基线，再选择实际文稿。按结果的 kind 选择：产品 ready 固化 requirements（quality_check 指向同文稿时不复制第二份）；开发 ready 固化 development_record，或 technical_plan、implementation_plan、verification；测试的 passed/failed/blocked 报告在交接有效时均可固化，状态和未执行项须如实展示。其他问题或阻塞仅在需求入口说明，不冒充正式交付。
+1. 按 [交接核对](routing.md#交接核对) 确认任务结束且交接有效后，选择实际文稿；同次未变的核对结果直接使用。按结果的 kind 选择：产品 ready 固化 requirements（quality_check 指向同文稿时不复制第二份）；开发 ready 固化 development_record，或 technical_plan、implementation_plan、verification；测试的 passed/failed/blocked 报告在交接有效时均可固化，状态和未执行项须如实展示。其他问题或阻塞仅在需求入口说明，不冒充正式交付。
 2. 仅将符合上文共享成果要求的文稿按上述固定文件名固化到 documents/；脚本、日志、基线和 sources 留在原 run。使用副本，不用硬链接/符号链接把已批准内容绑定到可变候选。文稿中本地引用写为 Markdown 相对链接；固化时先将来源目标和正式文稿父目录都解析为真实路径，再以同一基准计算相对链接（包括 /var 与 /private/var 等宿主路径别名），指向同批固化或已有的共享成果、项目文件及外部来源；执行证据留在 result/artifacts，不放正文链接。从正式文件位置核验每个链接，并在不读取 .workflow 的条件下核对正文及引用仍可用；无法满足时退回角色补齐文稿，不删改已批准内容。重定位后的正文才是评审和审批对象，不能沿用候选文稿的摘要。未经索引的附加文稿不自动发布。
 3. 写入前核对目标与来源真实路径不冲突。目标已存在时，只有根 artifacts 明确记录为本版受管理的正式文稿且当前摘要匹配，才可更新；同摘要可保留。用户修改、来源不明内容或符号链接冲突时停止。已批准 requirements.md 及其审批 manifest 不原地替换，范围变化走新修订。旧 run 候选和有效失败证据保留，正式位置只代表本版当前有效报告。
 4. 文件采用同目录临时文件准备后原子替换；记录正式 path、kind、revision、run_id、sha256、source_path（相对需求目录的候选位置）及 source_sha256 到根 artifacts，并保留该 run 的原始产物索引。确认文件及引用有效后再推进状态，最后按实际状态更新 README。固化中断时先比较候选、目标、已存索引与状态，只有能证实同一有效 run 的同内容写入才补完；不一致则阻塞，不猜测成功。
@@ -55,7 +55,9 @@
 
 ## 人工入口
 
-协调层使用 [需求入口模板](../templates/feature-readme.md) 创建需求根 README.md。只列当前版本、阶段、真实进度、待确认事项、已存在的共享正式文档；来源 run 和结果索引留根 artifacts，不在 README 链接内部任务或证据；启用 Issue 时按 [Issue 规则](issue-tracking.md) 补真实绑定链接及未完成/未知同步提示（包括旧目标），从未启用且无历史记录时省略；不重复文档正文、日志或完整验收表。未产出、过期、失败、阻塞要明确标注。默认人工确认当前 requirements.md，交付时看 test-report.md 与实际功能；技术决策需要人时链接适用开发文档，不新增所有阶段的强制审批。
+协调层使用 [需求入口模板](../templates/feature-readme.md) 创建需求根 README.md。只列当前版本、阶段、真实进度、待确认事项、已存在的共享正式文档；来源run在根artifacts仅登记目录入口，结果与证据索引留run内，不在 README 链接内部任务或证据；启用 Issue 时按 [Issue 规则](issue-tracking.md) 补真实绑定链接及未完成/未知同步提示（包括旧目标），从未启用且无历史记录时省略；不重复文档正文、日志或完整验收表。未产出、过期、失败、阻塞要明确标注。默认人工确认当前 requirements.md，交付时看 test-report.md 与实际功能；技术决策需要人时链接适用开发文档，不新增所有阶段的强制审批。
+
+README在首次创建、修订/阶段变化、出现或解除阻塞/待决策事项、正式成果或其有效性变化（含新修复轮使旧报告待重验），以及Issue绑定/同步提示实质变化时更新。同一动作合并一次更新；prepared/unknown/running切换、轮询、普通方案通知和常规任务进度仅保存在状态/事件或run记录。恢复时只补符合这些条件的遗漏更新；存量方案通知仍按其原兼容协议。
 
 README 是派生索引，不代替状态或审批；恢复时核对 status.yaml 并修正索引。生成后在根 artifacts 记录 kind: feature_index、path: README.md 和 sha256；下次只更新可由索引及摘要确认属于框架的入口。已有用户 README 或入口被用户编辑时不覆盖，先报告冲突。旧布局可在无路径冲突时生成指向已有文稿的入口，不搬旧文档。对话同步给出该需求目录、版本和待办。
 
@@ -68,10 +70,6 @@ README 是派生索引，不代替状态或审批；恢复时核对 status.yaml 
 
 ## 开发中候选展示
 
-原子提交、身份、摘要与双读检查以 [通知契约](execution-contract.md#开发中方案通知) 为准。开发正常通知后继续同 run；协调收到通知即处理，不能等最终 result 才首次展示。候选仍在 task.output_dir，不复制到 documents/，不另造方案正文；布局1按原task/output/artifacts路径读取，不搬迁历史、不补造旧通知。
+按 [方案通知](execution-contract.md#开发中方案通知) 读取当前run文稿，在对话标明文稿版本及“开发中方案，未验收”；README仅在 [人工入口](#人工入口) 的更新时机合并简短方案状态及缺口，不链接本机候选或通知。普通展示不创建显示状态、事件或产物索引，不清活动任务、不推进阶段。实质阻塞、需决策或最终交接时按原状态规则更新。
 
-核对完整版本后，在当前对话提供真实可读候选链接，标明“开发中方案，未验收”、修订/run、document_version及来源摘要；需求 README 只写方案状态、文稿版本及必要缺口，不链接本机候选、结果或清单。简版一份记录，完整版适用方案/计划，自验存在后才链接。既有正式开发/测试成果标“上一基线，当前待重验”，不能与候选混成当前正式交付。needs_input/blocked也展示已存在的稿件、缺口及解除条件；full部分稿须为契约允许的plan_partial，标“部分方案，未验收”，不要求缺稿存在、不链接缺稿、不放宽已列稿的整批稳定/摘要/有效链接检查；无稿明确未产出，不生成空成果。
-
-协调以根 artifacts 的 kind: development_progress 记录当前已核对版本：path（清单相对需求目录）、revision、run_id、document_version、sha256（清单摘要）、documents（每项kind/path/sha256，路径相对需求目录）、display_status（pending/displayed/blocked）及实际原因，按 [状态规则](state-contract.md#开发方案展示状态) 维护；该项只是显示来源索引，不能代替代码基线或最终result。先保存pending来源，再安全更新入口及对话，确认实际展示后才记displayed；中断可补未完成展示，同版本已展示不重复处理成新任务。若入口已更新但显示状态未保存，先核对入口已知摘要与同版本内容再补状态；无法确认时保留内容并报告，不覆盖或猜成功。
-
-README沿原 feature_index 拥有摘要规则检查，正式文稿沿原固化摘要规则检查。用户编辑或来源不明时停止覆盖、给出冲突位置及可读链接，记录展示blocked，不把其等同开发停止或成功。协调不同时写候选；开发清单过期或内容半更新只重读/请求开发恢复，不能索引未提交版本。最终ready须先核实宿主结束，按执行契约的最终交接收敛顺序检查末次清单、development_progress指针和最终artifacts摘要一致；未收敛不得固化。核对通过后，再按“固化正式成果”复制、重定位链接及保存来源；通知清单/恢复意图只留run证据，不当正式正文。开发结束后再有冲突也先保护用户内容，不能以最终结果绕过摘要检查。
+协调不代写候选；用户修改README或正式文稿时保留并说明冲突。最终以真实result的文稿摘要和代码基线为准，核对后按固化规则发布成果。旧run的进度清单及展示记录仅按 [存量协议](legacy-plan-notifications.md) 读取，不迁移或补造。

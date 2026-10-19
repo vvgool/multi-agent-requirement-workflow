@@ -5,18 +5,15 @@ layout_version: 2 # 与当前修订状态一致；旧任务缺字段视为1
 run_id: null
 role: product
 framework: null # 新锁定安装必填{name,version,protocol_version,sha256}；无锁历史任务保持缺失/null
+framework_lock: null # {path,sha256}，引用需求内按原字节摘要保存的锁快照；旧run沿原路径
+effective_config: null # {path,sha256}，引用需求内不可变有效配置快照；路径相对feature_dir
 framework_root: null # 从实际加载角色文件动态确定
 workspace_root: null # 当前宿主中的目标工作空间
 feature_dir: null
 target_project: null
 input_path: null
-required_files: []
+required_files: [] # 额外必读资料；task专用字段已引用的同一文件不重复列入
 output_dir: null # 当前run的outputs/，候选文稿与证据
 result_path: null # 布局2必须填当前run/result.yaml；artifacts仍相对output_dir
 external_write_scope: [] # 默认无外部写权限；仅在配置和用户授权允许时列出本版飞书写回目标
-completion_criteria: # 按结果状态适用；缺必需来源/能力时如实blocked，不伪造读取或产物
-  - 读取原始诉求、已有答复和全部必读来源
-  - needs_input时事实先查证，按依赖提出本轮问题，推荐不代替用户选择
-  - ready时完整需求和验收标准落到允许的输出目录；needs_input不要求生成需求稿
-  - ready时完成逐项质量检查，默认并入需求文稿自检段并建立产物索引
-  - result.yaml 身份与任务一致，只索引实际产物；无产物时artifacts为空
+completion_criteria: [] # 必填本轮目标及特有完成条件；产品Skill通用门槛直接适用，不复制全文

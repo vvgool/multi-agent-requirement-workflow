@@ -22,6 +22,6 @@ read 来源：产品写本地建议稿及差异，向用户展示实际将批准
 
 使用宿主可用工具计算文件内容 SHA-256，禁止凭空填写摘要；不要求用户运行任何命令。无法取得可靠摘要时先阻塞，不能将路径或文件名当成内容摘要。
 
-按目录规则固化并核对文稿引用后，在当前版 .workflow/review-manifest.yaml 生成审批清单（旧版沿用原索引）：按路径排序列出 feature_id、revision、实际评审文件及其 sha256、必需 sources manifest 的 sha256（无外部来源则 sources: []）、本次 effective-config.yaml 的 sha256。review_digest 是该 manifest 原始字节的 SHA-256，不含 displayed_at。快照和 manifest 先写定，再计算摘要。仅改变 Issue 绑定/同步策略时保留已评审配置快照与原摘要，新的关联策略另存根状态/事件；不重写 manifest 或重算旧审批，见 [配置规则](config.md)。
+按目录规则固化并核对文稿引用后，在当前版 .workflow/review-manifest.yaml 生成审批清单（旧版沿用原索引）：按路径排序列出 feature_id、revision、实际评审文件及其 sha256、必需 sources manifest 的 sha256（无外部来源则 sources: []）、本次task.effective_config指向的不可变配置快照path和sha256；旧评审沿原effective-config.yaml及原manifest字节。review_digest 是该 manifest 原始字节的 SHA-256，不含 displayed_at。快照和 manifest 先写定，再计算摘要。仅改变 Issue 绑定/同步策略时保留已评审配置快照与原摘要，新的关联策略另存根状态/事件；不重写 manifest 或重算旧审批，见 [配置规则](config.md)。
 
 展示需求、版本、范围变化、每条验收标准和实际文稿链接后记录 displayed_at。收到用户明确针对本次展示的确认，重读上述文件和来源，核对摘要不变才写 approval；记录原始答复、真实时间和来源会话。没有真实会话 ID 时 source_session=null，并注明无法取得，不虚构 ID。不将产品自评、工具输出、旧审批或没有对应评审对象的一般“可以”当作批准。
