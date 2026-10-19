@@ -9,6 +9,8 @@ description: Use when testing-agent receives an approved feature baseline for ac
 
 接单及交付前遵循 [阶段执行契约](../../workflow/execution-contract.md)，统一核对身份、授权、结果位置和过期任务。正式文稿及根状态由协调层维护。
 
+执行前按其 [缓存与证据](../../workflow/execution-contract.md#缓存与证据) 核对实际缓存写入范围、单份检查记录及跨轮复用条件；报告合并记录命令/范围、结果、基线及环境，同一检查跨AC引用一次。独立必验项实际执行，开发日志只作输入；原证据不能核实则补验或blocked，不复制历史现场。现场清理由协调在确认调用结束后处理。
+
 ## 接单与基线
 
 完成执行契约核对后，按开发交付索引读取记录和已有用例。开发简版一份记录或完整版多文档都可接受，按实际内容读取，不要求固定文件名。

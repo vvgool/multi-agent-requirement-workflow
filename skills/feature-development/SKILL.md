@@ -9,6 +9,8 @@ description: Use when development-agent receives an approved feature or defect-f
 
 接单及交付前遵循 [阶段执行契约](../../workflow/execution-contract.md)，统一核对身份、授权、结果位置和过期任务。正式文稿及根状态由协调层维护。
 
+执行检查前按该契约的 [缓存与证据](../../workflow/execution-contract.md#缓存与证据) 核对实际缓存位置和授权；自验记录合并命令/范围、结果、基线及环境事实，同一检查多个任务/AC共用一个编号与必要输出。复用先核实原result与适用条件，并注明本轮未重跑；收敛现场交协调在确认调用结束后处理。
+
 ## 接单与开发原则
 
 完成执行契约核对后，业务决策缺失返回 needs_input，执行条件不足返回 blocked；范围变化交协调层重新确认。

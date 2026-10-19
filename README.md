@@ -35,7 +35,7 @@
 
 默认初始化当前宿主及项目中检测到的宿主：.codex/ 对应 Codex；.claude/ 或 CLAUDE.md 对应 Claude Code；.opencode/ 或 opencode.json/jsonc 对应 OpenCode。只在项目根检测，不因机器装了 CLI 就生成配置。可明确要求“只初始化当前宿主”或“全部三个宿主”。
 
-全新项目单宿主 Codex/OpenCode 涉及 7 个文件、Claude Code 8 个，三个宿主一起共 14 个；共享一份版本锁、缓存和 AGENTS 入口。已有文件保留原文，只添加受管区块。所有目标先预检，任一冲突先停止整批写入，写入中断则保留原批次计划供恢复，不将半安装标为成功。
+全新项目单宿主 Codex/Claude Code 涉及 8 个文件、OpenCode 7 个，三个宿主一起共 15 个；共享一份版本锁、缓存和 AGENTS 入口。Codex通过 `.codex/config.toml` 的受管注册区块引用三个薄角色，仅拥有该区块，保留原有配置；restore不补缺失注册。已有文件保留原文，只添加受管区块。所有目标先预检，任一冲突先停止整批写入，写入中断则保留原批次计划供恢复，不将半安装标为成功。
 
 文件可一次准备，原生激活按宿主分别验证：在 Codex 中不能把 Claude Code/OpenCode 标为已激活。未验证者保持 pending；后续进入对应宿主会话再只读探测。
 
@@ -80,7 +80,7 @@
 
 无法联网时，可先在有权限的机器获取相同提交的代码，再向 Agent 提供本地包目录；已有 Git 锁须核实该目录确实对应锁定提交，无法证明时停止，不能改成 manual 绕过。无锁的新项目仍可按手动包安装。
 
-三个宿主的文件初始化已有隔离验证；**真实原生角色激活及完整需求闭环仍待验证**。无原生选择能力时记录 pending，不使用通用 Agent 冒充通过。仓库中的 [验证摘要](https://github.com/vvgool/multi-agent-requirement-workflow/tree/main/docs/verification) 记录实际边界；完整测试快照和运行记录不随当前源码分发。
+源码版本为 **0.2.5**。历史 0.2.4 候选（核心摘要 `39c446bc4a6593b66086b01ae183718b471cb0b96bf319fa7d8cc197564f0843`）已验证三宿主文件适配、Codex/OpenCode 三原生角色及 Codex 代表性真实闭环；Claude Code 原生运行仍缺验。版本整理改变包身份，这些历史证据不等于 0.2.5 原生运行验收。无原生选择能力时记录 pending，不使用通用 Agent 冒充通过。仓库中的 [验证摘要](https://github.com/vvgool/multi-agent-requirement-workflow/tree/main/docs/verification) 记录实际边界；完整测试快照和运行记录不随当前源码分发。
 
 ## 角色与流程
 
@@ -140,7 +140,20 @@ optional 在首次派发前选择绑定或跳过；required 在业务派发前�
 
 ## 验证与维护
 
+Codex注册区块的TOML语义与保留配置回归（仅源码分发提供测试，不是宿主激活验收）：`python3 -B -m unittest discover -s tests -p 'test_codex_registry.py'`。使用已有Python 3.11+ tomllib或tomli，不安装依赖。运行时setup所需纯合并helper位于包内 `skills/setup-requirement-workflow/scripts/codex_registry.py`。
+
+三端实际模板/共用正文及配置保留回归：`python3 -B scripts/verify-host-adapters.py --source-root . --scratch /absolute/authorized/empty-directory`。可选 `--opencode /absolute/path/to/existing/opencode` 以已有CLI核对合法JSONC和三个原生定义的发现；首次发现可能短暂不完整，输出保留最多三次只读观察。脚本只生成授权空目录内的开发夹具，不安装项目、写回执或执行模型；发现列表不能证明实际委派。OpenCode/Claude使用原生Markdown文件发现，不需要复制Codex的TOML合并helper。三个宿主分别核对自身的同名角色、禁用和权限，不能从一个宿主成功推断其他宿主。
+
+
 初始化区分文件安装、当前宿主原生激活和完整需求闭环，具体以本项目本机回执为准。验证范围见 docs/verification/README.md；历史手动加载正常闭环及旧快照证据不能作为当前三宿主原生通过的证明。真实飞书和Issue平台联调仍需独立完成。
+
+开发源码提供 `scripts/verify-artifact-slimming.py`（不属于业务安装包），只需已有 Python 3.9+、PyYAML 和 Git，无需私有需求历史、本机框架缓存或联网安装。取得候选源码后，在其根目录运行（将示例位置替换成**任务明确授权、已创建的空目录**）：
+
+```sh
+python3 scripts/verify-artifact-slimming.py --source-root . --scratch /absolute/authorized/empty-directory
+```
+
+脚本只写该目录，拒绝非空目录、目录链接、源码根及其祖先等危险目标，保留现场供检查，不执行框架源码提交。输出覆盖缓存/证据、复用失效、源码基线、清理保护和入口恢复的文件协议样例；它包含模型辅助函数，**不能证明生产调度、隔离包安装、宿主原生激活或真实需求闭环**。依赖缺失时报告缺口，不自动安装。候选源码的 Git 发布状态与本地复验分开报告。
 
 共享发布包包含framework.yaml、LICENSE、AGENTS.md、README.md、workflow.yaml、agents/、skills/、workflow/、templates/。docs/不默认安装到业务项目。框架自身agent-features/、早期docs/superpowers/、完整验证夹具及运行记录仅保留本地，不进入当前仓库版本。三个宿主不需要使用相同插件格式；插件只作为可选分发方式。
 
@@ -162,6 +175,7 @@ workflow/            # 共享流程契约
 templates/           # 交接及状态模板
 docs/planning/       # 当前目标与职责
 docs/verification/README.md  # 精简验证摘要
+scripts/             # 随源码分发的最小开发复验入口，不进入业务安装包
 ```
 
 ## 开源许可

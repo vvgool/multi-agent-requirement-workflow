@@ -5,11 +5,11 @@ run_id: null
 role: null
 status: null # development: ready/needs_input/blocked；testing: passed/failed/blocked；双方均可 stale_task
 summary: null
-artifacts: [] # 每项含 kind 和 path；有末次通知的文稿还须 sha256，与通知原字节一致；path 相对本 run outputs/。按实际内容索引，允许简版一份文档包含方案/任务/自验
+artifacts: [] # kind/path；末次通知文稿须sha256一致。只索引本run outputs安全相对路径；历史证据在报告按原result引用，见execution-contract；同检查不复制日志
 development_progress: null # 可选{path,document_version,sha256}，path相对output_dir；开发末次已提交通知，ready须完整稿；最终链接/清单/result按execution-contract收敛后才交接；旧任务缺失兼容，最终artifacts字节须一致
 changed_files: [] # 开发改动路径相对目标项目
 development_run_id: null # 测试结果必须关联待测开发 run
-code_baseline: null # ready/passed/failed 必填；格式及存量兼容见 workflow/code-baseline.md
+code_baseline: null # ready/passed/failed必填；本run权威源码清单，文稿引用不再额外导出；现有绑定字段不裁剪，见workflow/code-baseline.md
 acceptance_results: [] # 测试逐项填写 id、status、actual、evidence
 defects: [] # 失败需有 id、acceptance_id、steps、expected、actual、evidence
 questions: []

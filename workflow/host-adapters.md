@@ -4,7 +4,7 @@
 
 | host | 原生角色 product / development / testing | 定义位置 | 适配说明 |
 | --- | --- | --- | --- |
-| codex | requirement_product / requirement_development / requirement_testing | .codex/agents/*.toml | [Codex](../skills/setup-requirement-workflow/references/codex-adapter.md) |
+| codex | requirement_product / requirement_development / requirement_testing | .codex/config.toml 受管registry区块 + .codex/agents/*.toml | [Codex](../skills/setup-requirement-workflow/references/codex-adapter.md) |
 | claude-code | requirement-product / requirement-development / requirement-testing | .claude/agents/*.md | [Claude Code](../skills/setup-requirement-workflow/references/claude-code-adapter.md) |
 | opencode | requirement-product / requirement-development / requirement-testing | .opencode/agents/*.md | [OpenCode](../skills/setup-requirement-workflow/references/opencode-adapter.md) |
 
@@ -16,7 +16,7 @@
 
 ## 初始化输出与能力
 
-本机回执 schema_version=2：package（真实四字段身份）、framework_path（项目相对路径）、owned_files（路径与实际SHA256）、owned_blocks（文件、标记、区块实际SHA256）、hosts。普通已有文件不作为整体拥有项；AGENTS/CLAUDE/.gitignore 只拥有指定区块。默认初始化当前宿主和项目检测到的宿主；显式范围优先。全部目标先预检，再用同一 pending 安装，共享一份锁和缓存。非当前宿主只准备文件，不启动其程序；逐宿主报告 file_installation 和原生 pending。
+本机回执 schema_version=2：package（真实四字段身份）、framework_path（项目相对路径）、owned_files（路径与实际SHA256）、owned_blocks（文件、标记、区块实际SHA256）、hosts。普通已有文件不作为整体拥有项；AGENTS/CLAUDE/.gitignore/.codex/config.toml 只拥有指定区块。默认初始化当前宿主和项目检测到的宿主；显式范围优先。全部目标先预检，再用同一 pending 安装，共享一份锁和缓存。非当前宿主只准备文件，不启动其程序；逐宿主报告 file_installation 和原生 pending。
 
 hosts.<host> 保存真实可取得的 host_version（不可得=null）、role_mapping、file_installation、entry_probe、三个 native_role_probes（status、真实host_task_id或null、实际结果/原因）、native_role_invocation、end_to_end。状态为 passed/pending/failed；相同包下追加宿主时保留其他宿主有效回执，不把它们改成当前宿主通过；升级或拥有内容变化则将旧探测连同原包身份移入 hosts.<host>.probe_history，当前探测重置 pending。回执缺失不能接管已有未声明文件。
 

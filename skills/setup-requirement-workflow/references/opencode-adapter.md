@@ -8,10 +8,16 @@
 
 主会话入口使用共同AGENTS区块。预检当前版本支持的 opencode.json/opencode.jsonc、.opencode配置、适用AGENTS规则、插件或全局同名Agent；尊重配置中的委派/文件权限和disabled设置。支持JSONC时使用相应解析能力，不能用严格JSON否定合法注释文件。若项目通过instructions排除了入口或配置同名Agent遮蔽角色，先报告冲突；不覆写现有配置或追加通配权限。无法确认当前格式时查实际schema/能力，报告host_format_unsupported而不是猜格式。
 
+V2 使用 `agents`、`system`、`disabled` 和有序 `permissions` 列表，V1 常见字段为 `agent`、`prompt`、`disable`、`permission`。先核对当前发行版；兼容读取不代表应把V1字段写入V2。薄Markdown仍仅使用共同的description/mode和正文，不生成整份JSON配置。
+
+先检查实际加载的配置来源与原始同名声明，再核对有效角色。OpenCode 2.0.32实测：合法JSONC中 `agent` 与 `agents` 均可读，但项目Markdown可能盖过JSON同名description乃至disabled字段；因此仅看 `debug agents` 中角色存在/未禁用会漏掉用户意图冲突。同名声明即停止整批安装，不能以“最终加载的角色正确”接管它。全局配置只读核对相关角色/权限/入口字段，日志不复制凭据或整份配置；不能可靠取得来源时报告预检能力不足。
+
 ## 生效与调用
 
 新会话/已证实重载后，通过实际原生子Agent委派能力选择三个名称进行 initialization_probe=true。记录真实会话/任务标识及读取事实；仅看到Agent菜单或Skill列表不算派发通过。包内Skill以明确文件读取方式加载，不要求外部Skill扫描开关或符号链接，也不声称注册了原生skill工具入口。
 
 实际Task/委派工具的名称、参数、同步等待和会话恢复按当前版本说明使用，不把某版sessionID字段写成公共协议。业务host.yaml记录真实host及ID；不支持查询旧任务时报告unknown/blocked，不伪造恢复。所有阶段遵守实际权限，不安装JS插件来绕过缺少的原生委派能力。
 
-依据：[官方Agents](https://opencode.ai/docs/agents/)、[官方Skills](https://opencode.ai/docs/skills/)（2026-10-15核对）。文件层适配和真实版本验收分开，当前未完成OpenCode原生调用或完整需求闭环实测。
+V2 的原生工具为 `subagent`，V1 常见为 `task`；父角色的实际委派权限同样必须允许该原生名称。`run --agent` 只选主角色，`debug agents` 只证明发现，均不能替代具名子角色调用。不得使用 `--auto` 或临时放开权限来让探测通过。
+
+依据：[V1 Agents](https://opencode.ai/docs/agents/)、[V2 Agents](https://opencode.ai/v2/docs/agents/)、[V2迁移](https://opencode.ai/v2/docs/migrate-v1/)（2026-10-19核对）。机制依据、文件层适配和绑定包摘要的实际原生验收分别记录；不据文档宣称闭环通过。

@@ -10,7 +10,7 @@
 
 ## restore_only 交接
 
-主会话传 restore_only=true，工作空间、锁定身份/来源与当前宿主。setup先核对项目已有入口、当前宿主角色及全部已声明拥有内容的真实字节与锁定包模板；配置合法且本地忽略规则有效。缺受管项返回 host_not_initialized/managed_entry_missing，内容差异返回 adapter_modified，缓存存在但被改动返回 framework_integrity_mismatch。完整预检通过前不写项目。
+主会话传 restore_only=true，工作空间、锁定身份/来源与当前宿主。setup先核对项目已有入口、当前宿主角色（Codex还包含锁定模板要求的config.toml注册区块）及全部已声明拥有内容的真实字节与锁定包模板；配置合法且本地忽略规则有效。缺受管项返回 host_not_initialized/managed_entry_missing，内容差异返回 adapter_modified，缓存存在但被改动返回 framework_integrity_mismatch。完整预检通过前不写项目。
 
 新机器没有回执时，仅认领确定性模板匹配的角色/标记区块；用户自定义原文保留。恢复所需临时文件和缓存逐文件清单写入 schema_version=2 pending；operation=restore，沿用当前host及核实的原宿主集合。只有本地缓存/回执是新恢复计划的写入项，锁/配置/入口/角色在pending.read_only_files中分别记录路径与before_sha256，不列为写入项；临时内容按清单原子落位并回读，遵守 [安装恢复规则](../skills/setup-requirement-workflow/references/installation.md)。
 
