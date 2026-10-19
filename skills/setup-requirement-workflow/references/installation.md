@@ -46,7 +46,7 @@
 
 在任何目标写入前，独占创建 `.agents/requirement-workflow.pending.json`（可先建核验过的 .agents 容器）。schema_version=2，记录操作 install/restore/add_host/upgrade、host（当前实际宿主）、hosts（本批次目标宿主按 codex、claude-code、opencode 顺序排列的去重列表）、锁定package/source、原锁实际摘要或absent、所有计划文件路径与before（absent或真实摘要）/after_sha256、区块原文件整字节与区块预期摘要、缓存逐文件清单、旧回执摘要和实际temporary_files。不得伪造恢复来源；计划不含凭据，路径均相对项目。保存并回读后才开始修改。旧 schema_version=2 计划没有 hosts 时按 [host] 恢复；有 hosts 时按原集合恢复，不重新检测并扩大目标。
 
-先保存 .gitignore 的拥有区块以忽略新本地内容。根工作空间不是 Git 仓库也写这个区块，便于之后共享。Git 仓库中缓存/本机回执/pending 已在索引时报告 local_state_tracked，不能只加忽略后声称不提交；不自动修改暂存区。再按清单准备包到 `.agents/requirement-workflow-cache/<sha256>`，逐文件核验且无额外文件才作为有效包。缓存不可指回源目录或其他项目，目录只读约定不改变业务文件权限。
+先保存 .gitignore 的拥有区块以忽略新本地内容。根工作空间不是 Git 仓库也写这个区块，便于之后共享。忽略区块中的 `.workflow/` 匹配项目任意层级的同名执行目录，适用于默认及自定义 features_dir；正式 documents 不忽略。Git 仓库中缓存/本机回执/pending 或 .workflow 内容已在索引时报告 local_state_tracked，不能只加忽略后声称不提交；不自动修改暂存区。再按清单准备包到 `.agents/requirement-workflow-cache/<sha256>`，逐文件核验且无额外文件才作为有效包。缓存不可指回源目录或其他项目，目录只读约定不改变业务文件权限。
 
 所有写入先用同目录临时文件准备完整字节，临时路径先登记 pending；落位前重查目标仍为before，再原子替换并回读。新薄角色、Codex注册区块和所需入口区块完成后写锁（已有同锁保持原字节），不把初始化元数据塞入业务状态。保存或合并 `.agents/requirement-workflow.local.json`，拥有项只登记薄文件与区块、缓存清单；新增宿主保留其他宿主探测事实；本批次多个宿主分别登记 file_installation，不把非当前宿主标为原生激活通过。核对包、拥有项、锁、配置及每个目标宿主的三角色映射后才清理本次匹配的临时文件和 pending。回执不自包含自身摘要。
 

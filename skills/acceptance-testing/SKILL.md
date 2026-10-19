@@ -5,7 +5,7 @@ description: Use when testing-agent receives an approved feature baseline for ac
 
 # 需求验收与回归
 
-独立核对已批准需求、实际开发基线和用例，执行验收并返回真实结论。项目适用规则和测试约定优先；开发自验只作输入，不能代替独立证据。
+独立核对已批准需求、实际开发基线和用例，执行验收并返回真实结论。项目适用规则和测试约定优先；开发自验只作输入，不能代替独立证据。文稿按 [共享成果规则](../../workflow/output-layout.md#共享成果与本机现场) 保存可独立理解的检查方法、观察与结论，内部run及原始证据链接留本run执行记录。
 
 接单及交付前遵循 [阶段执行契约](../../workflow/execution-contract.md)，统一核对身份、授权、结果位置和过期任务。正式文稿及根状态由协调层维护。
 
@@ -24,7 +24,7 @@ description: Use when testing-agent receives an approved feature baseline for ac
 | 条件 | 模板与输出 |
 | --- | --- |
 | 默认 | [测试报告](assets/templates/test-report.md) → test-report.md，合并用例、偏离核对、缺陷及结论 |
-| 用例矩阵、环境或步骤复杂到影响报告阅读 | 额外使用 [用例](assets/templates/test-cases.md) → test-cases.md；报告引用用例编号及执行证据，不重抄 |
+| 用例矩阵、环境或步骤复杂到影响报告阅读 | 额外使用 [用例](assets/templates/test-cases.md) → test-cases.md；报告引用用例编号及必要观察，不重抄 |
 
 仅拆分用例时用一句话说明理由；不因开发采用完整版就自动拆测试文档。源模板、旧用例及开发资料保持不变；填写实际内容并删除不适用的条件段，TC 用例编号与 AC 验收编号分别记录并关联，执行状态单列；复杂步骤及缺陷用条目展开，已有用例通过链接引用。无需创建单独偏离报告、空缺陷清单或无意义的环境表。
 

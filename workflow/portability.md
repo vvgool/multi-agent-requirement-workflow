@@ -26,6 +26,6 @@
 
 独立框架包：framework.yaml、LICENSE（存在时）、AGENTS.md、README.md、agents/、skills/、workflow/、templates/ 和无凭据的 workflow.yaml 示例，清单摘要算法见包规则。业务项目仅提交workflow.yaml、workflow.lock.yaml、简短入口和各目标宿主薄角色/忽略区块。接收者在自己的工作空间维护配置和 agent-features。
 
-本框架开发需求 agent-features/、早期 docs/superpowers/、docs/verification/ 下的完整演示证据和运行记录仅保留维护者本地并被根 .gitignore 排除，可能含机器路径及项目内容，不随当前源码或核心包分发。仓库保留当前规划及精简验证摘要；业务项目使用的忽略模板仍须保留业务需求和证据。确需共享需求历史时由用户明确选择，按迁移步骤恢复，而不是将其视为新用户的默认工作空间。
+本框架开发需求 agent-features/、早期 docs/superpowers/、docs/verification/ 下的完整演示证据和运行记录仅保留维护者本地并被根 .gitignore 排除，可能含机器路径及项目内容，不随当前源码或核心包分发。仓库保留当前规划及精简验证摘要；业务项目按 [共享成果规则](output-layout.md#共享成果与本机现场) 保留正式文稿与可共享入口，忽略 `.workflow/` 本机执行现场。确需共享需求历史时由用户明确选择，按迁移步骤恢复，而不是将其视为新用户的默认工作空间。
 
 角色文件仍需宿主真实注册。使用通用 [初始化Skill](../skills/setup-requirement-workflow/SKILL.md) 为当前Codex、Claude Code或OpenCode生成相应薄入口；另一个人/机器按同一锁补本地缓存并验证当前宿主，不直接沿用其他人的激活回执。旧Codex快照按兼容流程保持，不自动升级。文件安装、真实新会话生效和完整需求闭环分别验证。

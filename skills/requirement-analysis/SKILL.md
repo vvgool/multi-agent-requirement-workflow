@@ -5,7 +5,7 @@ description: Use when product-agent receives a feature clarification or revision
 
 # 需求澄清与文稿
 
-将用户诉求转为可评审、可实现、可验收的需求。只处理产品阶段，ready 表示可提交评审，用户确认及阶段更新交协调 Agent。使用框架自带流程，不要求安装 grilling 或 Superpowers。
+将用户诉求转为可评审、可实现、可验收的需求。文稿遵循 [共享成果规则](../../workflow/output-layout.md#共享成果与本机现场)，必要来源事实写入正文，内部输入与快照索引留执行记录。只处理产品阶段，ready 表示可提交评审，用户确认及阶段更新交协调 Agent。使用框架自带流程，不要求安装 grilling 或 Superpowers。
 
 接单及交付前遵循 [阶段执行契约](../../workflow/execution-contract.md)，统一核对身份、授权、结果位置和过期任务。
 
@@ -44,7 +44,7 @@ description: Use when product-agent receives a feature clarification or revision
 
 信息足够时先读 [需求模板](assets/templates/requirements.md)，在 task.output_dir 生成 requirements.md，合并目标边界、规则、验收、必要差异及自检。大需求按业务场景或能力分组，仅当阅读或独立维护确有需要时拆附件并说明理由。
 
-自检范围与来源/答复一致性、逐项验收可验证性、必要边界/异常/关联覆盖及编号追踪，记录具体依据和结论。技术方案和模块任务交开发，不抄写原文凑检查报告。
+自检范围与来源/答复一致性、逐项验收可验证性、必要边界/异常/关联覆盖及编号追踪，正文仅写简短自检结论及具体缺口，详细来源核对依据留本run执行记录；不重抄验收表。技术方案和模块任务交开发，不抄写原文凑检查报告。
 
 按 [产品结果模板](../../templates/product-result.yaml) 写指定结果，artifacts 指向实际文稿；requirements 与 quality_check 可指向同一文件。acceptance_ids 对应正文有效编号。交付前按执行契约复核任务及来源；来源变化交协调层重新读取绑定。
 

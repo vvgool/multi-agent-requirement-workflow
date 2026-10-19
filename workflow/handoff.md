@@ -18,7 +18,7 @@
 
 result 必须带同一 schema_version、feature_id、requirements_revision、run_id、role=product。artifacts 路径相对当前 run 的 outputs/，拒绝绝对路径、.. 或符号链接越界。
 
-- ready：questions 为空，无关键未确认 assumptions；requirements 文稿存在，acceptance_ids 唯一且对应正文。每条标准有前置条件、操作和可观察结果。产品 Agent 完成正文与验收质量检查，默认并入文稿自检段；artifacts 的 requirements 和 quality_check 可指向同一文件，兼容旧独立 quality-check.md。协调 Agent 核对文稿、检查记录与结果字段存在，向用户展示评审。
+- ready：questions 为空，无关键未确认 assumptions；requirements 文稿存在，acceptance_ids 唯一且对应正文。每条标准有前置条件、操作和可观察结果。产品 Agent 完成正文与验收质量检查，正文保留简短自检结论，详细依据留本run执行记录；artifacts 的 requirements 和 quality_check 可指向同一文件，兼容旧独立 quality-check.md。协调 Agent 核对文稿、检查记录与结果字段存在，向用户展示评审。
 - needs_input：questions 非空，列具体问题与影响；有选项/推荐时一并原样转达，不将推荐记为用户选择。本轮理解使用 summary，不固化为已评审需求。新结果按下节提供问题依赖和适用条件。协调 Agent 保存真实答复，按 [路由判定](routing.md#产品澄清答复) 选择等待、转达或新调用；部分答复不必然产生新 run。
 - blocked：block_reason 非空，说明缺的能力、权限或证据；不能冒记 ready。
 - stale_task：按阶段执行契约记录旧任务失效事实，不作为本阶段交付。

@@ -31,7 +31,8 @@
 | workflow.lock.yaml：Git URL、完整提交、版本和包摘要 | 是 |
 | AGENTS.md 中的短入口、目标宿主各自的三个薄角色、.gitignore 区块 | 是 |
 | Claude Code 的 CLAUDE.md 短桥接 | 使用 Claude Code 时提交 |
-| .agents/requirement-workflow-cache/、本机回执和中断记录 | 否 |
+| documents/ 中的需求、方案和验收成果 | 按项目约定共享 |
+| .workflow/ 执行现场、.agents/requirement-workflow-cache/、本机回执和中断记录 | 否 |
 
 默认初始化当前宿主及项目中检测到的宿主：.codex/ 对应 Codex；.claude/ 或 CLAUDE.md 对应 Claude Code；.opencode/ 或 opencode.json/jsonc 对应 OpenCode。只在项目根检测，不因机器装了 CLI 就生成配置。可明确要求“只初始化当前宿主”或“全部三个宿主”。
 
@@ -157,7 +158,7 @@ python3 scripts/verify-artifact-slimming.py --source-root . --scratch /absolute/
 
 共享发布包包含framework.yaml、LICENSE、AGENTS.md、README.md、workflow.yaml、agents/、skills/、workflow/、templates/。docs/不默认安装到业务项目。框架自身agent-features/、早期docs/superpowers/、完整验证夹具及运行记录仅保留本地，不进入当前仓库版本。三个宿主不需要使用相同插件格式；插件只作为可选分发方式。
 
-业务项目通常只需提交workflow.yaml、workflow.lock.yaml、入口和各目标宿主的三个薄角色，以及精确的.gitignore区块；Claude Code按需多一份CLAUDE.md短桥接。完整包缓存和本机探测回执不提交。换机按锁重建环境，显式升级项目绑定；用户修改的入口不覆盖，旧包和需求证据不自动清理。详情见 [包与版本规则](workflow/package.md)。
+业务项目通常只需提交workflow.yaml、workflow.lock.yaml、入口和各目标宿主的三个薄角色，以及精确的.gitignore区块；Claude Code按需多一份CLAUDE.md短桥接。完整包缓存、本机探测回执和任意层级的 `.workflow/` 不提交，初始化写入忽略区块。`documents/` 独立可读，不链接本机任务和日志；本机仍保留恢复及审批记录。换机按锁重建环境，显式升级项目绑定；用户修改的入口不覆盖，旧包和需求证据不自动清理。详情见 [包与版本规则](workflow/package.md)。
 
 旧 `.agents/requirement-workflow/installation.json` 快照安装保持原状，不自动迁移。本框架不新增后台服务或跨会话锁，同一需求仅一个协调会话推进。升级/换宿主前确认旧任务结束；审批、开发基线和历史run不得改写。更完整的目标和职责说明位于开发目录docs/planning/。
 
