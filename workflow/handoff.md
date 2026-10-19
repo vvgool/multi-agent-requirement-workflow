@@ -14,7 +14,9 @@
 
 新轻量安装按 [包规则](package.md) 在 task/active_run 保存真实framework身份，task.framework_lock引用已核验的不可变锁快照；host.yaml记录当前host和该身份。旧run原锁及配置快照继续按原索引读取。适配映射见 [宿主契约](host-adapters.md)。旧历史任务不回填或迁移。
 
-准备记录不等于已派发。host.yaml 保存真实宿主、host_task_id 和实际取得的时间；宿主未返回 ID 时保持 unknown。结束后将宿主完成或失败事实记入同文件，再清空 active_run。
+先完整写定 task 和输出目录，准备过程不单独保存 prepared 状态或事件。调用前保存 host.yaml 的 unknown 意图（尚无真实任务ID），并在一次根状态更新中登记 run、active_run=unknown 和适用的开发次数；回读成功才真正调用。开发次数为调用预留，未知调用先核实；有证据证明未调用时才纠正，实际调用仅计一次。得到真实宿主ID后保存 host 并将根状态改为 running；结束事实仍写入 host 后再清空 active_run。
+
+中断恢复先核对根状态、host 和事件：只有 task 的目录不证明已调用；存在 unknown、真实宿主ID或存量 prepared 时先查询原调用。host 已写而根状态未写时先对齐原意图，不能创建第二个 run；无法确认调用是否发生就保留 unknown 并阻塞核查。根状态已写但事件缺失按状态恢复规则补记，准备文件不完整时不得调用。
 
 ## 产品结果
 

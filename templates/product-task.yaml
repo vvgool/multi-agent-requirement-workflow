@@ -12,8 +12,7 @@ workspace_root: null # 当前宿主中的目标工作空间
 feature_dir: null
 target_project: null
 input_path: null
-required_files: [] # 额外必读资料；task专用字段已引用的同一文件不重复列入
 output_dir: null # 当前run的outputs/，候选文稿与证据
 result_path: null # 布局2必须填当前run/result.yaml；artifacts仍相对output_dir
-external_write_scope: [] # 默认无外部写权限；仅在配置和用户授权允许时列出本版飞书写回目标
 completion_criteria: [] # 必填本轮目标及特有完成条件；产品Skill通用门槛直接适用，不复制全文
+# 额外必读资料才填 required_files；获授权的外部写回目标才填 external_write_scope。

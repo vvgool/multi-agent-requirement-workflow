@@ -6,7 +6,5 @@ role: product
 status: null # ready、needs_input、blocked 或 stale_task（处置见 workflow/execution-contract.md）
 summary: null # 当前目标/范围理解及本轮变化；推荐不等于用户确认
 artifacts: [] # 每项为 kind 和 path，path 相对当前 run 的 outputs/；requirements 与 quality_check 可指向同一文稿
-acceptance_ids: []
-questions: [] # 新问题必含id/question/impact；dependencies、validity及选项/推荐按需提供，见workflow/handoff.md；旧格式不回填
-assumptions: [] # 每项为 statement 和 confirmed
-block_reason: null
+# ready 必填 acceptance_ids；needs_input 必填 questions；blocked 必填 block_reason。
+# questions 含 id/question/impact；assumptions 有假设时填写 statement/confirmed，见 workflow/handoff.md。
