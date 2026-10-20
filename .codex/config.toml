@@ -1,0 +1,13 @@
+# requirement-workflow:codex-registry:begin
+[agents.requirement_product]
+description = "澄清需求并输出验收标准"
+config_file = "agents/requirement_product.toml"
+
+[agents.requirement_development]
+description = "实现已批准需求并完成自验"
+config_file = "agents/requirement_development.toml"
+
+[agents.requirement_testing]
+description = "独立验收当前开发基线并报告缺陷"
+config_file = "agents/requirement_testing.toml"
+# requirement-workflow:codex-registry:end

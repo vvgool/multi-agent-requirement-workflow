@@ -5,7 +5,7 @@ description: Use when testing-agent receives an approved feature baseline for ac
 
 # 需求验收与回归
 
-独立核对已批准需求、实际开发基线和用例，执行验收并返回真实结论。项目适用规则和测试约定优先；开发自验只作输入，不能代替独立证据。文稿按 [共享成果规则](../../workflow/output-layout.md#共享成果与本机现场) 保存可独立理解的检查方法、观察与结论，内部run及原始证据链接留本run执行记录。
+独立核对已批准需求、实际开发基线和用例，执行验收并返回真实结论。项目适用规则和测试约定优先；开发自验只作输入，不能代替独立证据。内部run及原始证据链接留本run执行记录。
 
 接单及交付前遵循 [阶段执行契约](../../workflow/execution-contract.md)，统一核对身份、授权、结果位置和过期任务。正式文稿及根状态由协调层维护。
 

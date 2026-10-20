@@ -7,7 +7,7 @@ description: Use when development-agent receives an approved feature or defect-f
 
 在已批准范围内完成实现与完整功能自验。文档按复杂度裁剪，执行方式按模块选择；两者分别判断。
 
-接单及交付前遵循 [阶段执行契约](../../workflow/execution-contract.md)，统一核对身份、授权、结果位置和过期任务。正式文稿及根状态由协调层维护；文稿按 [共享成果规则](../../workflow/output-layout.md#共享成果与本机现场) 面向人和AI独立可读，内部身份及证据索引留执行记录。
+接单及交付前遵循 [阶段执行契约](../../workflow/execution-contract.md)，统一核对身份、授权、结果位置和过期任务。正式文稿及根状态由协调层维护；内部身份及证据索引留执行记录。
 
 ## 接单与开发原则
 

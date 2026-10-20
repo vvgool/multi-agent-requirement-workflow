@@ -5,7 +5,7 @@ description: Use when product-agent receives a feature clarification or revision
 
 # 需求澄清与文稿
 
-将用户诉求转为可评审、可实现、可验收的需求。文稿遵循 [共享成果规则](../../workflow/output-layout.md#共享成果与本机现场)，必要来源事实写入正文，内部输入与快照索引留执行记录。只处理产品阶段，ready 表示可提交评审，用户确认及阶段更新交协调 Agent。使用框架自带流程，不要求安装 grilling 或 Superpowers。
+将用户诉求转为可评审、可实现、可验收的需求。必要来源事实写入正文，内部输入与快照索引留执行记录。只处理产品阶段，ready 表示可提交评审，用户确认及阶段更新交协调 Agent。使用框架自带流程，不要求安装 grilling 或 Superpowers。
 
 接单及交付前遵循 [阶段执行契约](../../workflow/execution-contract.md)，统一核对身份、授权、结果位置和过期任务。
 
