@@ -43,7 +43,7 @@ write_authorization 包含同一 target（provider/host/repository/issue_number�
 
 ## 存储与失败
 
-业务事件按 state-contract 落 events.jsonl，新增受管事件含稳定 event_id、revision、state_version、kind、summary 及实际证据引用。event_id 取 `<feature_id>:r<revision>:s<该业务状态版本>:<kind>`，不含机器路径或当前重试时间；同步字段更新不生成另一份同事实业务事件。
+业务事件按 state-contract 落 events.jsonl，新增受管事件含稳定 event_id、revision、state_version、kind、summary 及实际证据引用。event_id 取 `<feature_id>:r<revision>:s<该业务状态版本>:<kind>`，不含机器路径或当前重试时间；同步字段更新不生成另一份同事实业务事件。宿主 unknown/running 变化只在 host.yaml 和 active_run 中保存，不作为 Issue 业务事件或评论来源。
 
 只有绑定、sync 策略及授权均有效的事件才按需创建 `revisions/vN/.workflow/issue-sync/<sync_key>/{record.yaml,comment.md}`，路径由真实事件修订定位，不用当前版替换旧版。record 以 [模板](../skills/issue-tracking/assets/templates/sync-record.yaml) 保存不可变目标及事件快照，根 issue_tracking.sync_records 仅索引需求相对路径。旧布局也可按需新增这个可选侧目录，不移动旧文档/任务或重算审批。详细去重与写入恢复见 [同步流程](../skills/issue-tracking/references/synchronization.md)。
 
