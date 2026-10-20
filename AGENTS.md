@@ -38,15 +38,14 @@
 <!-- requirement-workflow:begin -->
 ## 需求协作入口
 
-发起、继续或优化命名需求时，以本项目为工作空间，先读 workflow.lock.yaml。框架缓存为 `.agents/requirement-workflow-cache/<package.sha256>/`；缓存不随 Git 提交，由主会话在派发前按以下步骤补齐。单纯问答/审查/维护不创建需求；用户要求只读或 initialization_probe=true 时不下载、修复或写入，缺环境仅报告阻塞。
+发起、继续或优化命名需求时，以本项目为工作空间，先读 workflow.lock.yaml。缓存位于 `.agents/requirement-workflow-cache/<package.sha256>/`，不随 Git 提交；首次进入或上下文丢失时按包规则完整核验，同会话后续按变化快照复用。单纯问答、审查和维护不创建需求；只读或 initialization_probe=true 时不下载、修复或写入，缺环境只报告阻塞。
 
 用户明确说“新需求”即进入协调接单，未命名时先收集目标并确定名称，再创建状态和产品任务。后续补充沿用原需求上下文，直到用户明确取消、切换需求或要求退出流程；即使修改对象是框架规则、Skill 或模板，也由协调层按阶段派发。上述维护例外仅用于未进入需求流程的独立请求，或用户明确退出流程后要求直接维护；协调层不以维护为由代做需求实现。
 
-1. 锁必须能可靠解析且无重复键，包含 schema_version=1、package{name,version,protocol_version,sha256}、source{kind,location,revision}；包名为 multi-agent-requirement-workflow，协议为1，摘要为64位小写十六进制。已有 `.agents/requirement-workflow.pending.json` 时先读取原计划；有锁时计划包身份/来源须与锁一致。缺锁仅在可信的原安装pending明确来源/身份时按原计划恢复，不重新规划或派发任务；无该计划或锁格式不合法则停止。
-2. 缓存目录完整时先核验下述包身份；目录存在但内容不符、含链接/额外文件时返回 framework_integrity_mismatch，不自动覆盖。完整缓存但缺本机回执时可直接从缓存执行下一步，无需联网。
-3. 缓存不存在且 source.kind=git 时，用已有 Git 能力在独立临时目录从 source.location 获取 source.revision 的完整提交并检出，核实实际 HEAD 一致；不解析最新分支或改锁。URL须为无凭据HTTPS/SSH远程Git来源，拒绝本机路径；revision须为完整提交SHA。只读获取，不执行下载的脚本或安装依赖。manual来源需用户提供同摘要包；标识不能当下载URL。无工具、无网络或无权限时返回 framework_restore_unavailable 及原因，不推进需求。
-4. 执行下载包的指令前先计算身份：文件清单为根 framework.yaml、AGENTS.md、README.md、workflow.yaml、LICENSE（存在时）以及 agents/、skills/、workflow/、templates/ 全部普通文件；拒绝清单内链接/特殊文件。按相对POSIX路径字符串升序生成 [路径,原字节SHA256] 条目数组，以UTF-8紧凑JSON编码（ensure_ascii=false、分隔符为逗号和冒号），其SHA256须等于锁中sha256；framework.yaml中的name/version/protocol_version须等于锁。来源提交或摘要不符时停止，不能读取其Skill执行修复。
-5. 身份通过后读取该包 skills/setup-requirement-workflow/SKILL.md，以 restore_only=true 补本地环境：先核对已有受管入口/角色/忽略区块均符合锁定模板，再按原pending或新restore计划补缓存/回执。自动恢复不得增改版本锁、项目配置、受管入口/角色、业务文稿、审批或active_run；缺角色、用户修改或冲突时报告具体问题，等待明确初始化/修复，不自动升级。成功核验并清理匹配的pending后才加载缓存中的 agents/coordinator-agent.md。
+1. 锁须可解析且无重复键，固定包含 schema_version=1、package 身份和 source；包名为 multi-agent-requirement-workflow、protocol_version=1，sha256 为64位小写十六进制，git revision 必须是完整提交 SHA。已有 `.agents/requirement-workflow.pending.json` 时先恢复原计划；锁缺失、格式不合法或计划身份不一致即停止，不重新规划。
+2. 缓存必须是锁定摘要对应的完整普通文件包；按根文件及 agents/、skills/、workflow/、templates/ 的相对 POSIX 路径和原字节 SHA256 排序计算紧凑 JSON 摘要，拒绝链接和额外文件。内容、来源提交或包身份不符时返回 framework_integrity_mismatch，不自动覆盖；缺缓存时按锁定提交恢复，只读获取并核验实际 HEAD，不跟随分支、不执行下载脚本。
+3. 身份核验后才读取 setup Skill，以 restore_only=true 补缓存或回执；不自动升级、扩展宿主、覆盖用户文件、改变项目配置、审批、业务文稿或 active_run。具体清单、摘要算法和失败语义按 [包规则](workflow/package.md) 与 [启动恢复](workflow/bootstrap.md) 执行。
+4. 按缓存 host-adapters 映射选择当前宿主的三个原生角色，并分别记录文件安装、宿主激活和完整业务闭环；不能用通用 Agent 或其他宿主结论替代原生证据。
+5. 业务阶段前核对当前需求 status、task 和 active_run；unknown 或无法查询的调用先恢复核实，不重复派发。Issue 默认关闭，启用时仅由协调层按授权处理。
 
-按缓存 workflow/host-adapters.md 的当前宿主映射真实选择三个原生角色，传入 task、包身份和当机框架路径。只读取角色文件不等于原生调用；文件安装、当前宿主激活、完整业务闭环分别记录。业务阶段前核对活动任务；未知调用不重复派发，不借环境恢复换宿主、升级或重置状态。Issue默认关闭，启用时仅由协调层按授权处理。
 <!-- requirement-workflow:end -->
