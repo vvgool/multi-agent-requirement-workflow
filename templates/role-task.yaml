@@ -3,7 +3,7 @@ feature_id: null
 requirements_revision: 1
 layout_version: 2 # 与当前修订状态一致；旧任务缺字段视为1
 run_id: null
-role: null # development 或 testing
+role: null # development、testing 或 bug
 framework: null # 新锁定安装必填{name,version,protocol_version,sha256}；无锁历史任务保持缺失/null
 framework_lock: null # {path,sha256}，引用需求内按原字节摘要保存的锁快照；旧run沿原路径
 effective_config: null # {path,sha256}，引用需求内不可变有效配置快照；路径相对feature_dir
@@ -22,3 +22,5 @@ completion_criteria: [] # 必填本轮目标及特有完成条件；阶段Skill�
 # 测试必填 development_run_id、development_baseline（run_id/code_baseline）。
 # 修复任务必填 defect_report_path；额外必读资料才填 required_files，测试必含原开发result。
 # write_scope.project_paths/temporary_paths 仅有实际授权时添加；缺失表示无对应写权限。
+# bug 必填 bug_purpose=boundary/fix；独立修复 boundary_path/boundary_digest 和对应 approval_digest。
+# 按 workflow/bugfix.md 填 source_run_id/source_baseline、defect_report_path、bugfix/continuation。

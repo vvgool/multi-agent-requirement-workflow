@@ -29,18 +29,18 @@
 | --- | --- |
 | workflow.yaml：项目策略 | 是 |
 | workflow.lock.yaml：Git URL、完整提交、版本和包摘要 | 是 |
-| AGENTS.md 中的短入口、目标宿主各自的三个薄角色、.gitignore 区块 | 是 |
+| AGENTS.md 中的短入口、目标宿主各自的四个薄角色、.gitignore 区块 | 是 |
 | Claude Code 的 CLAUDE.md 短桥接 | 使用 Claude Code 时提交 |
 | documents/ 中的需求、方案和验收成果 | 按项目约定共享 |
 | .workflow/ 执行现场、.agents/requirement-workflow-cache/、本机回执和中断记录 | 否 |
 
 默认初始化当前宿主及项目中检测到的宿主：.codex/ 对应 Codex；.claude/ 或 CLAUDE.md 对应 Claude Code；.opencode/ 或 opencode.json/jsonc 对应 OpenCode。只在项目根检测，不因机器装了 CLI 就生成配置。可明确要求“只初始化当前宿主”或“全部三个宿主”。
 
-全新项目单宿主 Codex/Claude Code 涉及 8 个文件、OpenCode 7 个，三个宿主一起共 15 个；共享一份版本锁、缓存和 AGENTS 入口。Codex通过 `.codex/config.toml` 的受管注册区块引用三个薄角色，仅拥有该区块，保留原有配置；restore不补缺失注册。已有文件保留原文，只添加受管区块。所有目标先预检，任一冲突先停止整批写入，写入中断则保留原批次计划供恢复，不将半安装标为成功。
+全新项目单宿主 Codex/Claude Code 涉及 9 个文件、OpenCode 8 个，三个宿主一起共 18 个；共享一份版本锁、缓存和 AGENTS 入口。Codex通过 `.codex/config.toml` 的受管注册区块引用四个薄角色，仅拥有该区块，保留原有配置；restore不补缺失注册。已有文件保留原文，只添加受管区块。所有目标先预检，任一冲突先停止整批写入，写入中断则保留原批次计划供恢复，不将半安装标为成功。
 
 文件可一次准备，原生激活按宿主分别验证：在 Codex 中不能把 Claude Code/OpenCode 标为已激活。未验证者保持 pending；后续进入对应宿主会话再只读探测。
 
-协调 Agent **运行在主会话**：宿主读取项目 AGENTS.md 后，按版本锁定位缓存，再加载 agents/coordinator-agent.md 和状态路由规则。因此只注册产品、开发、测试三个原生子 Agent。入口详见 [宿主适配](workflow/host-adapters.md)。
+协调 Agent **运行在主会话**：宿主读取项目 AGENTS.md 后，按版本锁定位缓存，再加载 agents/coordinator-agent.md 和状态路由规则。因此只注册产品、开发、测试、Bug 四个原生子 Agent。入口详见 [宿主适配](workflow/host-adapters.md)。
 
 ### 验证并使用
 
@@ -48,7 +48,7 @@
 
 ```text
 按项目 AGENTS.md 加载需求协作入口。
-只读核对框架版本，并实际验证产品、开发、测试三个原生角色是否可调用。
+只读核对框架版本，并实际验证产品、开发、测试、Bug 四个原生角色是否可调用。
 不创建需求，不执行开发。
 ```
 
@@ -81,7 +81,7 @@
 
 无法联网时，可先在有权限的机器获取相同提交的代码，再向 Agent 提供本地包目录；已有 Git 锁须核实该目录确实对应锁定提交，无法证明时停止，不能改成 manual 绕过。无锁的新项目仍可按手动包安装。
 
-源码版本为 **0.2.6**，协议仍为 1。本补丁合并共享文稿规则的按需读取精简、执行证据边界及 OpenCode 父会话目录核对说明；已有项目须显式升级版本锁和缓存才会采用新包。维护用离线实验工具不进入运行包，也不证明实际 token 收益。
+源码版本为 **0.3.0 候选**，协议仍为 1，尚未发布。本项目当前安装仍锁定 **0.2.6**；已有项目须显式升级版本锁和缓存才会采用新包。0.2.6 已合并共享文稿规则的按需读取精简、执行证据边界及 OpenCode 父会话目录核对说明。维护用离线实验工具不进入运行包，也不证明实际 token 收益。
 
 历史 0.2.4 候选（核心摘要 `39c446bc4a6593b66086b01ae183718b471cb0b96bf319fa7d8cc197564f0843`）已验证三宿主文件适配、Codex/OpenCode 三原生角色及 Codex 代表性真实闭环；Claude Code 原生运行仍缺验。版本整理改变包身份，旧包原生及闭环证据不等于 0.2.6 验收。无原生选择能力时记录 pending，不使用通用 Agent 冒充通过。仓库中的 [验证摘要](https://github.com/vvgool/multi-agent-requirement-workflow/tree/main/docs/verification) 记录实际边界；完整测试快照和运行记录不随当前源码分发。
 
@@ -105,7 +105,7 @@
   workflow.yaml                   # 项目策略
   workflow.lock.yaml              # 框架来源、固定版本与摘要
   AGENTS.md                       # 简短主会话入口
-  .codex/、.claude/或.opencode/    # 每个目标宿主三个薄角色
+  .codex/、.claude/或.opencode/    # 每个目标宿主四个薄角色
   .agents/requirement-workflow-cache/<sha256>/ # 本地缓存，Git忽略
   agent-features/<需求名称>/
     README.md                      # 人工入口：进度、有效文稿、待办及 Issue 同步提示
@@ -145,7 +145,7 @@ optional 在首次派发前选择绑定或跳过；required 在业务派发前�
 
 Codex注册区块的TOML语义与保留配置回归（仅源码分发提供测试，不是宿主激活验收）：`python3 -B -m unittest discover -s tests -p 'test_codex_registry.py'`。使用已有Python 3.11+ tomllib或tomli，不安装依赖。运行时setup所需纯合并helper位于包内 `skills/setup-requirement-workflow/scripts/codex_registry.py`。
 
-三端实际模板/共用正文及配置保留回归：`python3 -B scripts/verify-host-adapters.py --source-root . --scratch /absolute/authorized/empty-directory`。可选 `--opencode /absolute/path/to/existing/opencode` 以已有CLI核对合法JSONC和三个原生定义的发现；首次发现可能短暂不完整，输出保留最多三次只读观察。脚本只生成授权空目录内的开发夹具，不安装项目、写回执或执行模型；发现列表不能证明实际委派。OpenCode/Claude使用原生Markdown文件发现，不需要复制Codex的TOML合并helper。三个宿主分别核对自身的同名角色、禁用和权限，不能从一个宿主成功推断其他宿主。
+三端实际模板/共用正文及配置保留回归：`python3 -B scripts/verify-host-adapters.py --source-root . --scratch /absolute/authorized/empty-directory`。可选 `--opencode /absolute/path/to/existing/opencode` 以已有CLI核对合法JSONC和四个原生定义的发现；首次发现可能短暂不完整，输出保留最多三次只读观察。脚本只生成授权空目录内的开发夹具，不安装项目、写回执或执行模型；发现列表不能证明实际委派。OpenCode/Claude使用原生Markdown文件发现，不需要复制Codex的TOML合并helper。三个宿主分别核对自身的同名角色、禁用和权限，不能从一个宿主成功推断其他宿主。
 
 
 初始化区分文件安装、当前宿主原生激活和完整需求闭环，具体以本项目本机回执为准。验证范围见 docs/verification/README.md；历史手动加载正常闭环及旧快照证据不能作为当前三宿主原生通过的证明。真实飞书和Issue平台联调仍需独立完成。
@@ -160,7 +160,7 @@ python3 scripts/verify-artifact-slimming.py --source-root . --scratch /absolute/
 
 共享发布包包含framework.yaml、LICENSE、AGENTS.md、README.md、workflow.yaml、agents/、skills/、workflow/、templates/。docs/不默认安装到业务项目。框架自身agent-features/、早期docs/superpowers/、完整验证夹具及运行记录仅保留本地，不进入当前仓库版本。三个宿主不需要使用相同插件格式；插件只作为可选分发方式。
 
-业务项目通常只需提交workflow.yaml、workflow.lock.yaml、入口和各目标宿主的三个薄角色，以及精确的.gitignore区块；Claude Code按需多一份CLAUDE.md短桥接。完整包缓存、本机探测回执和任意层级的 `.workflow/` 不提交，初始化写入忽略区块。`documents/` 独立可读，不链接本机任务和日志；本机仍保留恢复及审批记录。换机按锁重建环境，显式升级项目绑定；用户修改的入口不覆盖，旧包和需求证据不自动清理。详情见 [包与版本规则](workflow/package.md)。
+业务项目通常只需提交workflow.yaml、workflow.lock.yaml、入口和各目标宿主的四个薄角色，以及精确的.gitignore区块；Claude Code按需多一份CLAUDE.md短桥接。完整包缓存、本机探测回执和任意层级的 `.workflow/` 不提交，初始化写入忽略区块。`documents/` 独立可读，不链接本机任务和日志；本机仍保留恢复及审批记录。换机按锁重建环境，显式升级项目绑定；用户修改的入口不覆盖，旧包和需求证据不自动清理。详情见 [包与版本规则](workflow/package.md)。
 
 旧 `.agents/requirement-workflow/installation.json` 快照安装保持原状，不自动迁移。本框架不新增后台服务或跨会话锁，同一需求仅一个协调会话推进。升级/换宿主前确认旧任务结束；审批、开发基线和历史run不得改写。更完整的目标和职责说明位于开发目录docs/planning/。
 
@@ -184,3 +184,9 @@ scripts/             # 随源码分发的最小开发复验入口，不进入业
 ## 开源许可
 
 本项目使用 [MIT License](https://github.com/vvgool/multi-agent-requirement-workflow/blob/main/LICENSE)。分发核心包时保留LICENSE；早期无LICENSE的包按其原清单校验，版本锁不会因仓库公开而自动迁移。
+
+## Bug 修复
+
+候选 0.3.0 增加 Bug 原生角色，当前源码版本不代表任何项目已升级。独立 Bug 先由 Bug Agent 整理边界经明确确认后修复，开发后/开发中补充按 [Bug 路由](workflow/bugfix.md) 交接。修复自验后必须由测试 Agent 独立验收，失败返回修复；全部写阶段派发共用默认 3 次额度。旧锁、历史任务、成果和审批不自动迁移。
+
+文件模板检查不证明原生角色调用或真实修复闭环通过。

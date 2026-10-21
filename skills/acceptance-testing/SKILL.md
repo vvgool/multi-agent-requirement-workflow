@@ -32,4 +32,8 @@ description: Use when testing-agent receives an approved feature baseline for ac
 
 按 [公共结果模板](../../templates/role-result.yaml) 在指定结果位置写 result.yaml，填实际验收结果、development_run_id、基线、缺陷和限制；artifacts 每项含 kind/path，相对本 run 输出。passed/failed/blocked 按流程门槛判断，报告与结果一致。
 
-业务源码修复交开发，需求歧义交协调层；改变批准正文须进入新修订评审。向协调 Agent 返回结果路径、状态及简要结论。
+业务源码修复交开发或绑定的 Bug 角色，需求歧义交协调层；改变批准正文须进入新修订评审。向协调 Agent 返回结果路径、状态及简要结论。
+
+## Bug 独立验收
+
+任务来自 Bug fix 时按 [Bug 路由](../../workflow/bugfix.md) 核对相应批准需求或 bug_boundary、真实 Bug task/result 与 development_run_id。独立执行原始未最小化场景、适用真实接缝回归及全部本轮适用验收，失败回传失败证据与待修复基线；测试不修源码。supplement 的 coverage_scope 明确为局部交接范围，通过后只回开发继续整体需求。

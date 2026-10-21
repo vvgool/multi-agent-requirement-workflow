@@ -9,6 +9,10 @@
 3. 直接维护例外仅适用于未进入需求流程的独立请求，或用户明确退出流程后要求直接维护。针对当前需求的问答、状态查询和只读诊断可由主会话直接答复，保留需求上下文，不因此推进阶段；诊断后的实现或修复继续按需求路由。协调层可以检查文件以定位和交接，但需求阶段的分析、实现及验收由原生角色执行。
 4. 每次接单先说明当前动作属于接单澄清、阶段派发或独立维护及其依据。尚未派发时如实说明，不把读取角色文件或主会话编辑视为 Agent 执行。
 
+## Bug 请求
+
+明确只修 Bug 的请求（包括新需求中明确只修缺陷）按 [Bug 入口](bugfix.md) 直接派 bug 整理边界，覆盖下表默认 draft 产品路由；其余新需求维持产品流程。开发后/开发中补充与独立路径均按该契约处理，unknown 优先恢复。
+
 ## 决策顺序
 
 1. 核对需求身份、版本和状态。已有状态缺失、未知或矛盾时阻塞核查。
@@ -77,6 +81,6 @@
 
 产品使用 [产品任务](../templates/product-task.yaml) 和 [产品结果](../templates/product-result.yaml)；开发/测试使用 [角色任务](../templates/role-task.yaml) 和 [角色结果](../templates/role-result.yaml)。按所选角色文件填写 completion_criteria；任务 approval_digest 取 approval.review_digest。测试绑定 development_run_id 和 development_baseline，按 [代码基线契约](code-baseline.md) 核对；修复任务附 defect_report_path。
 
-开发次数按修订版累计，默认 max_development_attempts=3，包含首次。实际发起新开发调用前增加一次并绑定 run；角色/宿主缺失不增加，未知调用恢复不重复计数。达到上限后 development/blocked、development_attempt_limit，等待用户调整或决策。
+开发次数按修订版累计，默认 max_development_attempts=3，包含首次。development 或 bug fix 共享额度，实际发起新写阶段调用前增加一次并绑定 run；角色/宿主缺失不增加，未知调用恢复不重复计数。达到上限后 development/blocked、development_attempt_limit，等待用户调整或决策。
 
 同一宿主 Agent 只在同一角色内复用。有新输入、状态变化、真实调用或交接时，在已有记录保存动作与依据；无变化的轮询和重复展示不新建决策记录。状态、历史、审批和范围变更分别遵循 [状态规则](state-contract.md)、[修订规则](revisions.md) 和 [文档规则](documents.md)。

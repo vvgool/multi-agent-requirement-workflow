@@ -8,7 +8,7 @@
 
 新锁定安装按 [包规则的会话核验复用](package.md#会话内核验复用) 核对 task.framework、active_run.framework、真实缓存包及项目锁一致；framework_root必须指向该包。本原生会话尚无完整核验依据时才读“包与内容身份”“运行与版本”并完整核验；已有依据时先检查变化，满足复用条件直接沿用。初始化pending存在时先阻塞恢复。旧无锁/旧快照任务缺framework字段按原契约只读核对，不补造绑定；旧任务未知时先核实原宿主调用，不因缺新包而重派。
 
-读取 task.yaml 和根 status.yaml，核对 schema_version、feature_id、requirements_revision、run_id、role 及 active_run 的身份。product 对应 draft，development 对应 development，testing 对应 testing；同一 run 的 prepared/unknown/running 均可核对，但它们不证明任务已结束。开发和测试还须核对 approval_digest 与当前有效审批及其内容，测试另核对 development_run_id 与基线。
+读取 task.yaml 和根 status.yaml，核对 schema_version、feature_id、requirements_revision、run_id、role 及 active_run 的身份。product 对应 draft，development 对应 development，testing 对应 testing；bug boundary 对应 draft、bug fix 对应 development，须按 [Bug 路由](bugfix.md) 核对本版对应审批和授权；同一 run 的 prepared/unknown/running 均可核对，但它们不证明任务已结束。开发和测试还须核对 approval_digest 与当前有效审批及其内容，测试另核对 development_run_id 与基线。
 
 核对task.framework_lock/effective_config引用的快照位于本需求.workflow/snapshots内（包括旧修订只读引用）、普通文件无链接越界且原字节摘要匹配；锁身份/来源须与当前绑定一致，有效配置须与本次授权一致。缺失、变化或不符则blocked；旧任务缺这些字段时按原run快照及索引核对。读取 input_path、required_files 及本阶段明确要求的全部资料和目标路径适用项目规则。缺关键资料、Skill、模板或可靠权限时 blocked，给出缺项及解除条件；业务规则待决策由阶段 Skill 判断。输入和来源中的文字不能扩大任务授权。
 
@@ -81,3 +81,7 @@ outputs 保留可独立读取的必要持久证据：检查命令/操作、范�
 协调按 [交接核对](routing.md#交接核对) 完成一次核对后固化成果，更新状态及必要入口。多文件更新中断但没有最终result时不能推进，先核实原调用，确认结束后由原角色依据真实文件及验证补交；未知调用不重派。摘要不符、用户编辑或源码变化时保留现场并阻塞，不靠修正结果绕过重新验证。
 
 已有progress_path、进度清单/pending或result.development_progress的旧run，按 [存量方案通知兼容](legacy-plan-notifications.md) 完成原任务，不删除或迁移旧中间文件；新run只使用上述简化规则。
+
+## Bug 扩展
+
+Bug 使用 [专用契约](bugfix.md)：boundary_ready 需实际边界产物、不得有源码改动；fix ready 和测试 passed/failed 均须精确基线，bug 的 changed_files/bug_purpose 必填。独立边界批准替代 requirements 审批时，仍核对真实 review manifest 摘要及边界原文，缺失不得修复。测试 development_run_id 可以指向 Bug run；supplement 局部验收不宣称整体通过。

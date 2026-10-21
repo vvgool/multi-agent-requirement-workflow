@@ -3,7 +3,7 @@ feature_id: null
 requirements_revision: 1
 run_id: null
 role: null
-status: null # development: ready/needs_input/blocked；testing: passed/failed/blocked；双方均可 stale_task
+status: null # development: ready/needs_input/blocked；testing: passed/failed/blocked；bug: boundary_ready/ready/needs_input/blocked；全部可 stale_task
 summary: null
 artifacts: [] # kind/path；文稿须记录真实sha256。只索引本run outputs安全相对路径；历史证据在本run执行记录按原result引用，见execution-contract；同检查不复制日志
 # 按角色添加 changed_files（开发）、development_run_id/acceptance_results（测试）。
@@ -11,3 +11,4 @@ artifacts: [] # kind/path；文稿须记录真实sha256。只索引本run output
 # unresolved_items 仅有未决事项时填写；详见 workflow/execution-contract.md。
 # acceptance_results 每项 id/status/actual/evidence；defects 每项 id/acceptance_id/steps/expected/actual/evidence。
 # code_baseline 结构见 workflow/code-baseline.md，绑定字段保留完整。
+# bug：bug_purpose、changed_files；boundary_ready 需 bug_boundary 文稿，fix ready 需 bug_report 及 code_baseline。

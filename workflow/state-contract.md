@@ -51,3 +51,7 @@ draft 阶段的答复按 [产品路由](routing.md#产品澄清答复) 处理；
 ## 开发方案展示
 
 普通方案展示在当前对话说明，README按人工入口触发条件更新，不维护独立显示状态、递增state_version或追加展示事件；实质业务变化及交接仍按本文件更新。旧development_progress产物、展示状态及事件按 [存量通知协议](legacy-plan-notifications.md) 读取保留，不新增或迁移。
+
+## 可选 Bug 字段
+
+workflow_kind=bugfix 与 bugfix 对象只在 [Bug 入口](bugfix.md) 适用时添加，stage 仍五阶段，active_run.role 可为 bug，approval/pending_review.type 可为 bug_boundary。字段缺失沿既有 requirements 审批语义，不推导独立 Bug 授权。所有交接、计数、回交和写入仍仅协调维护。

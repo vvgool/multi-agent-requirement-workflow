@@ -16,7 +16,7 @@ except ImportError:
 
 BEGIN = b'# requirement-workflow:codex-registry:begin\n'
 END = b'# requirement-workflow:codex-registry:end\n'
-NAMES = ('requirement_product', 'requirement_development', 'requirement_testing')
+NAMES = ('requirement_product', 'requirement_development', 'requirement_testing', 'requirement_bug')
 
 
 class RegistryError(ValueError):

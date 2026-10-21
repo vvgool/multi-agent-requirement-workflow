@@ -14,8 +14,11 @@
 - product-agent：澄清需求，输出需求文档和验收标准。
 - development-agent：设计和实现代码。
 - testing-agent：执行测试，输出测试报告并反馈缺陷。
+- bug-agent：整理修复边界、诊断修复并自验，独立测试仍由 testing-agent 负责。
 
-阶段执行由 [产品](agents/product-agent.md)、[开发](agents/development-agent.md)、[测试](agents/testing-agent.md) 负责；带 task.yaml 的派发先读对应角色文件。协调层仅负责路由、交接完整性和状态更新，阶段内容检查由执行角色负责。角色文件存在不代表真实调用已验证。
+阶段执行由 [产品](agents/product-agent.md)、[开发](agents/development-agent.md)、[测试](agents/testing-agent.md)、[Bug](agents/bug-agent.md) 负责；带 task.yaml 的派发先读对应角色文件。协调层仅负责路由、交接完整性和状态更新，阶段内容检查由执行角色负责。角色文件存在不代表真实调用已验证。
+
+仅修 Bug、开发后接续或开发中补充按 [Bug 路由](workflow/bugfix.md)；独立入口先确认边界，不改锁定缓存。
 
 ## 共同规则
 

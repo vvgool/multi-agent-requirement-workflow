@@ -20,6 +20,7 @@ ROLES = {
     "product": ("product-agent", "requirement-analysis", "澄清需求并输出验收标准"),
     "development": ("development-agent", "feature-development", "实现已批准需求并完成自验"),
     "testing": ("testing-agent", "acceptance-testing", "独立验收当前开发基线并报告缺陷"),
+    "bug": ("bug-agent", "bug-fixing", "诊断并修复缺陷并完成自验"),
 }
 
 
@@ -102,13 +103,13 @@ def main():
     config = scratch / ".codex/config.toml"
     config.write_bytes(merged)
     assert set(registry._parse(merged)["agents"]) == {
-        "other_reader", "requirement_product", "requirement_development", "requirement_testing"}
+        "other_reader", "requirement_product", "requirement_development", "requirement_testing", "requirement_bug"}
     # A fixture configuration is retained byte-for-byte; it is never an owned item.
     user_jsonc = b'// user comment\r\n{"agents":{"other-reader":{"description":"User","mode":"subagent"}},}\r\n'
     opencode_config = scratch / "opencode.jsonc"
     opencode_config.write_bytes(user_jsonc)
     result = dict(scope="template/helper regression, not setup installation or native activation",
-                  host_roles=9, codex_registry="passed", markdown_minimal_fields="passed",
+                  host_roles=12, codex_registry="passed", markdown_minimal_fields="passed",
                   opencode_discovery="not_requested", config_preserved=True)
     if args.opencode:
         # Read actual configuration sources first; do not persist full output
@@ -137,7 +138,7 @@ def main():
             assert actual[name]["mode"] == "subagent"
             assert actual[name].get("system", actual[name].get("prompt", "")).strip() == body
         assert any(a.get("name") == "other-reader" for a in agents), "user role not loaded"
-        result["opencode_discovery"] = "passed; three native definitions loaded; invocation untested"
+        result["opencode_discovery"] = "passed; four native definitions loaded; invocation untested"
         result["discovery_command"] = command
     assert opencode_config.read_bytes() == user_jsonc
     assert not list(helper.parent.rglob("codex_registry.cpython-*.pyc")), "source bytecode contamination"

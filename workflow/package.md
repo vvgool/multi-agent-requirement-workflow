@@ -14,7 +14,7 @@ framework.yaml 仅含 schema_version=1、name、非空 version、protocol_versio
 
 ## 项目内的两类文件
 
-需提交的最小内容为 workflow.yaml、workflow.lock.yaml、AGENTS.md 中的入口区块、目标宿主各自的三个薄角色文件、.gitignore 的本地目录忽略区块；Claude Code 如需读取入口另加 CLAUDE.md 的短桥接区块。不修改无关设置；默认安装当前宿主及项目检测到的宿主，用户显式选择范围优先；未检测且未选择的宿主不生成文件。具体见 [宿主选择](../skills/setup-requirement-workflow/references/installation.md#宿主选择与批量初始化)。需求成果按 [共享成果规则](output-layout.md#共享成果与本机现场) 共享，审批、精确基线和原始证据留本机执行记录。
+需提交的最小内容为 workflow.yaml、workflow.lock.yaml、AGENTS.md 中的入口区块、目标宿主各自的四个薄角色文件、.gitignore 的本地目录忽略区块；Claude Code 如需读取入口另加 CLAUDE.md 的短桥接区块。不修改无关设置；默认安装当前宿主及项目检测到的宿主，用户显式选择范围优先；未检测且未选择的宿主不生成文件。具体见 [宿主选择](../skills/setup-requirement-workflow/references/installation.md#宿主选择与批量初始化)。需求成果按 [共享成果规则](output-layout.md#共享成果与本机现场) 共享，审批、精确基线和原始证据留本机执行记录。
 
 本地不提交：`.agents/requirement-workflow-cache/<package.sha256>/`（完整只读包）、`.agents/requirement-workflow.local.json`（各宿主安装与探测回执）、`.agents/requirement-workflow.pending.json`（中断意图）及任意层级的 `.workflow/`（本机执行现场）。不忽略整个 .agents、.codex、.claude、.opencode 或 agent-features，保留用户配置和共享成果。不创建 Skill 符号链接或复制阶段 Skill 到宿主目录；原生角色按明确包内路径读取完整 Skill 及模板，属于文件加载，不宣称原生 Skill 发现已验证。
 

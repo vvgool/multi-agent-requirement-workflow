@@ -12,3 +12,5 @@ active_run: null
 development_attempt: 0
 max_development_attempts: 3
 artifacts: []
+# 仅 Bug 路由适用时添加 workflow_kind/bugfix；见 workflow/bugfix.md。
+# development_attempt 在 development 和 bug fix 派发间共享，不按角色重置。

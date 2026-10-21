@@ -1,12 +1,14 @@
 # 任务与结果交接
 
-所有角色派发只读“派发”；产品澄清或结果交接时再读后续产品专属章节。开发/测试结果及公共交接门槛见 [路由](routing.md#交接核对)，角色执行遵循 [执行契约](execution-contract.md)。结构化文件供Agent读取，不由额外程序调度。
+所有角色派发只读“派发”；产品澄清或结果交接时再读后续产品专属章节。开发/测试/Bug结果及公共交接门槛见 [路由](routing.md#交接核对)，角色执行遵循 [执行契约](execution-contract.md)。结构化文件供Agent读取，不由额外程序调度。
 
 ## 派发
 
 先读 [成果目录规范](output-layout.md) 确定布局。新修订 run 为 `<features_dir>/<名称>/revisions/vN/.workflow/runs/<run_id>/`；task.yaml及必要sources/由协调层写；锁和配置按包/配置规则引用本修订的不可变共享快照，不逐run复制。角色仅写 task.output_dir、task.result_path 及另外明确授权的位置；旧任务沿用原路径。
 
-按 [产品任务](../templates/product-task.yaml) 或 [开发/测试任务](../templates/role-task.yaml) 填写身份、实际路径、输入、授权及完成标准。completion_criteria只写本轮目标和特有完成条件，阶段Skill已有门槛直接适用；input_path指向累计输入，required_files只列额外必读文件，不重复task专用字段已明确的同一文件。测试仍须列原开发result，复用证据时列原result及必要来源。
+按 [产品任务](../templates/product-task.yaml) 或 [开发/测试/Bug任务](../templates/role-task.yaml) 填写身份、实际路径、输入、授权及完成标准。completion_criteria只写本轮目标和特有完成条件，阶段Skill已有门槛直接适用；input_path指向累计输入，required_files只列额外必读文件，不重复task专用字段已明确的同一文件。测试仍须列原开发result，复用证据时列原result及必要来源。
+
+Bug 任务按 [专用路由](bugfix.md) 填 bug_purpose、批准对象和适用回交信息。测试可绑定真实 Bug result，development_run_id 字段名不变。
 
 派发消息只传task路径、目标工作空间、真实framework身份/root及必要变化或缺陷摘要；完整授权和输入以task及其引用为准，不再另写任务简报或复制需求、规则和验收表。消息与task矛盾时阻塞核对，不用消息静默扩大授权。同角色续派复用宿主Agent，仍使用新run；首次或上下文丢失时读取适用规则，未变规则不重复传全文。
 

@@ -4,7 +4,7 @@
 
 ## 文件与检查
 
-三个项目角色位于 `.claude/agents/requirement-product.md`、requirement-development.md、requirement-testing.md。使用 [原生模板](../assets/templates/native-claude-code.md) 及 [共用角色正文](../assets/templates/role-body.md)；frontmatter只填 name/description，正文按角色绑定锁定包内的角色文件和完整阶段Skill。默认不指定model/tools/permissionMode，不提升宿主权限，不要求另装阶段Skill或插件。
+四个项目角色位于 `.claude/agents/requirement-product.md`、requirement-development.md、requirement-testing.md、requirement-bug.md。使用 [原生模板](../assets/templates/native-claude-code.md) 及 [共用角色正文](../assets/templates/role-body.md)；frontmatter只填 name/description，正文按角色绑定锁定包内的角色文件和完整阶段Skill。默认不指定model/tools/permissionMode，不提升宿主权限，不要求另装阶段Skill或插件。
 
 AGENTS.md使用共同 [薄入口](../assets/templates/project-entry-light.md)，CLAUDE.md保留原文并追加 [桥接区块](../assets/templates/claude-entry.md)。桥接仅指向AGENTS，不复制协调流程。已有桥接按拥有摘要核验，不重复追加。
 
@@ -12,7 +12,7 @@ AGENTS.md使用共同 [薄入口](../assets/templates/project-entry-light.md)，
 
 ## 生效与调用
 
-按当前Claude Code可用的角色选择/委派接口调用 requirement-product、requirement-development、requirement-testing，分别传 initialization_probe=true。使用新会话或宿主已证实的重载，记录实际任务/会话标识与只读结果；如果没有可取得ID则保留null并说明。列出或读取agents文件不等于真正调用，工具不暴露原生选择时保留pending。
+按当前Claude Code可用的角色选择/委派接口调用 requirement-product、requirement-development、requirement-testing、requirement-bug，分别传 initialization_probe=true。使用新会话或宿主已证实的重载，记录实际任务/会话标识与只读结果；如果没有可取得ID则保留null并说明。列出或读取agents文件不等于真正调用，工具不暴露原生选择时保留pending。
 
 协调在主会话运行，由当前原生角色独立加载Skill；不依赖子Agent再派子Agent。业务任务/结果及框架绑定共用原契约，超时/无法查询原调用时保持unknown，不能因新开会话就清空原任务。权限实际由Claude Code控制，薄模板不宣称权限隔离。
 
