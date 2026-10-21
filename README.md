@@ -81,7 +81,9 @@
 
 无法联网时，可先在有权限的机器获取相同提交的代码，再向 Agent 提供本地包目录；已有 Git 锁须核实该目录确实对应锁定提交，无法证明时停止，不能改成 manual 绕过。无锁的新项目仍可按手动包安装。
 
-源码版本为 **0.2.5**。历史 0.2.4 候选（核心摘要 `39c446bc4a6593b66086b01ae183718b471cb0b96bf319fa7d8cc197564f0843`）已验证三宿主文件适配、Codex/OpenCode 三原生角色及 Codex 代表性真实闭环；Claude Code 原生运行仍缺验。版本整理改变包身份，这些历史证据不等于 0.2.5 原生运行验收。无原生选择能力时记录 pending，不使用通用 Agent 冒充通过。仓库中的 [验证摘要](https://github.com/vvgool/multi-agent-requirement-workflow/tree/main/docs/verification) 记录实际边界；完整测试快照和运行记录不随当前源码分发。
+源码版本为 **0.2.6**，协议仍为 1。本补丁合并共享文稿规则的按需读取精简、执行证据边界及 OpenCode 父会话目录核对说明；已有项目须显式升级版本锁和缓存才会采用新包。维护用离线实验工具不进入运行包，也不证明实际 token 收益。
+
+历史 0.2.4 候选（核心摘要 `39c446bc4a6593b66086b01ae183718b471cb0b96bf319fa7d8cc197564f0843`）已验证三宿主文件适配、Codex/OpenCode 三原生角色及 Codex 代表性真实闭环；Claude Code 原生运行仍缺验。版本整理改变包身份，旧包原生及闭环证据不等于 0.2.6 验收。无原生选择能力时记录 pending，不使用通用 Agent 冒充通过。仓库中的 [验证摘要](https://github.com/vvgool/multi-agent-requirement-workflow/tree/main/docs/verification) 记录实际边界；完整测试快照和运行记录不随当前源码分发。
 
 ## 角色与流程
 
