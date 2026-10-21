@@ -5,7 +5,7 @@ description: Use when testing-agent receives an approved feature baseline for ac
 
 # 需求验收与回归
 
-独立核对已批准需求、实际开发基线和用例，执行验收并返回真实结论。项目适用规则和测试约定优先；开发自验只作输入，不能代替独立证据。内部run及原始证据链接留本run执行记录。
+独立核对已批准需求、实际开发基线和用例，执行验收并返回真实结论。项目适用规则和测试约定优先；开发自验只作输入，不能代替独立证据。内部run及原始证据链接留本任务具体交付记录。
 
 接单及交付前遵循 [阶段执行契约](../../workflow/execution-contract.md)，统一核对身份、授权、结果位置和过期任务。正式文稿及根状态由协调层维护。
 
@@ -30,10 +30,12 @@ description: Use when testing-agent receives an approved feature baseline for ac
 
 按已读测试流程建立 AC/TC 覆盖、核对需求/实现/用例偏离，独立执行必验项及受影响回归。用例修正、部分阻塞后的执行范围、证据复用及 passed/failed/blocked 门槛统一按该流程判断，不另建覆盖或偏离报告。
 
-按 [公共结果模板](../../templates/role-result.yaml) 在指定结果位置写 result.yaml，填实际验收结果、development_run_id、基线、缺陷和限制；artifacts 每项含 kind/path，相对本 run 输出。passed/failed/blocked 按流程门槛判断，报告与结果一致。
+按 [公共结果模板](../../templates/role-result.yaml) 在指定结果位置写 result.yaml，追加不可变交付，填实际验收结果、source_delivery={task_id,delivery_id}、基线、缺陷和限制；artifacts 每项含 kind/path，相对本任务 输出。passed/failed/blocked 按流程门槛判断，报告与结果一致。
 
 业务源码修复交开发或绑定的 Bug 角色，需求歧义交协调层；改变批准正文须进入新修订评审。向协调 Agent 返回结果路径、状态及简要结论。
 
 ## Bug 独立验收
 
-任务来自 Bug fix 时按 [Bug 路由](../../workflow/bugfix.md) 核对相应批准需求或 bug_boundary、真实 Bug task/result 与 development_run_id。独立执行原始未最小化场景、适用真实接缝回归及全部本轮适用验收，失败回传失败证据与待修复基线；测试不修源码。supplement 的 coverage_scope 明确为局部交接范围，通过后只回开发继续整体需求。
+任务来自 Bug fix 时按 [Bug 路由](../../workflow/bugfix.md) 核对相应批准需求或 bug_boundary、真实 Bug task/result 与source_delivery指定的交付。独立执行原始未最小化场景、适用真实接缝回归及全部本轮适用验收，失败回传失败证据与待修复基线；测试不修源码。supplement 的 coverage_scope 明确为局部交接范围，通过后只回开发继续整体需求。
+
+协议2持续同角色任务，调用/授权/交付按[持续任务](../../workflow/continuous-tasks.md)处理，不因回修/复验增任务。

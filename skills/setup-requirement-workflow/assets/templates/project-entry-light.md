@@ -7,7 +7,7 @@
 
 明确只修 Bug 时按锁定包 workflow/bugfix.md 的独立入口作为上述默认产品路由的例外：原生 Bug 先只读整理边界，由协调展示并取得本版明确确认后再修复，交原生测试独立验收；开发后接续和开发中补充也按该契约交接。缺陷不自动授权扩大范围，未知调用先恢复，保留共享尝试上限。
 
-1. 锁须可解析且无重复键，固定包含 schema_version=1、package 身份和 source；包名为 multi-agent-requirement-workflow、protocol_version=1，sha256 为64位小写十六进制，git revision 必须是完整提交 SHA。已有 `.agents/requirement-workflow.pending.json` 时先恢复原计划；锁缺失、格式不合法或计划身份不一致即停止，不重新规划。
+1. 锁须可解析且无重复键，固定包含 schema_version=1、package 身份和 source；包名为 multi-agent-requirement-workflow、protocol_version为受支持的1或2且与取得包完全一致（不得跨协议续写任务），sha256 为64位小写十六进制，git revision 必须是完整提交 SHA。已有 `.agents/requirement-workflow.pending.json` 时先恢复原计划；锁缺失、格式不合法或计划身份不一致即停止，不重新规划。
 2. 缓存必须是锁定摘要对应的完整普通文件包；按根文件及 agents/、skills/、workflow/、templates/ 的相对 POSIX 路径和原字节 SHA256 排序计算紧凑 JSON 摘要，拒绝链接和额外文件。内容、来源提交或包身份不符时返回 framework_integrity_mismatch，不自动覆盖；缺缓存时按锁定提交恢复，只读获取并核验实际 HEAD，不跟随分支、不执行下载脚本。
 3. 身份核验后才读取 setup Skill，以 restore_only=true 补缓存或回执；不自动升级、扩展宿主、覆盖用户文件、改变项目配置、审批、业务文稿或 active_run。具体清单、摘要算法和失败语义按 [包规则](workflow/package.md) 与 [启动恢复](workflow/bootstrap.md) 执行。
 4. 按缓存 host-adapters 映射选择当前宿主的四个原生角色，并分别记录文件安装、宿主激活和完整业务闭环；不能用通用 Agent 或其他宿主结论替代原生证据。

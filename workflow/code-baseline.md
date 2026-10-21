@@ -1,35 +1,24 @@
 # 代码基线契约
 
-开发准备交付、测试接单/结束或恢复复用证据时读取。基线描述已验证的实际文件内容，Git 提交号仅作辅助，不能省略未提交和未跟踪的相关文件。
+开发/Bug提交待验、测试接单/结束及复用证据时读取。协议2基线绑定具体交付，不能只看持续task_id。旧协议由原包解释，不改历史清单。
 
 ## 新交接的最小格式
 
-code_baseline（开发/测试结果）及 development_baseline.code_baseline（根状态和测试任务）使用相同结构；根 development_baseline 另带开发 run_id，任务 development_run_id 与其一致。
-
 ```yaml
 schema_version: 1
-git_commit: null # 没有 Git 时为空；有 Git 时记录实际 HEAD
-scope: [] # 相对 target_project 的文件或目录，覆盖实现、调用方、测试及相关配置
-exclude: [] # scope 内确需排除的相对文件/目录，仅缓存、产物等；不得排除相关源码
-files: [] # 按 path 排序，每项 {path: 项目相对文件路径, sha256: 实际文件内容摘要}
-evidence: [] # 可选的原始检查记录路径，相对产出此结果的 output_dir
+git_commit: null
+scope: []
+exclude: []
+files: [] # 每项{path,sha256}，按path排序，实际字节摘要
+evidence: [] # 相对产出任务output_dir的必要记录
 ```
 
-scope、files 必须非空，路径无 ..、绝对路径或未解析链接。目录 scope 递归枚举普通文件，排除 exclude 所列文件/目录；符号链接先核对真实目标仍在 target_project 内，相关目标须纳入实际文件清单，否则阻塞。scope 内不存在的文件目标仍保留在 scope，不列入 files，用于检测其重新出现。空目录无需记录。摘要使用实际文件字节 SHA-256，不生成含糊的“最新代码”标记。
-
-开发依据需求和调用链确定 scope，并在开发记录中说明覆盖依据；测试独立核查范围是否遗漏相关依赖、接口、测试或配置。报告、日志、需求运行目录、构建产物与缓存不纳入源码摘要，排除规则不得掩盖相关业务文件。无法完整捕获相关生成代码或外部依赖版本时说明限制并阻塞必需验证。
-
-结果中的 code_baseline 是本 run 源码清单的权威记录；文稿引用该结果，不额外导出同内容的基线 JSON、所有权清单或多份快照。task、根状态及测试结果现有绑定字段照常保留；测试仍重新枚举并比较实际文件，不能以减少清单副本为由只比较 HEAD 或聚合摘要。确有额外诊断需要时只记录差异及必要依据，不重复完整清单。
+scope/files非空，项目相对路径无绝对/..逃逸；目录递归枚举普通文件，exclude仅缓存/产物，不能排除源码。相关链接先解析目标，越界或目标未纳入blocked。删除文件保留在scope但不列files，新增/删除/内容变化均算差异。Git HEAD只作辅助，相关未提交/未跟踪文件必须包含；必要依赖/生成代码无法捕获时说明并阻塞必需验证。
 
 ## 比较与绑定
 
-1. 开发在最终检查后记录基线，再核对 files 与 scope 清单未变化，才交 ready。协调层保留该原始基线及开发 run，不用自己的当前 HEAD 替换。
-2. 测试按同一 scope/exclude 重新枚举、计算摘要并比较文件集合与内容；新增、删除及内容变化都算不一致。从根artifacts的原开发run目录入口读取原task，核对其result_path与必读的原开发result一致，再按原task.output_dir解析证据；旧逐文件索引沿原记录读取，不能猜测来源路径。开发原结果、任务与根状态绑定的源码字段必须一致；evidence 保留原产出 run 的解析基准，不复制到测试结果后误作相对本轮路径。
-3. 测试结果写入本轮实际核对的基线，可将 evidence 设为空或指向本轮证据。业务基线比较使用 scope、exclude、files；HEAD 变化须查明原因，只有能证明属于无关改动且相关依赖未变时才接受，并记录依据。执行结束再次比较，不一致优先 blocked，不认证新代码。
-4. 代码修复后由开发生成新基线；旧证据仅在相关输入、环境及检查范围仍有效时复用，变更影响范围重新验证。
+开发/Bug交付的code_baseline是该交付权威清单；根development_baseline={task_id,delivery_id,code_baseline}，测试本次授权source_delivery={task_id,delivery_id}须一致。按任务目录→原task.result_path→指定delivery→artifacts读取，不能只读result最后一条或猜run名。测试接单及结束重新枚举scope/exclude/files，与指定交付及根绑定比较，不仅比较HEAD/聚合摘要。证据路径始终相对原任务output_dir，不复制误解为本测试输出。
 
-## 存量兼容
+HEAD变化须证明无关且依赖未变；相关文件/环境/输入变化重验，无法核实blocked。代码修复仍原开发task、但新delivery和精确基线；测试仍原testing task、但新source_delivery与结论。新交付不能覆盖旧文件/失败证据，部分写入不能提前绑定。测试自验/局部通过不代替完整独立验收。
 
-旧任务、结果和历史审批保持原样。已有 Git/文件摘要格式先按其实际语义读取；能从实际文件清单和证据可靠比较时记录映射依据后使用，不能仅因格式旧而判失败。只有 HEAD 或无法确定覆盖范围/未提交内容时 blocked，要求开发补充新交接；不能猜测摘要算法或改写旧结果。历史证据中的聚合摘要不作为新格式的必填字段。
-
-Bug fix 交付视为开发基线生产者，沿用同一格式与 development_run_id/development_baseline 绑定字段；测试须核对真实 Bug task/result，不猜 run 名。边界只读任务不要求源码基线作为完成修复证据，不能返回 fix ready。
+报告只写实际版本/变化/限制，精确清单留对应交付，不另导出平行清单。旧格式可靠映射可读引用，只有HEAD或未知覆盖范围不够；不能猜摘要或回写历史。

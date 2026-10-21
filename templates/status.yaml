@@ -1,11 +1,11 @@
-schema_version: 1
+schema_version: 2
 state_version: 1
 feature_id: null # 协调 Agent 新建时填入真实 UUID
 title: null
 workspace_root: null # 本机运行时解析，迁移后重新绑定
 target_project: null # 本机运行时解析，不填写作者目录
 requirements_revision: 1
-layout_version: 2 # 当前修订布局；存量缺字段视为1，不迁移旧审批
+layout_version: 3 # 协议2新修订；旧协议/布局保持不变
 stage: draft
 execution_status: idle
 active_run: null

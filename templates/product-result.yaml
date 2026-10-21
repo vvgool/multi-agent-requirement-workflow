@@ -1,10 +1,9 @@
-schema_version: 1
+schema_version: 2
 feature_id: null
 requirements_revision: 1
-run_id: null
+task_id: product
 role: product
-status: null # ready、needs_input、blocked 或 stale_task（处置见 workflow/execution-contract.md）
-summary: null # 当前目标/范围理解及本轮变化；推荐不等于用户确认
-artifacts: [] # 每项为 kind 和 path，path 相对当前 run 的 outputs/；requirements 与 quality_check 可指向同一文稿
-# ready 必填 acceptance_ids；needs_input 必填 questions；blocked 必填 block_reason。
-# questions 含 id/question/impact；assumptions 有假设时填写 statement/confirmed，见 workflow/handoff.md。
+deliveries: []
+# 评审稿ready才追加{id,invocation_id,status,input_sha256,summary,artifacts,acceptance_ids}。
+# artifacts含真实path/sha256及quality_check（可与requirements同稿）。
+# 每轮交付不可变、可独立回读；澄清题/答复在既有input轻记录，不每次写result。

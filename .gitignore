@@ -13,6 +13,7 @@ __pycache__/
 /docs/superpowers/
 /docs/verification/*
 !/docs/verification/README.md
+!/docs/verification/continuous-tasks.md
 # requirement-workflow-local:begin
 /.agents/requirement-workflow-cache/
 /.agents/requirement-workflow.local.json

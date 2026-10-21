@@ -1,18 +1,18 @@
-schema_version: 1
+schema_version: 2
 feature_id: null
 requirements_revision: 1
-layout_version: 2 # 与当前修订状态一致；旧任务缺字段视为1
-run_id: null
+layout_version: 3
+task_id: product
 role: product
-framework: null # 新锁定安装必填{name,version,protocol_version,sha256}；无锁历史任务保持缺失/null
-framework_lock: null # {path,sha256}，引用需求内按原字节摘要保存的锁快照；旧run沿原路径
-effective_config: null # {path,sha256}，引用需求内不可变有效配置快照；路径相对feature_dir
-framework_root: null # 从实际加载角色文件动态确定
-workspace_root: null # 当前宿主中的目标工作空间
+framework: null # {name,version,protocol_version:2,sha256}，与锁及缓存一致
+framework_lock: null # {path,sha256}，相对feature_dir的不可变快照
+effective_config: null
+framework_root: null
+workspace_root: null
 feature_dir: null
 target_project: null
 input_path: null
-output_dir: null # 当前run的outputs/，候选文稿与证据
-result_path: null # 布局2必须填当前run/result.yaml；artifacts仍相对output_dir
-completion_criteria: [] # 必填本轮目标及特有完成条件；产品Skill通用门槛直接适用，不复制全文
-# 额外必读资料才填 required_files；获授权的外部写回目标才填 external_write_scope。
+output_dir: null # tasks/<task_id>/outputs，只有需要时建立
+result_path: null # tasks/<task_id>/result.yaml；仅真实交付时建立
+authorizations: [] # 按需追加{id,purpose,approval_digest,write_scope,completion_criteria}；调用绑定版本
+# required_files / external_write_scope 有实际授权时放对应授权版本；不每次问答重建task。

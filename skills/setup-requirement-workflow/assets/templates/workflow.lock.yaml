@@ -2,7 +2,7 @@ schema_version: 1
 package:
   name: multi-agent-requirement-workflow
   version: null # 从真实framework.yaml读取
-  protocol_version: 1
+  protocol_version: 2
   sha256: null # 真实包内容清单的SHA256
 source:
   kind: manual # manual / git

@@ -37,6 +37,8 @@
 
 11. 新锁定安装按 [包与版本规则](workflow/package.md) 校验项目绑定和任务身份；派发使用 [宿主适配](workflow/host-adapters.md)。旧快照/审批/任务按兼容路径保留，不自动迁移。
 
+候选协议2使用持续角色任务，调用与不可变交付分开，见[持续任务契约](workflow/continuous-tasks.md)。下方受管入口只记录本框架源码仓库自身的0.2.6安装：在源码仓库工作时继续服从其原锁，不能因源码变更提前采用候选协议。此文件作为分发包进入其他项目缓存时，下方旧入口不构成该业务项目的运行指令，不覆盖业务项目根AGENTS.md及workflow.lock.yaml的绑定；业务项目的协议和角色数由其锁定包framework.yaml、项目入口及宿主映射确定，不从缓存AGENTS.md的源码仓库安装记录推断。
+
 状态流转：draft -> requirement_review -> development -> testing -> completed。测试失败时返回 development。
 <!-- requirement-workflow:begin -->
 ## 需求协作入口

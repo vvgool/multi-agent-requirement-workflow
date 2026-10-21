@@ -61,11 +61,22 @@ def main():
 
     # Read the real templates; examples do not introduce new mandatory fields.
     task = yaml.safe_load((root / "templates/role-task.yaml").read_text())
-    task.update(run_id="development-001", output_dir=str(scratch / "run/outputs"))
-    task["write_scope"]["temporary_paths"] = [str(scratch / "run/tmp")]
+    task.update(output_dir=str(scratch / "run/outputs"))
+    if task["schema_version"] == 2:
+        task.update(task_id="development", role="development")
+        grant = dict(id="a001", purpose="execute", approval_digest="fixture", attempt=1,
+                     write_scope={"modify_business_source": True, "project_paths": ["src"],
+                                  "temporary_paths": [str(scratch / "run/tmp")]},
+                     completion_criteria=["cache/evidence example only"])
+        task["authorizations"] = [grant]
+        write_scope = grant["write_scope"]
+    else:
+        task["run_id"] = "development-001"
+        write_scope = task["write_scope"]
+        write_scope["temporary_paths"] = [str(scratch / "run/tmp")]
     write(scratch / "run/task.yaml", yaml.safe_dump(task))
     out = Path(task["output_dir"])
-    cache = Path(task["write_scope"]["temporary_paths"][0])
+    cache = Path(write_scope["temporary_paths"][0])
     font = write(cache / "fonts/example.woff2", "reproducible font fixture")
     build = write(cache / "build/cache.bin", "regenerable build fixture")
     check = subprocess.run([sys.executable, "-c", "print('representative check: passed')"],
@@ -76,8 +87,8 @@ def main():
     # Same actual check, two AC references, one physical output.
     report = write(out / "development.md", "AC-01/AC-02: [check-01](check-01.txt)\n")
     assert list(out.glob("*.txt")) == [evidence]
-    no_cache_task = dict(task, write_scope={"project_paths": [], "temporary_paths": []})
-    assert not no_cache_task["write_scope"]["temporary_paths"]  # Must block a cache-writing command.
+    no_cache_scope = {"project_paths": [], "temporary_paths": []}
+    assert not no_cache_scope["temporary_paths"]  # Must block a cache-writing command.
     retry_command = [sys.executable, "-c",
                      "import sys; v=input(); print('fixture failure' if v=='fail' else 'fixture passed'); sys.exit(v=='fail')"]
     failed = subprocess.run(retry_command, input="fail\n", capture_output=True, text=True, check=False)
@@ -106,11 +117,15 @@ def main():
     original = {"run_id": "development-001", "files": files, "inputs": "v1", "env": "fixture-v1",
                 "check_scope": "src", "evidence_sha256": digest(evidence)}
     source_result = yaml.safe_load((root / "templates/role-result.yaml").read_text())
-    source_result.update(schema_version=1, feature_id="fixture", requirements_revision=1,
-                         run_id="development-001", role="development", status="ready",
-                         code_baseline={"schema_version": 1, "git_commit": None, "scope": ["src"],
-                                        "exclude": [], "files": files, "evidence": ["check-01.txt"]},
-                         artifacts=[{"kind": "evidence", "path": "check-01.txt"}])
+    result_fields = dict(status="ready", code_baseline={"schema_version": 1, "git_commit": None, "scope": ["src"],
+                            "exclude": [], "files": files, "evidence": ["check-01.txt"]},
+                         artifacts=[{"kind": "evidence", "path": "check-01.txt", "sha256": digest(evidence)}])
+    source_result.update(feature_id="fixture", requirements_revision=1, role="development")
+    if source_result["schema_version"] == 2:
+        source_result.update(task_id="development", deliveries=[dict(result_fields, id="d001",
+            invocation_id="i001", input_sha256=digest(evidence), summary="cache/evidence fixture", changed_files=[])])
+    else:
+        source_result.update(result_fields, run_id="development-001")
     original_result = write(scratch / "run/result.yaml", yaml.safe_dump(source_result))
 
     def reuse(current):

@@ -1,26 +1,21 @@
-schema_version: 1
+schema_version: 2
 feature_id: null
 requirements_revision: 1
-layout_version: 2 # 与当前修订状态一致；旧任务缺字段视为1
-run_id: null
-role: null # development、testing 或 bug
-framework: null # 新锁定安装必填{name,version,protocol_version,sha256}；无锁历史任务保持缺失/null
-framework_lock: null # {path,sha256}，引用需求内按原字节摘要保存的锁快照；旧run沿原路径
-effective_config: null # {path,sha256}，引用需求内不可变有效配置快照；路径相对feature_dir
-framework_root: null # 当前宿主动态解析
+layout_version: 3
+task_id: null # 同修订同角色持续任务，默认角色名
+role: null # development/testing/bug
+framework: null # {name,version,protocol_version:2,sha256}
+framework_lock: null
+effective_config: null
+framework_root: null
 workspace_root: null
 feature_dir: null
 target_project: null
 input_path: null
 requirements_path: null
-approval_digest: null
-output_dir: null # 当前run的outputs/，候选文稿与证据
-result_path: null # 布局2必须填当前run/result.yaml；artifacts仍相对output_dir
-write_scope:
-  modify_business_source: false # 开发获授权后才设 true；测试始终 false
-completion_criteria: [] # 必填本轮目标及特有完成条件；阶段Skill通用门槛直接适用，不复制全文
-# 测试必填 development_run_id、development_baseline（run_id/code_baseline）。
-# 修复任务必填 defect_report_path；额外必读资料才填 required_files，测试必含原开发result。
-# write_scope.project_paths/temporary_paths 仅有实际授权时添加；缺失表示无对应写权限。
-# bug 必填 bug_purpose=boundary/fix；独立修复 boundary_path/boundary_digest 和对应 approval_digest。
-# 按 workflow/bugfix.md 填 source_run_id/source_baseline、defect_report_path、bugfix/continuation。
+output_dir: null
+result_path: null
+authorizations: [] # {id,purpose,approval_digest,write_scope,completion_criteria}；旧版本不可改
+# testing授权含source_delivery={task_id,delivery_id}及development_baseline，始终禁止修业务源码。
+# fix授权有非空源码范围和attempt；bug边界只读，确认后同task追加fix版本及boundary_path/boundary_digest。
+# required_files（含原开发/Bug result及具体交付）/temporary_paths/外部写权限按适用版本明确填写。

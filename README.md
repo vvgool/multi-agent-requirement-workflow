@@ -4,7 +4,7 @@
 
 ## 快速开始
 
-支持 Codex、Claude Code 和 OpenCode。需要宿主具备项目文件读写、Git 获取及原生子 Agent 派发能力；初始化不需要独立工作流 CLI 或全局插件。
+提供 Codex、Claude Code 和 OpenCode 文件适配；各宿主原生激活与业务闭环须分别验证。需要宿主具备项目文件读写、Git 获取及原生子 Agent 派发能力；初始化不需要独立工作流 CLI 或全局插件。
 
 在**目标业务项目**中打开 Agent 会话，发送：
 
@@ -81,9 +81,9 @@
 
 无法联网时，可先在有权限的机器获取相同提交的代码，再向 Agent 提供本地包目录；已有 Git 锁须核实该目录确实对应锁定提交，无法证明时停止，不能改成 manual 绕过。无锁的新项目仍可按手动包安装。
 
-源码版本为 **0.3.0 候选**，协议仍为 1，尚未发布。本项目当前安装仍锁定 **0.2.6**；已有项目须显式升级版本锁和缓存才会采用新包。0.2.6 已合并共享文稿规则的按需读取精简、执行证据边界及 OpenCode 父会话目录核对说明。维护用离线实验工具不进入运行包，也不证明实际 token 收益。
+源码版本为 **0.4.0**，协议为 2；发布状态以仓库的 Git tag 和 Release 为准。本项目当前安装仍锁定 **0.2.6**；已有项目须显式升级版本锁和缓存才会采用新包。0.2.6 已合并共享文稿规则的按需读取精简、执行证据边界及 OpenCode 父会话目录核对说明。维护用离线实验工具不进入运行包，也不证明实际 token 收益。
 
-历史 0.2.4 候选（核心摘要 `39c446bc4a6593b66086b01ae183718b471cb0b96bf319fa7d8cc197564f0843`）已验证三宿主文件适配、Codex/OpenCode 三原生角色及 Codex 代表性真实闭环；Claude Code 原生运行仍缺验。版本整理改变包身份，旧包原生及闭环证据不等于 0.2.6 验收。无原生选择能力时记录 pending，不使用通用 Agent 冒充通过。仓库中的 [验证摘要](https://github.com/vvgool/multi-agent-requirement-workflow/tree/main/docs/verification) 记录实际边界；完整测试快照和运行记录不随当前源码分发。
+历史 0.2.4 候选（核心摘要 `39c446bc4a6593b66086b01ae183718b471cb0b96bf319fa7d8cc197564f0843`）已验证三宿主文件适配、Codex/OpenCode 三原生角色及 Codex 代表性真实闭环；Claude Code 原生运行仍缺验。版本整理改变包身份，旧包原生及闭环证据不等于 0.2.6 验收。无原生选择能力时记录 pending，不使用通用 Agent 冒充通过。仓库中的 [验证摘要](docs/verification/README.md) 记录实际边界；完整测试快照和运行记录不随当前源码分发。
 
 ## 角色与流程
 
@@ -92,6 +92,7 @@
 | [协调](agents/coordinator-agent.md) | 状态路由、宿主派发、交接、用户确认和成果索引 | [协调路由](workflow/routing.md)；按条件加载 Issue 支持 Skill |
 | [产品](agents/product-agent.md) | 澄清业务规则，整理需求与验收标准 | [requirement-analysis](skills/requirement-analysis/SKILL.md) |
 | [开发](agents/development-agent.md) | 技术设计、模块/任务规划、实现、完整功能自验及基线 | [feature-development](skills/feature-development/SKILL.md) |
+| [Bug](agents/bug-agent.md) | 边界整理、证据诊断、最小修复和自验 | [bug-fixing](skills/bug-fixing/SKILL.md) |
 | [测试](agents/testing-agent.md) | 核对需求/实现/用例偏离，独立验收、回归和缺陷报告 | [acceptance-testing](skills/acceptance-testing/SKILL.md) |
 
 阶段为 draft → requirement_review → development → testing → completed；测试失败回开发。开发前必须取得当前修订的真实用户确认；同名续改按 [修订规则](workflow/revisions.md) 保留历史，新版重新确认。恢复先核对活动任务，不能重复派发未知调用。
@@ -117,7 +118,7 @@
       documents/                   # 正式需求稿、开发记录、测试报告
       .workflow/
         review-manifest.yaml
-        runs/<run_id>/             # 任务、结果、候选文稿及必要证据
+        tasks/<task_id>/           # 持续角色任务，host调用与result交付按序追加
         issue-sync/<sync_key>/     # 启用且有获授权事件时才创建
 ```
 
@@ -172,7 +173,7 @@ python3 scripts/verify-artifact-slimming.py --source-root . --scratch /absolute/
 当前仓库布局：
 
 ```text
-agents/              # 四个逻辑角色
+agents/              # 协调主会话及四个执行角色
 skills/              # 阶段及支持 Skill、模板和宿主适配
 workflow/            # 共享流程契约
 templates/           # 交接及状态模板
@@ -187,6 +188,12 @@ scripts/             # 随源码分发的最小开发复验入口，不进入业
 
 ## Bug 修复
 
-候选 0.3.0 增加 Bug 原生角色，当前源码版本不代表任何项目已升级。独立 Bug 先由 Bug Agent 整理边界经明确确认后修复，开发后/开发中补充按 [Bug 路由](workflow/bugfix.md) 交接。修复自验后必须由测试 Agent 独立验收，失败返回修复；全部写阶段派发共用默认 3 次额度。旧锁、历史任务、成果和审批不自动迁移。
+0.3.0 历史候选引入 Bug 原生角色；当前 0.4.0 沿用并轻量化持续任务，当前源码版本不代表任何项目已升级。独立 Bug 先由 Bug Agent 整理边界经明确确认后修复，开发后/开发中补充按 [Bug 路由](workflow/bugfix.md) 交接。修复自验后必须由测试 Agent 独立验收，失败返回修复；全部写阶段派发共用默认 3 次额度。旧锁、历史任务、成果和审批不自动迁移。
 
 文件模板检查不证明原生角色调用或真实修复闭环通过。
+
+## 0.4 持续角色任务（协议2）
+
+同一事项/修订每个实际角色一个持续任务；产品问答、开发回修、测试复验及换宿主不再自动建立任务包。调用身份与每轮不可变交付分别保存在已有host/result中，测试绑定具体交付和代码基线；普通问题轻记input。详见[持续任务契约](workflow/continuous-tasks.md)。新任务schema_version=2/layout_version=3，旧协议1及旧审批由原锁定包继续解释，不迁移、不自动升级本项目安装。框架是宿主执行规范，静态场景不证明真实宿主已激活或业务闭环通过。
+
+持续任务的真实Codex产品续接、开发修复/独立复验、新上下文恢复和OpenCode未知原因Bug证据，均绑定各自包身份，见[持续任务验证](docs/verification/continuous-tasks.md)。最终验收另已覆盖 Codex 与 OpenCode 新主会话四原生角色及各自代表性业务闭环；Claude 未纳入本轮验收，真实消费者升级和生产部署仍须单独验证。

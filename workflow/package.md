@@ -6,7 +6,7 @@
 
 框架包包含根 framework.yaml、AGENTS.md、README.md、workflow.yaml、LICENSE（存在时必须纳入），以及 agents/、skills/、workflow/、templates/ 内的全部普通文件。排除 docs/、agent-features/、Git 元数据、宿主安装目录及本机回执。包内不接受符号链接或特殊文件，未知根文件不纳入包，不让整个开发仓库扫描成为安装步骤。
 
-framework.yaml 仅含 schema_version=1、name、非空 version、protocol_version=1；它声明版本而非已发布事实。包名固定为 multi-agent-requirement-workflow。使用宿主文件/计算工具实际生成清单：所有包文件按相对 POSIX 路径升序，取 `[相对路径,原字节SHA256]`，将全部条目编码为 UTF-8 紧凑 JSON 数组（ensure_ascii=false、无额外空格），整体 SHA-256 为 package.sha256。framework.yaml 自身也参与，不在其中存自引用摘要。文本不转换换行；同名同版本不同字节按不同内容身份处理，不能自动接受。
+framework.yaml 仅含 schema_version=1、name、非空 version、protocol_version=2（本包）；它声明版本而非已发布事实。包名固定为 multi-agent-requirement-workflow。使用宿主文件/计算工具实际生成清单：所有包文件按相对 POSIX 路径升序，取 `[相对路径,原字节SHA256]`，将全部条目编码为 UTF-8 紧凑 JSON 数组（ensure_ascii=false、无额外空格），整体 SHA-256 为 package.sha256。framework.yaml 自身也参与，不在其中存自引用摘要。文本不转换换行；同名同版本不同字节按不同内容身份处理，不能自动接受。
 
 ## GitHub URL 与固定提交
 
@@ -26,7 +26,7 @@ framework.yaml 仅含 schema_version=1、name、非空 version、protocol_versio
 
 新轻量安装的框架根目录固定为项目根下 `.agents/requirement-workflow-cache/<锁定sha256>`；首次进入当前会话时完整校验包清单、当前宿主薄角色与入口及其实际生效状态；后续按下节复用未变化的环境核验。缓存或薄角色被修改返回 framework_integrity_mismatch/adapter_modified。读取不同宿主的回执不能证明当前宿主生效。初始化 pending 存在时先恢复，不能运行半安装结果。
 
-新 task 携带 framework={name,version,protocol_version,sha256} 和当机 framework_root。根状态 active_run 同时保存这份绑定；锁原字节按SHA256保存到本修订 .workflow/snapshots/framework-<锁文件摘要>.yaml，相同内容只保存一份，复用前核对普通文件、无链接及原字节摘要，已有快照不符则阻塞而不覆盖；task.framework_lock记录相对feature_dir的path及真实sha256，恢复时核对内容与task.framework及来源。旧run的framework-lock.yaml保持原索引。子角色核对 task、active_run 和真实包身份；新初始化但无绑定的任务不能视为旧任务。旧快照安装和无锁的历史任务按原契约读取，不回写身份或重新计算旧审批。
+协议2任务/调用/交付以[持续任务](continuous-tasks.md)为准；下述旧run快照引用按实际协议读取，不将旧一调用一run格式用于协议2。新 task 携带 framework={name,version,protocol_version,sha256} 和当机 framework_root。根状态 active_run 同时保存这份绑定；锁原字节按SHA256保存到本修订 .workflow/snapshots/framework-<锁文件摘要>.yaml，相同内容只保存一份，复用前核对普通文件、无链接及原字节摘要，已有快照不符则阻塞而不覆盖；task.framework_lock记录相对feature_dir的path及真实sha256，恢复时核对内容与task.framework及来源。旧run的framework-lock.yaml保持原索引。子角色核对 task、active_run 和真实包身份；新初始化但无绑定的任务不能视为旧任务。旧快照安装和无锁的历史任务按原契约读取，不回写身份或重新计算旧审批。
 
 已有 active_run 先查询原宿主任务，即使本机缺包也不能重复派发。旧任务未证实结束前禁止升级、换宿主继续执行或换绑框架。缺原包时可按原锁快照重建，无法核实则 blocked，不套用新版本。已有审批配置快照保持原字节；纯框架补丁升级不改业务评审对象，但协议/模板语义不兼容时暂停评估，不自动迁移已批准内容。
 

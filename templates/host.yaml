@@ -1,0 +1,16 @@
+schema_version: 2
+feature_id: null
+requirements_revision: 1
+task_id: null
+role: null
+invocations: []
+# 每次实际调用追加：
+# - id: i001
+#   host: codex
+#   agent_id: null # 实际Agent标识
+#   call_id: null # 无真实宿主调用标识时null，另说明限制，不用Agent ID冒充
+#   status: unknown # unknown/running/ended/cancelled
+#   started_at: null
+#   input: {path: null, sha256: null} # 相对feature_dir；本次读取累计输入
+#   authorization: a001
+# 结束补ended_at/end_evidence，历史调用保留；缺call_id补call_id_limitation。
