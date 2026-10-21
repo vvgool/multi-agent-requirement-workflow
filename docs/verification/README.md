@@ -68,3 +68,50 @@ Claude Code已按当前用户范围安装官方CLI 2.1.304并核验签名；沿�
 当前源码只保留本摘要及 [当前规划](../planning/overall-goals.md)，不包含框架自身 agent-features、早期 specs/plans、完整测试夹具或运行日志。根 .gitignore 的排除规则仅针对本框架仓库；初始化生成到业务项目的忽略模板不忽略业务需求和证据。
 
 原文件从当前Git跟踪中移除，维护者本地原件仍保留。Git历史未改写；需要审计当时的完整记录时可查看 [清理前版本](https://github.com/vvgool/multi-agent-requirement-workflow/tree/c6e6bece377a7c11ec6d191310f3e4a5591f94c4/docs/verification)。仓库当前目录精简不等于历史内容彻底擦除。
+
+
+## 确定性实验控制（离线工具）
+
+标准库工具 [experiment_control.py](../../scripts/experiment_control.py) 只校验/输出载荷，不发送网络或模型请求；[package_digest.py](../../scripts/package_digest.py) 固化原字节与相对POSIX字符串排序算法。以下命令中的路径必须是明确授权的绝对路径，摘要须来自事先可信确认，不能把待验证输入自行算出的摘要冒充预期。
+
+```sh
+python3 -B scripts/package_digest.py /approved/package <expected-package-sha256>
+python3 -B scripts/experiment_control.py prepare --spec /approved/spec.json --actual /approved/actual.json
+python3 -B scripts/experiment_control.py compare --policy /approved/policy.json --left /approved/left.json --right /approved/right.json
+python3 -B tests/test_experiment_control.py --scratch-root /explicitly-authorized/test-directory -v
+```
+
+`prepare` 的可信 `spec.json` 使用以下唯一结构；尖括号值须由调用者填入真实预期，所有sha256均为64位小写十六进制。`protected_files` 四项必须齐全，各文件按原字节哈希，不解析/改写业务YAML。
+
+```json
+{
+  "schema_version": 1,
+  "package": {"root": "/approved/package", "sha256": "<package-sha256>"},
+  "prompt": {"path": "/approved/prompt.txt", "sha256": "<prompt-sha256>"},
+  "bindings": {
+    "model": {"id": "<model-id>", "provider_id": "<provider-id>", "variant": "<variant>"},
+    "role": "requirement-development",
+    "task": {"feature_id": "<feature-id>", "revision": 1, "run_id": "development-001"},
+    "approval": {"digest": "<approval-digest>"},
+    "authorization": {"project_root": "/approved/a", "project_paths": ["label.py"], "temporary_paths": ["/approved/scratch"]}
+  },
+  "protected_files": {
+    "lock": {"path": "/approved/lock.yaml", "sha256": "<lock-sha256>"},
+    "task": {"path": "/approved/task.yaml", "sha256": "<task-sha256>"},
+    "approval": {"path": "/approved/approval.yaml", "sha256": "<approval-file-sha256>"},
+    "authorization": {"path": "/approved/scope.json", "sha256": "<scope-sha256>"}
+  },
+  "path_policy": {
+    "fields": ["workspace", "task_file"],
+    "roots": [{"path": "/approved/a", "label": "project"}, {"path": "/approved/b", "label": "project"}]
+  }
+}
+```
+
+`actual.json` 为 `{"schema_version":1,"bindings":<完整实际bindings对象>,"paths":{"workspace":"/approved/a","task_file":"/approved/a/task.yaml"}}`。bindings必须严格等于可信预期；路径字段须与policy.fields完全一致，且只能落入一个声明根，映射后保留相对段；拒绝链接、越界、未知/重叠根。模型/角色/任务/审批/授权声明和受保护文件哈希共同构成本地门禁，**不证明声明源可信、真人授权或真实宿主已激活**；可信清单的来源仍由调用者核实。
+
+通过才输出JSON载荷：原字节 `body_base64`、`body_sha256`、严格bindings、四类受保护摘要、package_sha256和声明paths。同一文件输入重复生成相同载荷；每次未来使用前重新运行prepare，文件变化会失败，不能把旧载荷当作未来有效授权。工具没有自动执行入口。失败只输出类别到stderr、无载荷，退出2。
+
+`compare` 的left/right文件是上述载荷；policy.json是预先声明的path_policy对象。它只映射paths字段，不替换正文中出现的路径，其他身份和摘要严格比较。正文原字节相同通过；单个终止LF差异仅在较短一方不以LF/CR结尾时通过，不折叠多LF/CRLF、空格或Unicode空白。比较通过退出0、有效但不等价退出1并给差异类别/字节位置；输入无效退出2，不输出完整正文。所有输入JSON拒绝重复键及未知结构。
+
+离线用例用模拟入口计数验证成功才生成载荷、失败入口为0；仅证明本地控制逻辑。独立验收另行执行；v3失败、token收益、v2Claude阻塞和当前运行包完整业务闭环pending不因本工具改变，也不自动开启后续外部测量。
