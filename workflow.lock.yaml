@@ -1,10 +1,10 @@
 schema_version: 1
 package:
   name: multi-agent-requirement-workflow
-  version: 0.2.6
-  protocol_version: 1
-  sha256: 837ef105018fd44a7b003acd0a7b04a1b1af6fe69e1c60db768a230d2aaf820c
+  version: 0.4.0
+  protocol_version: 2
+  sha256: e6743716e380eebe749797be5bdd0db992a2430ecfed66b8a4a724256a913c74
 source:
   kind: git
   location: https://github.com/vvgool/multi-agent-requirement-workflow.git
-  revision: 4ca2b0ff66f64f306d5ff5e6566c76247440600d
+  revision: 2f97f2ace53af73e0cf43ddbaa12eb948e5c0ede

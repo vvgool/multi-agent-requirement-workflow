@@ -10,4 +10,8 @@ config_file = "agents/requirement_development.toml"
 [agents.requirement_testing]
 description = "独立验收当前开发基线并报告缺陷"
 config_file = "agents/requirement_testing.toml"
+
+[agents.requirement_bug]
+description = "诊断并修复缺陷并完成自验"
+config_file = "agents/requirement_bug.toml"
 # requirement-workflow:codex-registry:end
