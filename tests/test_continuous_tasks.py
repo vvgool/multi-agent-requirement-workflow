@@ -102,7 +102,7 @@ class Fixture:
         self.directory = directory / role
         self.out = self.directory / 'outputs'
         self.task = yaml.safe_load((ROOT / ('templates/product-task.yaml' if role == 'product' else 'templates/role-task.yaml')).read_text())
-        self.task.update(feature_id='fixture', requirements_revision=1, task_id=role, role=role,
+        self.task.update(feature_id='fixture', requirements_revision=1, layout_version=3, task_id=role, role=role,
                          framework=dict(name='multi-agent-requirement-workflow', version='0.4.0', protocol_version=2, sha256='a' * 64),
                          output_dir=str(self.out), result_path=str(self.directory / 'result.yaml'))
         identity = dict(schema_version=2, feature_id='fixture', requirements_revision=1, task_id=role, role=role)
@@ -333,7 +333,7 @@ class ContinuousTaskTests(unittest.TestCase):
     def test_all_stage_templates_have_single_authoritative_structure(self):
         for name in ['product-task', 'role-task']:
             t = yaml.safe_load((ROOT / f'templates/{name}.yaml').read_text())
-            self.assertEqual((t['schema_version'], t['layout_version']), (2, 3))
+            self.assertEqual((t['schema_version'], t['layout_version']), (2, 4))
             self.assertIn('authorizations', t)
             self.assertNotIn('run_id', t)
             self.assertNotIn('write_scope', t)  # each invocation's authorization owns this

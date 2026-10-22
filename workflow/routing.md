@@ -8,7 +8,7 @@
 
 1. 重读status，核对事项/修订/协议；未知组合或矛盾blocked。协议1用原锁定包路由，不迁移。
 2. active_run非空先查询/等待/重连，unknown不重派。新输入记入input待处理，保留活动身份。普通方案通知只读展示，不清调用/推进。
-3. waiting_user处理原问题或pending_review；只有当前正式评审明确回复才批准。blocked先核实解除条件，“继续”不代替。
+3. 同目标未完成的范围/验收新增按[增量契约](incremental-changes.md)原目录回产品重审；保留任务及额度，旧审批/结论不能推进新范围。waiting_user处理原问题或pending_review；只有当前正式评审明确回复才批准。blocked先核实解除条件，“继续”不代替。
 4. Issue默认关闭；启用或有历史待处理才读[Issue规则](issue-tracking.md)。外部写入仍须授权，策略不代替业务审批。
 5. 无活动调用且允许执行时按表续接既有角色任务；先按[包复用](package.md#会话内核验复用)与[宿主映射](host-adapters.md#业务派发和恢复)核对环境，再按[交接](handoff.md#派发)启动。
 
@@ -16,8 +16,8 @@
 | --- | --- |
 | draft | 续产品澄清/产稿；独立Bug入口续bug boundary |
 | requirement_review | 展示当前需求或Bug边界，待明确确认 |
-| development | 有本版审批及额度后续原开发/Bug任务 |
-| testing | 续testing，绑定当前具体交付及基线 |
+| development | 有当前baseline_id及review_digest审批、无未处理范围变化且额度允许后续原开发/Bug任务 |
+| testing | 续testing，绑定当前批准baseline_id/approval_digest、具体交付及精确代码基线 |
 | completed | 展示证据；新变更建新修订 |
 
 ## 产品澄清答复

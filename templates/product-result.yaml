@@ -7,3 +7,6 @@ deliveries: []
 # 评审稿ready才追加{id,invocation_id,status,input_sha256,summary,artifacts,acceptance_ids}。
 # artifacts含真实path/sha256及quality_check（可与requirements同稿）。
 # 每轮交付不可变、可独立回读；澄清题/答复在既有input轻记录，不每次写result。
+
+# 布局4每项delivery含baseline_id（产品候选未评审可null），须等于该调用授权。
+# development/testing/bug fix另含approval_digest，绑定当时批准摘要，不回填根最新值。

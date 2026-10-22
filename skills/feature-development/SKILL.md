@@ -11,7 +11,7 @@ description: Use when development-agent receives an approved feature or defect-f
 
 ## 接单与开发原则
 
-完成执行契约核对后，业务决策缺失返回 needs_input，执行条件不足返回 blocked；范围变化交协调层重新确认。
+完成执行契约核对后，业务决策缺失返回 needs_input，执行条件不足返回 blocked；布局4范围变化按[增量契约](../../workflow/incremental-changes.md)交协调原目录重审；原任务不变，新调用绑定新baseline_id和approval_digest，旧授权不得扩大，额度不重置。
 
 先读 [开发原则](references/development-principles.md)：遵循适用项目规则和已有架构约定；缺少约定时按 Clean Architecture 的职责划分和依赖方向做最小设计。规则来源和技术选择记入下述文档，不另建原则报告。
 

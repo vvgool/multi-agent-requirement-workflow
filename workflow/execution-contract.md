@@ -4,11 +4,11 @@
 
 ## 接单与授权
 
-本次调用必须传工作空间、task路径、invocation_id。核对feature_id/revision/task_id/role与根active_run及host对应条目，framework四字段/root/锁及快照有效；stage与角色相符，开发/测试/Bug fix有当前本版审批。取host.authorization对应的不可变授权版本，不取“最新权限”扩写旧调用。required_files/外部写范围缺失不代表授权；身份或状态矛盾先核实。每次核对实际输入/权限/审批/基线，不以环境复用替代。
+本次调用必须传工作空间、task路径、invocation_id。核对feature_id/revision/task_id/role与根active_run及host对应条目，framework四字段/root/锁及快照有效；stage与角色相符，开发/测试/Bug fix有当前本版审批。布局4须核对[审批基线及增量](incremental-changes.md#最小基线与历史)的baseline_id/approval_digest与当前输入；取host.authorization对应的不可变授权版本，不取“最新权限”扩写旧调用。required_files/外部写范围缺失不代表授权；身份或状态矛盾先核实。每次核对实际输入/权限/审批/基线，不以环境复用替代。
 
 ## 路径与结果
 
-布局3的task/output_dir/result_path属于本事项/修订/tasks/<task_id>；工作稿写outputs，正式交付保存必要不可变版本。artifacts相对output_dir，拒绝绝对/..与链接越界；changed_files/code_baseline相对target_project。正式documents/、根状态、审批及Issue协调维护。源码/测试/临时目录仅按本次授权写入，不因需求目录位于项目内扩权。交付模板[公共](../templates/role-result.yaml)/[产品](../templates/product-result.yaml)只在真实交付时使用，不给每次问答写空result。
+布局4的task/output_dir/result_path属于本事项/修订/tasks/<task_id>；工作稿写outputs，正式交付保存必要不可变版本。artifacts相对output_dir，拒绝绝对/..与链接越界；changed_files/code_baseline相对target_project。正式documents/、根状态、审批及Issue协调维护。源码/测试/临时目录仅按本次授权写入，不因需求目录位于项目内扩权。交付模板[公共](../templates/role-result.yaml)/[产品](../templates/product-result.yaml)只在真实交付时使用，不给每次问答写空result。
 
 ### 共享文稿边界
 

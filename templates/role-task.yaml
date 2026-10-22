@@ -1,7 +1,7 @@
 schema_version: 2
 feature_id: null
 requirements_revision: 1
-layout_version: 3
+layout_version: 4
 task_id: null # 同修订同角色持续任务，默认角色名
 role: null # development/testing/bug
 framework: null # {name,version,protocol_version:2,sha256}
@@ -15,7 +15,12 @@ input_path: null
 requirements_path: null
 output_dir: null
 result_path: null
-authorizations: [] # {id,purpose,approval_digest,write_scope,completion_criteria}；旧版本不可改
+authorizations: [] # {id,purpose,baseline_id,approval_digest,write_scope,completion_criteria}；旧版本不可改
 # testing授权含source_delivery={task_id,delivery_id}及development_baseline，始终禁止修业务源码。
 # fix授权有非空源码范围和attempt；bug边界只读，确认后同task追加fix版本及boundary_path/boundary_digest。
 # required_files（含原开发/Bug result及具体交付）/temporary_paths/外部写权限按适用版本明确填写。
+
+# 布局4授权版本含baseline_id及approval_digest；产品/边界分析可为null，source_baseline_id指旧来源。
+# 新写/测试授权须匹配当前批准基线；旧授权永不扩大；详见workflow/incremental-changes.md。
+
+# 配置变化只在新授权增加effective_config；task.effective_config保留初始快照，旧调用不继承新配置。

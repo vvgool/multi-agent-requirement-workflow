@@ -12,7 +12,7 @@
 
 边界含症状、预期行为、允许/禁止修改范围、逐项验证标准、必要环境、来源和限制。审批对象格式沿用 documents.md 的稳定评审摘要算法及 sources/配置绑定，将 requirements 正文位置替换为边界正文；pending_review.type=bug_boundary，approval.type=bug_boundary，记录 boundary_path 和原字节 sha256，当前授权boundary_path/boundary_digest 与之相符。review_digest 是包含 feature_id、修订、边界正文原字节摘要和有效配置依据的 review-manifest.yaml 原始字节 SHA256（验收包含在边界正文中），展示后任何变化使旧 pending_review 失效。普通“继续”、旧审批、澄清选择不算批准。已有 approval.type 缺失仅代表 requirements，不能拿来批准 standalone。
 
-批准后 stage=development，授权purpose=fix，requirements_path 可空但 boundary_path 必填；审批和边界摘要仍每轮核对。改预期/范围/标准进入新修订，经 Bug 重整边界并再次明确批准；已结束旧版与历史保留。confirmed 内容缺失或漂移时 blocked，不擅自修补审批。
+批准后 stage=development，授权purpose=fix，requirements_path 可空但 boundary_path 必填；审批和边界摘要仍每轮核对。布局4的boundary_path指当前批准reviews基线内不可变bug-boundary.md，baseline_id与approval_digest贯通fix授权、交付和独立测试；documents只展示当前稿。布局4同目标未完成改预期/范围/标准按[增量契约](incremental-changes.md)原目录经 Bug 重整边界并再次明确批准，原bug任务追加授权；完成后才新修订；已结束旧版与历史保留。confirmed 内容缺失或漂移时 blocked，不擅自修补审批。
 
 ## 派发与状态
 

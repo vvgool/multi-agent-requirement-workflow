@@ -1,7 +1,7 @@
 schema_version: 2
 feature_id: null
 requirements_revision: 1
-layout_version: 3
+layout_version: 4
 task_id: product
 role: product
 framework: null # {name,version,protocol_version:2,sha256}，与锁及缓存一致
@@ -14,5 +14,10 @@ target_project: null
 input_path: null
 output_dir: null # tasks/<task_id>/outputs，只有需要时建立
 result_path: null # tasks/<task_id>/result.yaml；仅真实交付时建立
-authorizations: [] # 按需追加{id,purpose,approval_digest,write_scope,completion_criteria}；调用绑定版本
+authorizations: [] # 按需追加{id,purpose,baseline_id,approval_digest,write_scope,completion_criteria}；调用绑定版本
 # required_files / external_write_scope 有实际授权时放对应授权版本；不每次问答重建task。
+
+# 布局4授权版本含baseline_id及approval_digest；产品/边界分析可为null，source_baseline_id指旧来源。
+# 新写/测试授权须匹配当前批准基线；旧授权永不扩大；详见workflow/incremental-changes.md。
+
+# 配置变化只在新授权增加effective_config；task.effective_config保留初始快照，旧调用不继承新配置。

@@ -32,7 +32,7 @@ description: Use when testing-agent receives an approved feature baseline for ac
 
 按 [公共结果模板](../../templates/role-result.yaml) 在指定结果位置写 result.yaml，追加不可变交付，填实际验收结果、source_delivery={task_id,delivery_id}、基线、缺陷和限制；artifacts 每项含 kind/path，相对本任务 输出。passed/failed/blocked 按流程门槛判断，报告与结果一致。
 
-业务源码修复交开发或绑定的 Bug 角色，需求歧义交协调层；改变批准正文须进入新修订评审。向协调 Agent 返回结果路径、状态及简要结论。
+业务源码修复交开发或绑定的 Bug 角色，需求歧义交协调层；布局4改变批准正文须按[增量契约](../../workflow/incremental-changes.md)重新评审，旧报告注明上一基线，绑定当前baseline_id/approval_digest及具体新开发交付后才独立验收。向协调 Agent 返回结果路径、状态及简要结论。
 
 ## Bug 独立验收
 

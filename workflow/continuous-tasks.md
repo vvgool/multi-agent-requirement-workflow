@@ -4,16 +4,17 @@
 
 ## 身份与布局
 
-协议2只用于明确绑定protocol_version=2、schema_version=2、layout_version=3的新修订任务。协议1的run与布局1/2继续由其原锁定包解释；新包不得接管旧活动调用、续写旧task、迁移审批或重算历史。未知组合blocked；框架升级仅改变安装，不使旧修订自动改协议。新修订经用户审批后才进入写阶段。
+协议2只用于明确绑定protocol_version=2、schema_version=2、layout_version=4的新工作上下文任务（0.5.0起）。布局3及协议1的run与布局1/2继续由其原锁定包解释；新包不得接管旧活动调用、续写旧task、迁移审批或重算历史。未知组合blocked；框架升级仅改变安装，不使旧修订自动改协议。每个实际评审基线经用户明确确认后才进入写阶段。
 
-一个feature_id表示业务事项；修订区分范围/规则/验收变化。同修订每个实际需要的product/development/testing/bug默认只有一个持续task_id（默认取角色名），协调只用根状态，不建立自己的task。仅独立目标/明确拆分独立工作、修订变化、用户明确终止后替代才建新任务，并在既有input中记关系。调用结束、等待、断线、换Agent/宿主、代码变化、失败回修或同范围授权更新均不增任务。
+一个feature_id表示业务事项；修订定位持续目录上下文，baseline_id区分目录内实际评审内容；同目标未完成范围/规则/验收变化遵循[增量契约](incremental-changes.md)，原目录续原任务重审。同修订每个实际需要的product/development/testing/bug默认只有一个持续task_id（默认取角色名），协调只用根状态，不建立自己的task。仅独立目标/明确拆分独立工作、修订变化、用户明确终止后替代才建新任务，并在既有input中记关系。调用结束、等待、断线、换Agent/宿主、代码变化、失败回修或同范围授权更新均不增任务。
 
 ```text
 revisions/vN/
   input.md                         # 累计输入、问题/答复、处理关联
   documents/                       # 当前正式成果（协调维护）
   .workflow/
-    snapshots/                     # 已有锁/配置/评审，不新增账本
+    snapshots/                     # 已有锁/配置，不新增账本
+    reviews/<baseline_id>/          # 布局4必要正文/manifest/批准，非整套修订包
     tasks/<task_id>/
       task.yaml                    # 稳定身份、路径、授权版本
       host.yaml                    # 依序追加调用，协调单写
@@ -22,7 +23,7 @@ revisions/vN/
         <delivery_id>/             # 真正提交时保存必要不可变版本/证据
 ```
 
-任务身份是feature_id+requirements_revision+task_id+role；调用身份是任务内invocation_id（如i001）；交付身份是任务内delivery_id（如d001）。不再使用run_id混指三者，不在它们外面加session/batch/run目录。同一角色任务的交付序号不随宿主变化归零。task.output_dir/result_path固定指向该任务（明确迁移时按portability核对并保存原定位证据，不新建业务任务）。任务与host/result包含schema_version=2及任务身份；无需在每轮复制framework或完整需求。
+任务身份是feature_id+requirements_revision+task_id+role；调用身份是任务内invocation_id（如i001）；交付身份是任务内delivery_id（如d001）。不再使用run_id混指三者，不在它们外面加session/batch/run目录。同一角色任务的交付序号不随宿主变化归零。task.output_dir/result_path固定指向该任务（明确迁移时按portability核对并保存原定位证据，不新建业务任务）。任务与host/result包含schema_version=2及任务身份；布局4的授权版本、每项交付、审批及待验交付必须按[最小基线](incremental-changes.md#最小基线与历史)关联baseline_id和approval_digest，不能用旧审批授权新范围；无需在每轮复制framework或完整需求。
 
 ## 调用与授权
 
@@ -34,9 +35,9 @@ revisions/vN/
 - status=unknown/running/ended/cancelled、started_at、结束时ended_at及end_evidence。ended只证明宿主调用结束，不表示业务完成；取消须有真实证据。
 - input={path,sha256}、authorization（task.authorizations内版本id）、本次source_delivery（适用时）。输入路径相对feature_dir，摘要绑定本次实际读到的累计输入。历史输入还须可重建：input保持只追加，host.input.sha256对应调用前文件的原字节前缀，协调可按该摘要唯一定位前缀；无法重建则blocked。用户修改历史input时保留现场，不将新文件冒作原输入。输入原文保留在input.md；历史原始外部来源按原快照保留，不反复复制累计输入全文。
 
-task.authorizations按序追加{id,purpose,approval_digest,write_scope,completion_criteria}，只含实际需要的授权；第一版即明确范围，无授权不执行。required_files、boundary_path/boundary_digest、source_delivery及外部写授权等按适用情况放对应版本，避免task上有相互冲突的当前授权副本。每次调用指向其中一版；协调仅在无活动调用时追加新版本，保留批准依据和生效顺序。既有版本不可扩大/覆盖，旧调用仍绑定旧授权。
+task.authorizations按序追加{id,purpose,baseline_id,approval_digest,write_scope,completion_criteria}，只含实际需要的授权；第一版即明确范围，无授权不执行。required_files、boundary_path/boundary_digest、source_delivery及外部写授权等按适用情况放对应版本，避免task上有相互冲突的当前授权副本。每次调用指向其中一版；协调仅在无活动调用时追加新版本，保留批准依据和生效顺序。既有版本不可扩大/覆盖，旧调用仍绑定旧授权。
 
-product只写候选与必要授权正文；development/bug fix必须有当前有效审批及明确源码路径；testing始终modify_business_source=false，不修业务源码。Bug boundary仅只读项目，不写测试/源码/探针；边界正式确认后同task追加fix授权，旧boundary调用不变。修改范围/验收语义须新修订重审，同范围授权调整也必须有真实依据，不因Agent续接默认沿用写权。
+product只写候选与必要授权正文；development/bug fix必须有当前有效审批及明确源码路径；testing始终modify_business_source=false，不修业务源码。Bug boundary仅只读项目，不写测试/源码/探针；边界正式确认后同task追加fix授权，旧boundary调用不变。修改范围/验收语义按增量契约原目录重审（完成后才新修订），同范围授权调整也必须有真实依据，不因Agent续接默认沿用写权。
 
 原Agent可续接优先复用；不支持续接/上下文丢失/换宿主时先确认旧调用ended/cancelled，核对持续身份、产物归属、最新输入、权限和原生角色，再用同task追加调用。新宿主需自己的真实激活证据；不能推广别的宿主能力。unknown或查询不可靠先恢复核实，不取消标记掩盖疑点；无法恢复blocked并指出缺项。
 

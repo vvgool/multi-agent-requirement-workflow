@@ -5,10 +5,14 @@ title: null
 workspace_root: null # 本机运行时解析，迁移后重新绑定
 target_project: null # 本机运行时解析，不填写作者目录
 requirements_revision: 1
-layout_version: 3 # 协议2新修订；旧协议/布局保持不变
+layout_version: 4 # 协议2新修订；旧协议/布局保持不变
+content_baseline: null # 实际评审时分配b001；同目录重审递增，非修订号
 stage: draft
 execution_status: idle
 active_run: null
+approval: null # 布局4含baseline_id/review_digest，历史批准留reviews，不授权新增范围
+pending_review: null # 布局4含baseline_id/review_digest/displayed_at
+development_baseline: null # {task_id,delivery_id,baseline_id,approval_digest,code_baseline}
 development_attempt: 0
 max_development_attempts: 3
 artifacts: []

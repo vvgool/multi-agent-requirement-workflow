@@ -14,3 +14,6 @@ deliveries: []
 # 开发/Bug另有changed_files；ready/passed/failed另有code_baseline。
 # testing另有source_delivery={task_id,delivery_id}、acceptance_results；failed有defects。
 # blocked有block_reason；needs_input有questions。中间澄清只写input，不生成交付。
+
+# 布局4每项delivery含baseline_id（产品候选未评审可null），须等于该调用授权。
+# development/testing/bug fix另含approval_digest，绑定当时批准摘要，不回填根最新值。

@@ -11,17 +11,18 @@
 - `feature_id`：内部唯一标识，首次新建时生成 UUID，改名、修订不改变；存量 REQ-001 等值保持不变。
 - `title`、`workspace_root`、`target_project`：名称及当前宿主动态解析的绝对路径。后两者是本机运行定位信息；复制或迁移后须按 [portability.md](portability.md) 核对并重新绑定，不能当作框架安装约定。
 - `requirements_revision`：正整数；当前修订版目录为 revisions/vN。
-- `layout_version`：当前修订布局，协议2新修订为 3（协议1为2）；缺字段的存量为 1，规则见 [成果目录](output-layout.md)，不原地改变旧版。
+- `layout_version`：当前修订布局，0.5.0协议2新工作上下文为 4（0.4.0为3，协议1为2）；缺字段的存量为 1，规则见 [成果目录](output-layout.md)，不原地改变旧版。
+- `content_baseline`：布局4当前实际展示的baseline_id（尚未评审为null）；审批、授权、交付及历史最小格式按[增量基线](incremental-changes.md#最小基线与历史)。进行中重审保留requirements_revision和attempt，不复制状态快照。
 - `state_version`：每次成功更新递增，与需求修订号不同。
 - `stage`：draft、requirement_review、development、testing、completed。
 - `execution_status`：idle、running、waiting_user、blocked。
 - `coordinator_session`：当前负责的真实会话标识；宿主不提供可核实标识时可省略，并遵守单会话约束，不编造标识。
 - `active_run`：协议2为null或{task_id,role,revision,invocation_id,host,dispatch_status,framework}及真实可得host_task_id，指向host内本次调用；unknown/running先恢复，不代表持续任务结束。协议1仍按原run身份解释。
-- `approval`：null 或含 feature_id、revision、review_digest、user_response、confirmed_at、source_session 的审批记录。人工确认后才填入；审批原文保留，时间和来源不能伪造。
-- `pending_review`：null 或含 revision、review_digest、displayed_at 的待审记录；文件、来源和配置摘要统一从本版不可变 review manifest 核对，不在根状态复制。旧待审记录仍按原清单核验。
+- `approval`：null 或含 feature_id、revision、baseline_id、review_digest、user_response、confirmed_at、source_session 的审批记录。人工确认后才填入；审批原文保留，时间和来源不能伪造。
+- `pending_review`：null 或含 revision、baseline_id、review_digest、displayed_at 的待审记录；文件、来源和配置摘要统一从本版不可变 review manifest 核对，不在根状态复制。旧待审记录仍按原清单核验。
 - `artifacts`：当前正式成果、入口及kind=task的持续目录；路径相对feature_dir。正式成果含kind/path/revision/task_id/delivery_id/sha256，来源从该任务result的具体交付按kind唯一解析。task目录只登记一次，详细文件不重复索引；旧run索引只读保留。
 - `block_reason`：null 或具体原因，缺角色时另记录 `required_role`；`development_attempt`、`max_development_attempts` 为非负/正整数。实际写阶段尝试按 [routing.md](routing.md) 记录，缺角色时不消耗次数。
-- `development_baseline`：{task_id,delivery_id,code_baseline}，绑定具体开发/Bug交付；testing授权source_delivery必须一致，精确内容见[基线](code-baseline.md)。
+- `development_baseline`：{task_id,delivery_id,baseline_id,approval_digest,code_baseline}，绑定具体开发/Bug交付；testing授权source_delivery必须一致，精确内容见[基线](code-baseline.md)。
 - `issue_tracking`：缺失/null 时按默认策略；启用后记录需求级选择、真实绑定、评论授权和同步记录相对路径，见 [Issue 规则](issue-tracking.md)。同步摘要与业务 stage/execution_status 分开，不以远端评论代替审批。
 事件以 events.jsonl 为准，新状态不写重复的 last_event；存量值只作历史线索，不作为当前路由依据。
 

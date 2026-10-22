@@ -17,7 +17,7 @@ scope/files非空，项目相对路径无绝对/..逃逸；目录递归枚举普
 
 ## 比较与绑定
 
-开发/Bug交付的code_baseline是该交付权威清单；根development_baseline={task_id,delivery_id,code_baseline}，测试本次授权source_delivery={task_id,delivery_id}须一致。按任务目录→原task.result_path→指定delivery→artifacts读取，不能只读result最后一条或猜run名。测试接单及结束重新枚举scope/exclude/files，与指定交付及根绑定比较，不仅比较HEAD/聚合摘要。证据路径始终相对原任务output_dir，不复制误解为本测试输出。
+开发/Bug交付的code_baseline是该交付权威清单；布局4根development_baseline={task_id,delivery_id,baseline_id,approval_digest,code_baseline}，测试本次授权source_delivery={task_id,delivery_id}须一致，测试授权/结果的baseline_id和approval_digest须与根及源交付一致。旧交付不能验新增范围。按任务目录→原task.result_path→指定delivery→artifacts读取，不能只读result最后一条或猜run名。测试接单及结束重新枚举scope/exclude/files，与指定交付及根绑定比较，不仅比较HEAD/聚合摘要。证据路径始终相对原任务output_dir，不复制误解为本测试输出。
 
 HEAD变化须证明无关且依赖未变；相关文件/环境/输入变化重验，无法核实blocked。代码修复仍原开发task、但新delivery和精确基线；测试仍原testing task、但新source_delivery与结论。新交付不能覆盖旧文件/失败证据，部分写入不能提前绑定。测试自验/局部通过不代替完整独立验收。
 
