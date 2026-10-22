@@ -1,0 +1,16 @@
+schema_version: 2
+target: null # 实际核实的{provider,host,repository,issue_number}
+feature_id: null
+baseline_id: null
+scope_description: null # 展示的事项/完整Issue范围
+operations: [] # comment / close；互不隐含，不包括发布/重开
+close_policy: "off" # off / after_release；与实际展示策略一致
+include_future_revisions: false # 只有用户明确涵盖才true
+full_issue_scope: false # 用户明确确认完整Issue关闭范围
+scope_evidence: [] # 用户范围确认与实际核对引用
+event_kinds: [] # 精确允许评论的事件；新增发布事件不继承旧权限
+history_event_ids: [] # 仅明确允许补记的真实历史事件
+user_response: null
+confirmed_at: null
+source_session: null
+revoked: false

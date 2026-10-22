@@ -19,3 +19,7 @@
 - [GitLab Notes API](https://docs.gitlab.com/api/notes/)：Issue notes 的列表、创建和读取。
 
 本文件只规定所需操作与核验，不要求某个固定工具名、模型、认证方案或 API 版本；其他平台首版返回 unsupported_issue_provider，不套用以上格式。隔离模拟可验证规则，真实权限/网络/读写须单独验证。
+
+## 状态能力（仅按生命周期契约获授权后）
+
+分别发现同一完整目标的状态读取、open→closed写入及原请求回执读取能力。GitHub按真实Issue identity更新state=closed；GitLab按真实project与iid执行close状态操作；字段和调用形式必须按宿主现有工具说明核实，不从评论能力推断关闭能力。缺任一能力报告具体限制。状态只表达open/closed，业务阶段用摘要评论，不要求Project/看板/标签。重定向、PR/MR、global id/iid冲突拒绝，不自动重开。返回成功仍须同目标回读，归因不足保持unknown。

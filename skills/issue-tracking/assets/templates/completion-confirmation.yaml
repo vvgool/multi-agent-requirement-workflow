@@ -1,0 +1,16 @@
+# 技术独立passed后、针对当前精确交付展示取得；不是产品审批或关闭权限。
+schema_version: 1
+kind: delivery_completion
+feature_id: null
+baseline_id: null
+delivery_id: null
+code_baseline_digest: null
+target: null # 实际Issue四字段
+scope_ids: []
+scope_description: null
+event_id: null # 真实delivery_confirmed事件，不用feature_completed代替
+user_response: null # 对展示的本次交付最终确认原话
+response_evidence: null # 实际答复原始引用
+confirmed_at: null
+source_session: null # 实际不可得保持null
+presentation: null # {presented_at,evidence,delivery_summary,scope_coverage_evidence:[],acceptance_results:[{id,status,evidence}],feature_id,baseline_id,delivery_id,code_baseline_digest,target,scope_ids,scope_description,acceptance_evidence,unresolved_items:[],release_kind,release_status,release_required,release_impact:{assessed:true,unresolved:[],evidence:[]}}

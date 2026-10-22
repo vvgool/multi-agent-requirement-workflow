@@ -5,8 +5,12 @@
 ## 准备记录
 
 1. 从已存在的 events.jsonl 读取原 event_id、修订、业务 state_version、kind、摘要及证据，核对真实阶段交接。同步重试不能生成新业务事件或改原发生时间。没有事件但有状态时先按状态恢复规则核实并补事件，不凭当前 stage 猜历史成功。
-2. sync_key 是 UTF-8 紧凑 JSON 数组 `[feature_id, revision, event_id, provider, host, repository, issue_number]` 的 SHA-256（ensure_ascii=false，无额外空格；revision/issue_number 为整数，其余为字符串）。数组取已核实的固定身份，摘要用实际工具算，不能编造。相同事件/目标永远取同一 key。
-3. 读真实 [评论模板](../assets/templates/comment.md)，按原事件生成 comment.md，计算实际字节 body_sha256，先保存 pending record，再登记根 sync_records 和状态事件。事件/目标/正文一旦进入发送流程不可改写；修正事实在后续有依据的允许业务事件中显式说明，不覆盖历史；不另造未定义的留痕事件类型。原子落盘并回读，已有 key 先核对身份/摘要，不覆盖。
+2. sync_key 是 UTF-8 紧凑 JSON 数组 `[feature_id, revision, event_id, provider, host, repository, issue_number, operation]` 的 SHA-256（ensure_ascii=false，无额外空格；revision/issue_number 为整数，其余为字符串）。数组取已核实的固定身份，摘要用实际工具算，不能编造。operation=comment/close；旧schema1评论保持原七项算法，新记录必须schema2且加入类型。相同事件/目标/操作永远取同一 key。
+3. 本节准备步骤只适用comment；close直接按末节生命周期契约处理。读真实 [评论模板](../assets/templates/comment.md)，按原事件生成 comment.md，计算实际字节 body_sha256，先保存 pending record，再登记根 sync_records 和状态事件。事件/目标/正文一旦进入发送流程不可改写；修正事实在后续有依据的允许业务事件中显式说明，不覆盖历史；不另造未定义的留痕事件类型。原子落盘并回读，已有 key 先核对身份/摘要，不覆盖。
+
+## 只读协议门禁
+
+按生命周期契约使用随包校验器的 comment 检查，将真实完整分页/原文读取、唯一匹配、回执回读及当前授权/策略结论传入；输出 action 仅是协调下一步建议，不执行请求。实际传输结果用 outcome 分类；close 用 close/recovery。缺分页/原文、冲突或未终局unknown禁止发送。
 
 ## 每次尝试
 
@@ -22,3 +26,7 @@
 - blocked/pending：解除对应条件后按同一 key 和原正文重新核对，再决定是否创建。不能用新的 run_id 或时间逃过去重。
 
 更新 record、根 sync_status/索引和 issue_sync_* 事件采用单协调会话与 state_version 检查。写后本地中断时先读回 record、回执和实际远端事实再补齐；不清理记录或原 comment.md。所有“已同步”均须有可复核的读取事实。无持久幂等键的平台不能保证严格只写一次，未知写入宁可保留待核实。
+
+## 关闭操作
+
+关闭不走创建评论步骤。先按 [生命周期契约](lifecycle.md) 核对关闭门槛及其只读校验器，持久化close记录、预期状态、授权和证据，最后读同一Issue open后发一次关闭请求，再回读状态与原请求归因。sending/unknown严格先恢复；closed无归因仅报告外部/未知关闭，open本身不证明未执行。必要评论失败/unknown不得发送close；评论成功不重复发，关闭失败单独记录。

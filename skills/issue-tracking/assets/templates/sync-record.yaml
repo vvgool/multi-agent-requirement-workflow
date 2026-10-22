@@ -1,10 +1,17 @@
-schema_version: 1
-sync_key: null # 实际计算的稳定SHA-256
+schema_version: 2
+operation: comment # comment / close；旧schema1不迁移
+authorization_ref: null # 实际授权证据，非策略配置
+expected_state: null # close固定{from: open, to: closed}
+evidence: [] # close引用验收、manual最终完成确认、适用发布、完整范围、必要摘要与最后远端读取
+remote_state: null
+attribution: null # own_request / external_or_unknown
+remote_operation_receipt: null
+sync_key: null # schema2按包含operation的八项数组实际计算；旧schema1不迁移
 feature_id: null
 event: null # 原快照：{event_id, revision, state_version, kind, occurred_at, stage, execution_status, summary, evidence}
 binding: null # 该事件固定的{provider, host, repository, issue_number, url}
 status: pending # pending / sending / unknown / synced / blocked
-body_sha256: null # 同目录comment.md实际字节摘要
+body_sha256: null # comment同目录comment.md实际字节摘要；close为null
 remote_comment_id: null
 remote_comment_url: null
 last_error: null

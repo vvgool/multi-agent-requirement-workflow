@@ -23,7 +23,7 @@
 - `artifacts`：当前正式成果、入口及kind=task的持续目录；路径相对feature_dir。正式成果含kind/path/revision/task_id/delivery_id/sha256，来源从该任务result的具体交付按kind唯一解析。task目录只登记一次，详细文件不重复索引；旧run索引只读保留。
 - `block_reason`：null 或具体原因，缺角色时另记录 `required_role`；`development_attempt`、`max_development_attempts` 为非负/正整数。实际写阶段尝试按 [routing.md](routing.md) 记录，缺角色时不消耗次数。
 - `development_baseline`：{task_id,delivery_id,baseline_id,approval_digest,code_baseline}，绑定具体开发/Bug交付；testing授权source_delivery必须一致，精确内容见[基线](code-baseline.md)。
-- `issue_tracking`：缺失/null 时按默认策略；启用后记录需求级选择、真实绑定、评论授权和同步记录相对路径，见 [Issue 规则](issue-tracking.md)。同步摘要与业务 stage/execution_status 分开，不以远端评论代替审批。
+- `issue_tracking`：缺失/null 时按默认策略；启用后记录需求级选择、真实绑定、独立评论/关闭授权、范围覆盖、当前精确交付的最终完成确认事件引用、发布适用性、已核实远端状态和同步记录相对路径，见 [Issue 规则](issue-tracking.md)。同步摘要与业务 stage/execution_status 分开，不以远端评论代替审批。
 事件以 events.jsonl 为准，新状态不写重复的 last_event；存量值只作历史线索，不作为当前路由依据。
 
 ## 迁移与条件

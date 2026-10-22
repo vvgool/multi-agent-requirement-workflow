@@ -130,17 +130,18 @@
 
 [workflow.yaml](workflow.yaml) 提供本地/飞书文档策略。修订内 documents.yaml 仅覆盖文档来源；Issue 的需求级策略保存在根状态。飞书受控写回目前仅覆盖产品需求正文，技术方案和测试报告仍输出本地文稿。权限和来源校验见 [文档规则](workflow/documents.md)。
 
-Issue 默认关闭：
+Issue 功能默认停用，自动关闭策略默认为 off：
 
 ```yaml
 issue_tracking:
   binding: "off"   # off / optional / required
   sync: "off"      # off / milestones
+  close: "off"     # off / after_release；不是关闭授权
 ```
 
-optional 在首次派发前选择绑定或跳过；required 在业务派发前要求绑定。sync=milestones 且用户明确授权目标后，协调主会话通过 [issue-tracking](skills/issue-tracking/SKILL.md) 在评审、确认、开发交付、测试失败、阻塞及完成等节点评论。选择和授权跨本需求修订保存，也可只对单个需求启用。
+optional 在首次派发前选择绑定或跳过；required 在业务派发前要求绑定。sync=milestones 且用户明确授权目标后，协调主会话通过 [issue-tracking](skills/issue-tracking/SKILL.md) 在评审、确认、开发交付、测试失败、阻塞及完成等节点评论。绑定选择跨本需求修订保存，授权仅在用户明确的范围/基线或后续修订边界内生效，也可只对单个需求启用。
 
-首版只关联已有 GitHub/GitLab Issue，不创建/关闭 Issue，不改标签或负责人。评论失败独立记录，不回退业务；未知写入先核实，不盲目重发。使用宿主已有连接能力。详细身份、授权及恢复语义见 [Issue 规则](workflow/issue-tracking.md)。
+只关联已有 GitHub/GitLab Issue，不新建 Issue、不改正文/标签或负责人；默认不关闭。新增 close=off/after_release，明确目标/范围/操作授权、独立验收及完整范围核实后，manual还须用户对当前精确交付最终确认完成；发布仅在批准完成条件或after_release时必需。普通源码/工具/框架/文稿无需统一打包或Release，保留真实未发布状态即可按manual关闭并回读，不自动发布或重开。旧评论授权不扩权。评论失败独立记录，不回退业务；未知写入先核实，不盲目重发。使用宿主已有连接能力。详细身份、授权及恢复语义见 [Issue 规则](workflow/issue-tracking.md)。
 
 ## 验证与维护
 

@@ -28,6 +28,7 @@ approval:
 issue_tracking:
   binding: "off"
   sync: "off"
+  close: "off" # off / after_release；策略不授予关闭权
 ```
 
 - `schema_version`：整数，当前仅接受 1。
@@ -36,9 +37,9 @@ issue_tracking:
 - `documents.feishu.write_enabled`：布尔值，默认 false。
 - `documents.requirements`、`references`、`design`、`test_report`：文档配置，references 是列表，其余是单个文档。每项字段为 `provider`（可选，继承默认）、`path`（本地）、`source_revision`（仅本地，可选）、`url`（飞书）、`access`（read/read_write，默认 read）。本地 path 默认相对当前修订版目录解析；source_revision 指定本需求中已有的来源修订版，须为不大于当前版的正整数，path 改为相对该来源修订版解析，仍禁止越界。飞书 url 使用 HTTPS 文档或知识库链接，不同时配置 path 和 url。
 - `approval.channel`：首版仅接受 `coordinator`，在协调会话内明确确认。
-- `issue_tracking.binding`：字符串 off/optional/required，默认 "off"；`issue_tracking.sync`：字符串 off/milestones，默认 "off"。使用引号，布尔值不合法。绑定选择、需求级覆盖、授权及失败语义见 [Issue 规则](issue-tracking.md)。这两个字段不放 documents.yaml；需求级覆盖仅取根状态中有真实用户指令的 policy_override。
+- `issue_tracking.binding`：字符串 off/optional/required，默认 "off"；`issue_tracking.sync`：字符串 off/milestones，默认 "off"；`issue_tracking.close`：字符串 off/after_release，默认 "off"。binding=off 不得启用 sync/close，sync=off 不得启用 after_release。使用引号，布尔值不合法。绑定选择、需求级覆盖、授权及失败语义见 [Issue 规则](issue-tracking.md)。协调首次生效或覆盖变化时，按 [Issue生命周期校验接口](../skills/issue-tracking/references/lifecycle.md#关闭门槛和接口) 对合并后的三字段执行config检查，不以配置结果推定授权。这三个字段不放 documents.yaml；需求级覆盖仅取根状态中有真实用户指令的 policy_override。
 
-按字段递归覆盖：内置默认值 → 工作空间配置 → 当前修订版文档配置；Issue 策略另叠加用户明确的需求级覆盖，仅限 issue_tracking 的 binding/sync；列表整体替换。空值不能用于清除必填字段。未知字段、重复键、类型不符、无法可靠读取的配置先报告具体问题，不创建或修改需求状态。凭据从宿主已配置的连接能力取得，不写进上述文件。
+按字段递归覆盖：内置默认值 → 工作空间配置 → 当前修订版文档配置；Issue 策略另叠加用户明确的需求级覆盖，仅限 issue_tracking 的 binding/sync/close；列表整体替换。空值不能用于清除必填字段。未知字段、重复键、类型不符、无法可靠读取的配置先报告具体问题，不创建或修改需求状态。凭据从宿主已配置的连接能力取得，不写进上述文件。
 
 本地默认无外部需求正文时，以 input.md 为输入，由产品在本地产出需求。默认来源为飞书却没有 requirements.url 时，先请用户指定正文链接；仅配置父节点不代表已有需求正文。
 

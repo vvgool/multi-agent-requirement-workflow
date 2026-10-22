@@ -1,0 +1,18 @@
+kind: null # 真实对象package / service / none；不因manual无需发布伪改none
+status: unknown # succeeded / failed / partial / rolled_back / revoked / unknown / unpublished / not_required；实际状态独立于完成条件
+occurred_at: null
+target: null # 实际发布渠道；服务必须为当前请求的环境
+identity: null # 版本、制品或部署身份
+commit_or_artifact: null # 实际固定源码提交或制品摘要
+receipt: null # 可读取回执，不是只有tag/commit/build
+receipt_readable: false # 协调实际读取并保留证据才true
+published: false
+public: false # package必须为true
+draft: false
+environment: null # service目标环境
+runtime_verified: false # service实际部署/运行身份已核实
+feature_id: null
+baseline_id: null
+delivery_id: null
+code_baseline_digest: null
+coverage: [] # 已发布的实际范围标识

@@ -1,0 +1,25 @@
+# 校验器close接口；各读取结论必须由协调实际核实，不是自动事实探测。
+mode: automatic # automatic / manual
+policy: {binding: optional, sync: milestones, close: after_release}
+binding: null
+feature_id: null
+baseline_id: null
+scope_description: null
+scope_ids: []
+authorization: null # authorization.yaml中的实际已批准内容
+acceptance: null # {status: passed, independent: true, feature_id, baseline_id, delivery_id, code_baseline_digest, evidence, passed_at, acceptance_results:[{id,status,evidence}]}
+release: null # release-evidence.yaml
+approval_valid: false
+active_write: false
+pending_input: false
+unfinished_changes: false
+scope_coverage: null # {mode: exclusive/shared, confirmed: true, inspected_at, evidence: [], remaining: [], unknown: false, scope_ids: []}
+required_comments: [] # 可单项facts:[{kind,event_kind,event_id,evidence}]承载多个事实；每项{kind: progress/acceptance/release/confirmation, event_kind, target, status: synced, receipt, verified_at}
+related_sync_uncertain: true
+remote: null # {target, state: open/closed, read_at, scope_unchanged: true, externally_reopened: false}
+capabilities: [] # close / state_read
+manual_summary_authorized: false # sync=off或close=off手动关闭的必要摘要写范围已明确展示批准
+environment: null # service请求的实际环境，package无需
+future_scope_covered: false # 后续修订的新范围已明确落在原授权范围内
+completion_requirements: null # 当前已批准完成标准{feature_id,baseline_id,scope_ids,evidence,required_acceptance_ids:[],release_required:bool,release_kind:package/service/none}
+completion_confirmation: null # manual必须有completion-confirmation.yaml的真实最终确认，布尔许可不代替
