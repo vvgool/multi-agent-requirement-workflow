@@ -37,7 +37,7 @@
 
 11. 新锁定安装按 [包与版本规则](workflow/package.md) 校验项目绑定和任务身份；派发使用 [宿主适配](workflow/host-adapters.md)。旧快照/审批/任务按兼容路径保留，不自动迁移。
 
-候选协议2使用持续角色任务，调用与不可变交付分开，见[持续任务契约](workflow/continuous-tasks.md)。下方受管入口只记录本框架源码仓库自身的0.2.6安装：在源码仓库工作时继续服从其原锁，不能因源码变更提前采用候选协议。此文件作为分发包进入其他项目缓存时，下方旧入口不构成该业务项目的运行指令，不覆盖业务项目根AGENTS.md及workflow.lock.yaml的绑定；业务项目的协议和角色数由其锁定包framework.yaml、项目入口及宿主映射确定，不从缓存AGENTS.md的源码仓库安装记录推断。
+候选协议2使用持续角色任务，调用与不可变交付分开，见[持续任务契约](workflow/continuous-tasks.md)。下方受管入口只记录本框架源码仓库自身的安装，版本及协议以本项目workflow.lock.yaml为准：在源码仓库工作时继续服从其实际锁定包，不能因源码变更提前采用其他协议。此文件作为分发包进入其他项目缓存时，下方旧入口不构成该业务项目的运行指令，不覆盖业务项目根AGENTS.md及workflow.lock.yaml的绑定；业务项目的协议和角色数由其锁定包framework.yaml、项目入口及宿主映射确定，不从缓存AGENTS.md的源码仓库安装记录推断。
 
 状态流转：draft -> requirement_review -> development -> testing -> completed。测试失败时返回 development。
 <!-- requirement-workflow:begin -->
@@ -51,7 +51,7 @@
 
 1. 锁须可解析且无重复键，固定包含 schema_version=1、package 身份和 source；包名为 multi-agent-requirement-workflow、protocol_version为受支持的1或2且与取得包完全一致（不得跨协议续写任务），sha256 为64位小写十六进制，git revision 必须是完整提交 SHA。已有 `.agents/requirement-workflow.pending.json` 时先恢复原计划；锁缺失、格式不合法或计划身份不一致即停止，不重新规划。
 2. 缓存必须是锁定摘要对应的完整普通文件包；按根文件及 agents/、skills/、workflow/、templates/ 的相对 POSIX 路径和原字节 SHA256 排序计算紧凑 JSON 摘要，拒绝链接和额外文件。内容、来源提交或包身份不符时返回 framework_integrity_mismatch，不自动覆盖；缺缓存时按锁定提交恢复，只读获取并核验实际 HEAD，不跟随分支、不执行下载脚本。
-3. 身份核验后才读取 setup Skill，以 restore_only=true 补缓存或回执；不自动升级、扩展宿主、覆盖用户文件、改变项目配置、审批、业务文稿或 active_run。具体清单、摘要算法和失败语义按 [包规则](workflow/package.md) 与 [启动恢复](workflow/bootstrap.md) 执行。
+3. 身份核验后才读取 setup Skill，以 restore_only=true 补缓存或回执；不自动升级、扩展宿主、覆盖用户文件、改变项目配置、审批、业务文稿或 active_run。以下路径均相对于已核验的锁定缓存根 `.agents/requirement-workflow-cache/<package.sha256>/`（以本项目根为起点，摘要取本项目 `workflow.lock.yaml`，不使用原机器绝对路径）：具体清单、摘要算法和失败语义读取 `workflow/package.md` 与 `workflow/bootstrap.md`。不得将这些路径当作项目根下的文件；克隆缺缓存时仍按上述固定来源恢复并核验，不复制规则到项目根、不扩大运行包。
 4. 按缓存 host-adapters 映射选择当前宿主的四个原生角色，并分别记录文件安装、宿主激活和完整业务闭环；不能用通用 Agent 或其他宿主结论替代原生证据。
 5. 业务阶段前核对当前需求 status、task 和 active_run；unknown 或无法查询的调用先恢复核实，不重复派发。Issue 默认关闭，启用时仅由协调层按授权处理。
 
