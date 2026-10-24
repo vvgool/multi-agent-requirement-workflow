@@ -1,12 +1,12 @@
 # 通用框架包与项目绑定
 
-初始化、恢复派发、换机或升级时读取。共享核心不依赖某个宿主的插件格式；插件可作为分发渠道，原生注册仍由 [宿主适配契约](host-adapters.md) 处理。
+实际使用框架协作、原生角色、任务恢复、安装、换机或升级等能力时读取；独立一次性、明确局部低风险且非旧任务续接的小修只遵循已载入项目入口的授权/风险/未知操作规则，不为其读锁、缓存或本文件。共享核心不依赖某个宿主的插件格式；插件可作为分发渠道，原生注册仍由 [宿主适配契约](host-adapters.md) 处理。
 
 ## 包与内容身份
 
 框架包包含根 framework.yaml、AGENTS.md、README.md、workflow.yaml、LICENSE（存在时必须纳入），以及 agents/、skills/、workflow/、templates/ 内的全部普通文件。排除 docs/、agent-features/、Git 元数据、宿主安装目录及本机回执。包内不接受符号链接或特殊文件，未知根文件不纳入包，不让整个开发仓库扫描成为安装步骤。
 
-framework.yaml 仅含 schema_version=1、name、非空 version、protocol_version=2（本包）；它声明版本而非已发布事实。包名固定为 multi-agent-requirement-workflow。使用宿主文件/计算工具实际生成清单：所有包文件按相对 POSIX 路径升序，取 `[相对路径,原字节SHA256]`，将全部条目编码为 UTF-8 紧凑 JSON 数组（ensure_ascii=false、无额外空格），整体 SHA-256 为 package.sha256。framework.yaml 自身也参与，不在其中存自引用摘要。文本不转换换行；同名同版本不同字节按不同内容身份处理，不能自动接受。
+framework.yaml 仅含 schema_version=1、name、非空 version、protocol_version=3（本包）；它声明版本而非已发布事实。包名固定为 multi-agent-requirement-workflow。使用宿主文件/计算工具实际生成清单：所有包文件按相对 POSIX 路径升序，取 `[相对路径,原字节SHA256]`，将全部条目编码为 UTF-8 紧凑 JSON 数组（ensure_ascii=false、无额外空格），整体 SHA-256 为 package.sha256。framework.yaml 自身也参与，不在其中存自引用摘要。文本不转换换行；同名同版本不同字节按不同内容身份处理，不能自动接受。
 
 ## GitHub URL 与固定提交
 
@@ -14,7 +14,7 @@ framework.yaml 仅含 schema_version=1、name、非空 version、protocol_versio
 
 ## 项目内的两类文件
 
-需提交的最小内容为 workflow.yaml、workflow.lock.yaml、AGENTS.md 中的入口区块、目标宿主各自的四个薄角色文件、.gitignore 的本地目录忽略区块；Claude Code 如需读取入口另加 CLAUDE.md 的短桥接区块。不修改无关设置；默认安装当前宿主及项目检测到的宿主，用户显式选择范围优先；未检测且未选择的宿主不生成文件。具体见 [宿主选择](../skills/setup-requirement-workflow/references/installation.md#宿主选择与批量初始化)。需求成果按 [共享成果规则](output-layout.md#共享成果与本机现场) 共享，审批、精确基线和原始证据留本机执行记录。
+需提交的最小内容为 workflow.yaml、workflow.lock.yaml、AGENTS.md 中的入口区块、目标宿主各自的四个薄角色文件、.gitignore 的本地目录忽略区块；Claude Code 如需读取入口另加 CLAUDE.md 的短桥接区块。不修改无关设置；默认安装当前宿主及项目检测到的宿主，用户显式选择范围优先；未检测且未选择的宿主不生成文件。具体见 [宿主选择](../skills/setup-requirement-workflow/references/installation.md#宿主选择与批量初始化)。事项文档及实际成果按 [成果规则](output-layout.md) 共享，不默认建立本机业务执行记录。
 
 本地不提交：`.agents/requirement-workflow-cache/<package.sha256>/`（完整只读包）、`.agents/requirement-workflow.local.json`（各宿主安装与探测回执）、`.agents/requirement-workflow.pending.json`（中断意图）及任意层级的 `.workflow/`（本机执行现场）。不忽略整个 .agents、.codex、.claude、.opencode 或 agent-features，保留用户配置和共享成果。不创建 Skill 符号链接或复制阶段 Skill 到宿主目录；原生角色按明确包内路径读取完整 Skill 及模板，属于文件加载，不宣称原生 Skill 发现已验证。
 
@@ -24,17 +24,17 @@ framework.yaml 仅含 schema_version=1、name、非空 version、protocol_versio
 
 ## 运行与版本
 
-新轻量安装的框架根目录固定为项目根下 `.agents/requirement-workflow-cache/<锁定sha256>`；首次进入当前会话时完整校验包清单、当前宿主薄角色与入口及其实际生效状态；后续按下节复用未变化的环境核验。缓存或薄角色被修改返回 framework_integrity_mismatch/adapter_modified。读取不同宿主的回执不能证明当前宿主生效。初始化 pending 存在时先恢复，不能运行半安装结果。
+新轻量安装的框架根目录固定为项目根下 `.agents/requirement-workflow-cache/<锁定sha256>`；当前会话实际使用框架能力前首次完整校验包清单、当前宿主薄角色与入口及其实际生效状态；后续按下节复用未变化的环境核验。缓存或薄角色被修改返回 framework_integrity_mismatch/adapter_modified。读取不同宿主的回执不能证明当前宿主生效。初始化 pending 存在时先恢复，不能运行半安装结果。
 
-0.5.0新上下文为布局4，旧0.4.0布局3继续原包，不因升级迁移；新包不得续写旧task。协议2任务/调用/交付以[持续任务](continuous-tasks.md)为准；下述旧run快照引用按实际协议读取，不将旧一调用一run格式用于协议2。新 task 携带 framework={name,version,protocol_version,sha256} 和当机 framework_root。根状态 active_run 同时保存这份绑定；锁原字节按SHA256保存到本修订 .workflow/snapshots/framework-<锁文件摘要>.yaml，相同内容只保存一份，复用前核对普通文件、无链接及原字节摘要，已有快照不符则阻塞而不覆盖；task.framework_lock记录相对feature_dir的path及真实sha256，恢复时核对内容与task.framework及来源。旧run的framework-lock.yaml保持原索引。子角色核对 task、active_run 和真实包身份；新初始化但无绑定的任务不能视为旧任务。旧快照安装和无锁的历史任务按原契约读取，不回写身份或重新计算旧审批。
+0.6.0候选采用协议3，一次性局部低风险小修可直接在当前会话完成，需要持久文档时只维护一份当前入口，需要委派才用原生任务；不创建机器状态/调用/交付，不沿用协议2的schema/layout。协议1/2旧任务必须读取原锁定包，不被本包续写、迁移或重新审批。源码仓库的旧受管入口只代表其当前锁，分发时使用新入口模板，不复制该区块作为新协议运行要求。
 
-已有 active_run 先查询原宿主任务，即使本机缺包也不能重复派发。旧任务未证实结束前禁止升级、换宿主继续执行或换绑框架。缺原包时可按原锁快照重建，无法核实则 blocked，不套用新版本。已有审批配置快照保持原字节；纯框架补丁升级不改业务评审对象，但协议/模板语义不兼容时暂停评估，不自动迁移已批准内容。
+显式升级前确认原生活动调用已经结束，旧协议还须按原包核对其active_run。旧包、旧需求版本和审批原样保留。升级不静默迁移历史；如果需要继续旧任务先保持原绑定直到其结束。
 
 ## 会话内核验复用
 
 各原生会话在相同工作空间、宿主和锁定包下，自行完整校验后可在自己的上下文保留结果及文件变化快照（路径、类型、大小、纳秒级mtime/ctime），不新增回执字段或报告。同一角色的初始化探测与后续业务任务也适用；主会话或其他角色的结论不替代本角色首次核验。后续调用仍重读锁、检查安装pending，并核对包及受管入口/角色的文件集合与变化快照；未变时复用完整校验和当前宿主激活证据，不重复逐文件哈希、restore或原生探测。元数据比较仅用于可信本机只读缓存的性能优化，不作为抗恶意并写保证；无法可靠取得变化信息时完整校验。
 
-新会话、上下文丢失、换机/换宿主、锁或受管文件变化、安装/升级/恢复后，以及任何内容或并写疑点，均使复用失效：重新完整核验，发现修改仍按完整性规则阻塞，不将变化快照直接认作新合法内容。业务status、活动任务、审批和代码基线每次按原契约核对，不复用环境结论替代它们。
+新会话、上下文丢失、换机/换宿主、锁或受管文件变化、安装/升级/恢复后，以及任何内容或并写疑点，均使复用失效：重新完整核验，发现修改仍按完整性规则阻塞，不将变化快照直接认作新合法内容。当前任务文档、允许范围和原生任务状态按实际工作核对；环境复用不替代业务事实。
 
 ## 升级、离线与旧安装
 

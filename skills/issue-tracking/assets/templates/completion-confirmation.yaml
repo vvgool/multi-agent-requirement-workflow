@@ -1,3 +1,4 @@
+# 仅历史协议识别；协议3不生成此记录。
 # 技术独立passed后、针对当前精确交付展示取得；不是产品审批或关闭权限。
 schema_version: 1
 kind: delivery_completion

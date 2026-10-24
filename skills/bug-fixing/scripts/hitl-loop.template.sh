@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# 历史实验模板；协议3不调用循环脚本或新增运行服务。
 # Copy to the task-authorized debug directory, then customize the exact symptom.
 # Human actions are structured; never claim unattended execution of human steps.
 set -euo pipefail

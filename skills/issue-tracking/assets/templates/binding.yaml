@@ -1,3 +1,4 @@
+# 仅历史协议识别；协议3不生成此记录。
 # 仅在需要判断绑定或用户明确启用时写入根status的issue_tracking，不单独创建此文件
 policy_override: {} # 仅用户明确指定的binding/sync/close覆盖；指令保留在input/events
 decision: pending # pending / skipped / bound

@@ -60,6 +60,12 @@ def main():
     spec = importlib.util.spec_from_file_location("codex_registry", helper)
     registry = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(registry)
+    adapter = (root / "skills/setup-requirement-workflow/references/opencode-adapter.md").read_text()
+    assert "不创建业务host.yaml" in adapter
+    assert "业务host.yaml记录真实host及ID" not in adapter
+    bridge = (templates / "claude-entry.md").read_text()
+    assert "需求、续改、小修及初始化验证" in bridge and "无需文档、任务" in bridge
+    assert "无需先读锁、缓存或框架包" in bridge and "旧任务仍原锁原包" in bridge
     expected_bodies = {}
     for host, prefix, separator, extension in [
         ("codex", ".codex", "_", "toml"),
@@ -75,7 +81,9 @@ def main():
             body = render((templates / "role-body.md").read_text(), values)
             values["role_body"] = body
             native = render((templates / f"native-{host}.{extension}").read_text(), values)
-            assert "initialization_probe=true" in native and "task.yaml" in native
+            assert "initialization_probe=true" in native and "任务文档" in native
+            assert "不要求task.yaml" in native and "协议3" in native
+            assert "版本目录" in native and "未知外部操作先查" in native
             assert "workflow.lock.yaml" in native and values["skill_file"] in native
             if host == "codex":
                 parsed = registry._parse(native.encode())

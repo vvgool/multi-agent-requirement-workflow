@@ -1,3 +1,4 @@
+# 仅历史协议识别；协议3不生成此记录。
 schema_version: 2
 operation: comment # comment / close；旧schema1不迁移
 authorization_ref: null # 实际授权证据，非策略配置

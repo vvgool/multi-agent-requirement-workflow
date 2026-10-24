@@ -342,6 +342,19 @@ class ContinuousTaskTests(unittest.TestCase):
             self.assertEqual(t['deliveries'], [])
             self.assertNotIn('status', t)
         bug_skill = (ROOT / 'skills/bug-fixing/SKILL.md').read_text()
+        if yaml.safe_load((ROOT / 'framework.yaml').read_text())['protocol_version'] == 3:
+            # Historical schemas above stay parseable; new entry must not require them.
+            self.assertIn('一次性、局部低风险且目标明确的小修直接定位', bug_skill)
+            self.assertIn('不先建文档、清单、计划或派其他角色', bug_skill)
+            self.assertIn('无需先建文档或原生任务', bug_skill)
+            self.assertIn('不对所有Bug强制边界报告和评审', bug_skill)
+            body = (ROOT / 'skills/setup-requirement-workflow/assets/templates/role-body.md').read_text()
+            self.assertIn('不要求task.yaml', body)
+            self.assertIn('旧协议任务回原锁定包', body)
+            contract = (ROOT / 'workflow/continuous-tasks.md').read_text()
+            self.assertIn('不建立机器业务状态', contract)
+            self.assertIn('原锁定包解释', contract)
+            return
         self.assertNotIn('bug_purpose', bug_skill)
         self.assertIn('授权purpose=boundary', bug_skill)
         self.assertIn('授权purpose=fix', bug_skill)

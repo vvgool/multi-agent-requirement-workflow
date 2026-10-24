@@ -1,41 +1,14 @@
 ---
 name: acceptance-testing
-description: Use when testing-agent receives an approved feature baseline for acceptance or defect regression, including requirement drift, incorrect existing cases, and baseline mismatch checks.
+description: Independently verify relevant work when requested or warranted by concrete risk and report actual findings.
 ---
 
-# 需求验收与回归
+# 按需独立验证
 
-独立核对已批准需求、实际开发基线和用例，执行验收并返回真实结论。项目适用规则和测试约定优先；开发自验只作输入，不能代替独立证据。内部run及原始证据链接留本任务具体交付记录。
+遵循目标项目规则及 [执行约定](../../workflow/execution-contract.md)。当前事项文档是唯一目标与进度来源，原生任务保留派发和结束事实；不创建机器业务账本、逐轮快照或版本目录。旧任务回原锁定包，不以本Skill解释旧权限。共享文档单写，返回结果由文档写入者合并。
 
-接单及交付前遵循 [阶段执行契约](../../workflow/execution-contract.md)，统一核对身份、授权、结果位置和过期任务。正式文稿及根状态由协调层维护。
+用户要求、具体风险或跨角色需要时独立验证，不是所有任务的必经阶段。读取目标与允许范围、相关实际改动、已验与未决项，核对当前内容；需要时才保存相关版本，不能默认全项目逐文件基线。
 
-## 接单与基线
+依据行为选择已有检查、集成/异常/回归或实际操作，不为低风险可逆文稿修改新增镜像测试。不修改业务源码。既有自验可辅助判断但不当成本角色独立通过。当前内容/环境变化重验受影响范围，未执行不报通过。
 
-完成执行契约核对后，按开发交付索引读取记录和已有用例。开发简版一份记录或完整版多文档都可接受，按实际内容读取，不要求固定文件名。
-
-按 [代码基线契约](../../workflow/code-baseline.md) 在接单和结束时核对实际源码、范围及相关未提交改动，绑定任务和原开发交付；不符时保留差异并返回 blocked。
-
-## 文档选择
-
-先读 [测试流程与判定](references/workflow.md)，再读所需真实模板，在 task.output_dir 生成实例：
-
-| 条件 | 模板与输出 |
-| --- | --- |
-| 默认 | [测试报告](assets/templates/test-report.md) → test-report.md，合并用例、偏离核对、缺陷及结论 |
-| 用例矩阵、环境或步骤复杂到影响报告阅读 | 额外使用 [用例](assets/templates/test-cases.md) → test-cases.md；报告引用用例编号及必要观察，不重抄 |
-
-仅拆分用例时说明理由。源模板、旧用例及开发资料保持不变；填写实际内容并删除不适用的条件段，已有用例通过链接引用。
-
-## 检查、执行与交接
-
-按已读测试流程建立 AC/TC 覆盖、核对需求/实现/用例偏离，独立执行必验项及受影响回归。用例修正、部分阻塞后的执行范围、证据复用及 passed/failed/blocked 门槛统一按该流程判断，不另建覆盖或偏离报告。
-
-按 [公共结果模板](../../templates/role-result.yaml) 在指定结果位置写 result.yaml，追加不可变交付，填实际验收结果、source_delivery={task_id,delivery_id}、基线、缺陷和限制；artifacts 每项含 kind/path，相对本任务 输出。passed/failed/blocked 按流程门槛判断，报告与结果一致。
-
-业务源码修复交开发或绑定的 Bug 角色，需求歧义交协调层；布局4改变批准正文须按[增量契约](../../workflow/incremental-changes.md)重新评审，旧报告注明上一基线，绑定当前baseline_id/approval_digest及具体新开发交付后才独立验收。向协调 Agent 返回结果路径、状态及简要结论。
-
-## Bug 独立验收
-
-任务来自 Bug fix 时按 [Bug 路由](../../workflow/bugfix.md) 核对相应批准需求或 bug_boundary、真实 Bug task/result 与source_delivery指定的交付。独立执行原始未最小化场景、适用真实接缝回归及全部本轮适用验收，失败回传失败证据与待修复基线；测试不修源码。supplement 的 coverage_scope 明确为局部交接范围，通过后只回开发继续整体需求。
-
-协议2持续同角色任务，调用/授权/交付按[持续任务](../../workflow/continuous-tasks.md)处理，不因回修/复验增任务。
+返回实际范围、检查与结果、可复现缺陷和限制；由当前文档写入者合并，无强制test-cases/test-report/result文件。失败保留事实，修复/复验继续原文档，不建版本。模板仅在确需独立长报告时参考。

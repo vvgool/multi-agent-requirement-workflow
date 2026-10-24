@@ -1,3 +1,4 @@
+# 仅旧快照兼容；协议3使用native-codex.toml。
 name = "{{native_name}}"
 description = "{{description}}"
 developer_instructions = """

@@ -1,5 +1,3 @@
-# 测试阶段工作流入口
+# 验证
 
-测试 Agent 接单后读取 [acceptance-testing Skill](../skills/acceptance-testing/SKILL.md)，按指针加载阶段流程与真实文档模板。
-
-需求、实现、用例及基线的偏离核对和通过/失败/阻塞判定维护在 Skill 内。本文件保留为旧引用的兼容入口，根状态由协调 Agent 更新。
+所有修改按实际影响自验；独立验证仅在用户要求、具体风险或跨角色需要时调用 [测试Skill](../skills/acceptance-testing/SKILL.md)。未执行不报通过，自验不等同独立验收。只验证当前相关内容，已有文档需要时合并结果。

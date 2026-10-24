@@ -1,3 +1,4 @@
+# 仅供历史协议识别；新协议3不创建或使用此机器业务记录，旧任务由原锁定包解释。
 # 仅供存量progress_path任务使用，新任务不创建；见workflow/legacy-plan-notifications.md
 schema_version: 1
 feature_id: null

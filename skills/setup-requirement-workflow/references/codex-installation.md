@@ -1,3 +1,5 @@
+> 仅旧快照安装的历史参考。协议3新安装使用installation.md及native-*模板；旧项目恢复必须读取其原锁定包，不以本候选重生成旧入口。
+
 # Codex 旧快照安装（兼容）
 
 新项目默认使用 [通用轻量安装](installation.md) 和 [Codex薄适配](codex-adapter.md)。本文仅用于既有 `.agents/requirement-workflow/installation.json` 或旧pending的恢复及用户明确选择的离线快照模式；不要把旧清单改成新格式。旧模板 agent.toml/project-entry.md 专用于此路径。

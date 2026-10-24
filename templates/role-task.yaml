@@ -1,3 +1,4 @@
+# 仅供历史协议识别；新协议3不创建或使用此机器业务记录，旧任务由原锁定包解释。
 schema_version: 2
 feature_id: null
 requirements_revision: 1

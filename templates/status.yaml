@@ -1,3 +1,4 @@
+# 仅供历史协议识别；新协议3不创建或使用此机器业务记录，旧任务由原锁定包解释。
 schema_version: 2
 state_version: 1
 feature_id: null # 协调 Agent 新建时填入真实 UUID

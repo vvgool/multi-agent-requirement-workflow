@@ -256,6 +256,14 @@ class LifecycleChecks(unittest.TestCase):
             self.assertEqual([x.name for x in Path(tmp).iterdir()], ['input.json'])
 
     def test_real_phase_mapping_and_snapshot_contract(self):
+        if yaml.safe_load((ROOT / 'framework.yaml').read_text())['protocol_version'] == 3:
+            text = (ROOT / 'workflow/issue-tracking.md').read_text()
+            self.assertIn('默认关闭', text)
+            self.assertIn('不创建本地事件流、sync目录', text)
+            self.assertIn('未知先查原调用/远端事实', text)
+            self.assertIn('配置和本地完成不替代关闭授权', text)
+            self.assertIn('旧记录按原包解释', text)
+            return
         text = (ROOT / 'workflow/issue-tracking.md').read_text()
         rows = [line for line in text.splitlines() if line.startswith('|')]
         mapping = {event: next(row for row in rows if event in row) for event in L.EVENTS}
@@ -278,6 +286,17 @@ class LifecycleChecks(unittest.TestCase):
                 self.assertIn(phrase, path.read_text())
 
     def test_shipped_templates_and_references_agree(self):
+        if yaml.safe_load((ROOT / 'framework.yaml').read_text())['protocol_version'] == 3:
+            # Keep historical fixture structures and all corruption checks intact.
+            self.assertEqual(template('sync-record.yaml')['schema_version'], 2)
+            self.assertIn('remote_state', template('binding.yaml'))
+            self.assertEqual(set(template('close-context.yaml')) - set(context()), set())
+            text = (SKILL / 'SKILL.md').read_text()
+            self.assertIn('不新增绑定/事件/授权/result YAML或同步目录', text)
+            self.assertIn('未知写先查询原调用及远端', text)
+            self.assertIn('默认关闭', text)
+            self.assertIn('历史协议', (SKILL / 'references/lifecycle.md').read_text())
+            return
         self.assertEqual(template('sync-record.yaml')['schema_version'], 2)
         self.assertIn('remote_state', template('binding.yaml'))
         self.assertIn('close: "off"', (ROOT / 'workflow/config.md').read_text())

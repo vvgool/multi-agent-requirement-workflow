@@ -1,3 +1,4 @@
+<!-- 仅旧快照安装兼容；协议3使用project-entry-light.md与native-*模板。 -->
 <!-- requirement-workflow:begin -->
 ## 需求协作入口
 

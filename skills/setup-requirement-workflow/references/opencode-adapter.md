@@ -20,7 +20,7 @@ V2 使用 `agents`、`system`、`disabled` 和有序 `permissions` 列表，V1 �
 
 新会话/已证实重载后，通过实际原生子Agent委派能力选择四个名称进行 initialization_probe=true。记录真实会话/任务标识及读取事实；仅看到Agent菜单或Skill列表不算派发通过。包内Skill以明确文件读取方式加载，不要求外部Skill扫描开关或符号链接，也不声称注册了原生skill工具入口。
 
-实际Task/委派工具的名称、参数、同步等待和会话恢复按当前版本说明使用，不把某版sessionID字段写成公共协议。业务host.yaml记录真实host及ID；不支持查询旧任务时报告unknown/blocked，不伪造恢复。所有阶段遵守实际权限，不安装JS插件来绕过缺少的原生委派能力。
+实际Task/委派工具的名称、参数、同步等待和会话恢复按当前版本说明使用，不把某版sessionID字段写成公共协议。协议3由宿主原生会话/任务保留真实host及ID，仅在恢复需要时引用，不创建业务host.yaml；旧协议1/2任务的host.yaml只由原锁定包解释。不支持查询旧任务时报告unknown/blocked，不伪造恢复。所有阶段遵守实际权限，不安装JS插件来绕过缺少的原生委派能力。
 
 V2 的原生工具为 `subagent`，V1 常见为 `task`；父角色的实际委派权限同样必须允许该原生名称。`run --agent` 只选主角色，`debug agents` 只证明发现，均不能替代具名子角色调用。不得使用 `--auto` 或临时放开权限来让探测通过。
 

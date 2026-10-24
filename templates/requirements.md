@@ -1,3 +1,3 @@
-# 需求模板入口
+# 历史模板入口
 
-产品角色使用 [requirement-analysis 的真实模板](../skills/requirement-analysis/assets/templates/requirements.md)，在当前 task.output_dir 生成实例。默认同一文稿合并规则、验收、续改差异与产品自检；本文件仅保留旧引用入口。
+协议3使用 [唯一任务文档](task.md)，不复制输入、README索引或需求稿。旧任务按原锁定包中的模板执行，不使用本候选重建历史。

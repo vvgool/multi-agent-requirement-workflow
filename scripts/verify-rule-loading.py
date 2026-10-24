@@ -1,71 +1,65 @@
 #!/usr/bin/env python3
-"""Read-only source comparison, not a runtime, token meter or native acceptance.
+"""Read-only protocol3 entry consistency and rule-size regression.
 
-Use --baseline-root for an independently verified pre-change package. No writes,
-dependencies, network, role invocations or assumptions about model tokenization.
+No model execution, runtime, token meter, installation or native acceptance.
+The named scenarios are static contract checks, not business E2E tests.
 """
 import argparse
 import json
 from pathlib import Path
-import re
+
+ENTRY_FILES = [
+    "agents/coordinator-agent.md", "agents/product-agent.md",
+    "agents/development-agent.md", "agents/testing-agent.md", "agents/bug-agent.md",
+    "workflow/execution-contract.md", "workflow/routing.md", "workflow/revisions.md",
+    "workflow/handoff.md", "workflow/output-layout.md", "workflow/code-baseline.md",
+    "skills/requirement-analysis/SKILL.md", "skills/feature-development/SKILL.md",
+    "skills/bug-fixing/SKILL.md", "skills/acceptance-testing/SKILL.md",
+    "skills/setup-requirement-workflow/assets/templates/role-body.md",
+    "skills/setup-requirement-workflow/assets/templates/project-entry-light.md",
+]
 
 
-def section(root, relative, title):
-    text = (root / relative).read_bytes().decode("utf-8")
-    headings = list(re.finditer(r"(?m)^(#{1,6}) (.+)\n", text))
-    matches = [i for i, h in enumerate(headings) if h[2] == title]
-    if len(matches) != 1:
-        raise ValueError(f"expected unique section: {relative}#{title}")
-    i = matches[0]
-    end = next((h.start() for h in headings[i + 1:] if len(h[1]) <= len(headings[i][1])), len(text))
-    return text[headings[i].start():end].encode("utf-8")
-
-
-def measure(root, requests):
-    total = 0
-    for relative, title in requests:
-        raw = section(root, relative, title) if title else (root / relative).read_bytes()
-        total += len(raw)
-    return {"rule_utf8_bytes": total, "selected_reads": len(requests),
-            "distinct_files": len({p for p, _ in requests})}
-
-
-def compare(baseline, candidate):
-    contract = "workflow/execution-contract.md"
-    layout = "workflow/output-layout.md"
-    old_shared = section(baseline, layout, "共享成果与本机现场").decode().split("\n", 1)[1].strip()
-    new_shared = section(candidate, contract, "共享文稿边界").decode().split("\n", 1)[1].strip()
-    if old_shared != new_shared:
-        raise ValueError("shared-document constraints changed rather than moved")
-    compatibility = section(candidate, layout, "共享成果与本机现场")
-    if b"execution-contract.md#" not in compatibility or "共享文稿边界".encode() not in compatibility:
-        raise ValueError("compatibility anchor does not reach canonical document constraints")
-    common = [(contract, title) for title in ("接单与授权", "路径与结果", "缓存与证据")]
-    result = {}
-    for role, skill in [("product", "requirement-analysis"), ("development", "feature-development"),
-                        ("testing", "acceptance-testing")]:
-        path = f"skills/{skill}/SKILL.md"
-        text = (candidate / path).read_text(encoding="utf-8")
-        if "../../workflow/output-layout.md#共享成果与本机现场" in text:
-            raise ValueError(f"extra shared-document read still present: {path}")
-        if "../../workflow/execution-contract.md" not in text:
-            raise ValueError(f"required execution contract missing: {path}")
-        before = measure(baseline, [(path, None)] + common + [(layout, "共享成果与本机现场")])
-        after = measure(candidate, [(path, None)] + common)
-        result[role] = {"before": before, "after": after}
-    result["coordinator_compatibility"] = {
-        "before": measure(baseline, [(layout, "共享成果与本机现场")]),
-        "after": measure(candidate, [(layout, "共享成果与本机现场"), (contract, "共享文稿边界")])}
-    result["total"] = {side: {key: sum(case[side][key] for case in result.values())
-                              for key in ("rule_utf8_bytes", "selected_reads")}
-                       for side in ("before", "after")}
-    if result["total"]["after"]["rule_utf8_bytes"] >= result["total"]["before"]["rule_utf8_bytes"]:
-        raise ValueError("no net rule input reduction including coordinator compatibility")
-    result["boundary"] = ("same full stage Skills + mandatory contract sections + shared-document read; "
-                          "coordinator compatibility included; business input and other unchanged rules omitted equally; "
-                          "selected_reads are file/section reads, NOT host tool calls or tokens")
-    result["tokens"] = "no comparable measured tokens"
-    return result
+def check(root, baseline):
+    texts = {p: (root / p).read_text(encoding="utf-8") for p in ENTRY_FILES}
+    framework = (root / "framework.yaml").read_text(encoding="utf-8")
+    lock = (root / "skills/setup-requirement-workflow/assets/templates/workflow.lock.yaml").read_text()
+    assert "protocol_version: 3" in framework and 'version: "0.6.0"' in framework
+    assert "protocol_version: 3" in lock
+    role = texts["skills/setup-requirement-workflow/assets/templates/role-body.md"]
+    assert "不要求task.yaml" in role and "旧协议任务回原锁定包" in role
+    assert "原生任务已有的派发/结束事实不重复落盘" in role
+    for path in [p for p in ENTRY_FILES if p.startswith("agents/")]:
+        assert "不要求task.yaml" in texts[path] and "单写" in texts[path], path
+    entry = texts["skills/setup-requirement-workflow/assets/templates/project-entry-light.md"]
+    assert entry.index("独立一次性") < entry.index("需要上述框架能力时")
+    assert "无需读取workflow.lock.yaml、检查缓存" in entry
+    assert "已有旧任务仍按原锁原包续接" in entry
+    assert "本入口的授权、风险和未知操作边界" in entry
+    execution = texts["workflow/execution-contract.md"]
+    revisions = texts["workflow/revisions.md"]
+    assert "无需先建文档、清单、计划或宿主原生任务" in execution
+    assert "原因未知先由同一角色" in execution
+    assert "不默认全量测试" in execution and "无意义测试" in execution
+    assert "小任务在原文档列任务后" not in execution
+    assert "消息提供当前任务文档路径" not in role
+    assert "付款、权限、数据删除或大范围共享逻辑变更" in execution
+    assert "另由一名角色独立验证" in execution
+    assert "未知不等于结束" in execution and "不重复派发或重放外部操作" in execution
+    assert "补充、修改验收、修复、重试、普通继续与完成后续改" in revisions
+    assert "只有独立目标才新建事项" in revisions and "不删除、不合并、不静默迁移" in revisions
+    task = (root / "templates/task.md").read_text()
+    assert all(title in task for title in ["目标与范围", "- [ ]", "验证与未决项"])
+    assert not any(field in task for field in ["baseline_id", "invocation_id", "delivery_id", "revision"])
+    before = sum((baseline / p).stat().st_size for p in ENTRY_FILES if (baseline / p).is_file())
+    after = sum(len(t.encode("utf-8")) for t in texts.values())
+    assert after < before, (before, after)
+    return dict(protocol=3, entry_files=len(texts),
+                scenarios=["simple-document-or-known-fix", "same-item-continued-after-completion",
+                           "cross-role-single-writer", "risk-confirmation-independent-verification",
+                           "unknown-external-operation-no-replay", "old-lock-no-migration"],
+                selected_rule_utf8_bytes=dict(before=before, after=after),
+                scope="static contract consistency only; not native execution, tokens or elapsed time")
 
 
 def main():
@@ -73,7 +67,7 @@ def main():
     parser.add_argument("--source-root", required=True, type=Path)
     parser.add_argument("--baseline-root", required=True, type=Path)
     args = parser.parse_args()
-    print(json.dumps(compare(args.baseline_root.resolve(), args.source_root.resolve()), ensure_ascii=False, sort_keys=True))
+    print(json.dumps(check(args.source_root.resolve(), args.baseline_root.resolve()), ensure_ascii=False))
 
 
 if __name__ == "__main__":

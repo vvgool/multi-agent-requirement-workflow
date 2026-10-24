@@ -561,6 +561,10 @@ class IncrementalTests(unittest.TestCase):
             self.assertFalse([x for x in links if x.startswith('workflow/')],
                              'installed entry must not resolve package rules at project root')
             self.assertIn('以下路径均相对于已核验的锁定缓存根', text)
+            if yaml.safe_load((ROOT / 'framework.yaml').read_bytes())['protocol_version'] == 3:
+                self.assertLess(text.index('独立一次性'), text.index('需要上述框架能力时'))
+                self.assertIn('无需读取workflow.lock.yaml、检查缓存', text)
+                self.assertIn('已有旧任务仍按原锁原包续接', text)
             lock = yaml.safe_load((project / 'workflow.lock.yaml').read_bytes())
             cache = project / '.agents/requirement-workflow-cache' / lock['package']['sha256']
             for relative in ['workflow/package.md', 'workflow/bootstrap.md']:
@@ -589,6 +593,19 @@ class IncrementalTests(unittest.TestCase):
                             validate_review(self.root, f.status)
 
     def test_standalone_routes_in_all_increment_stages(self):
+        if yaml.safe_load((ROOT / 'framework.yaml').read_text())['protocol_version'] == 3:
+            route = (ROOT / 'workflow/routing.md').read_text()
+            revisions = (ROOT / 'workflow/revisions.md').read_text()
+            execution = (ROOT / 'workflow/execution-contract.md').read_text()
+            self.assertIn('目标明确的小修由当前会话直接定位', route)
+            self.assertIn('无需先建文档、清单、原生任务或派其他角色', route)
+            self.assertNotIn('接单先读当前事项的任务文档', route)
+            self.assertIn('角色不是强制阶段链', route)
+            self.assertIn('补充、修改验收、修复、重试、普通继续与完成后续改', revisions)
+            self.assertIn('只有独立目标才新建事项', revisions)
+            self.assertIn('未知不等于结束', execution)
+            self.assertIn('旧锁/旧任务', revisions)
+            return
         contract = (ROOT / 'workflow/incremental-changes.md').read_text()
         rows = [line for line in contract.splitlines() if line.startswith('| 同目标未完成')]
         for stage in ['draft', 'requirement_review', 'development', 'testing']:
@@ -605,6 +622,20 @@ class IncrementalTests(unittest.TestCase):
     def test_templates_and_reachable_instructions_agree(self):
         for name in ['status', 'role-task', 'product-task']:
             self.assertEqual(yaml.safe_load((ROOT / f'templates/{name}.yaml').read_bytes())['layout_version'], 4)
+        framework = yaml.safe_load((ROOT / 'framework.yaml').read_bytes())
+        if framework['protocol_version'] == 3:
+            self.assertEqual(framework['version'], '0.6.0')
+            lock = yaml.safe_load((ROOT / 'skills/setup-requirement-workflow/assets/templates/workflow.lock.yaml').read_bytes())
+            self.assertEqual(lock['package']['protocol_version'], framework['protocol_version'])
+            template = (ROOT / 'templates/task.md').read_text()
+            for phrase in ('目标与范围', '- [ ]', '验证与未决项'):
+                self.assertIn(phrase, template)
+            for field in ('baseline_id', 'invocation_id', 'delivery_id', 'revision'):
+                self.assertNotIn(field, template)
+            contract = (ROOT / 'workflow/incremental-changes.md').read_text()
+            self.assertIn('不建立baseline_id', contract)
+            self.assertIn('不套用本条删改旧记录', contract)
+            return
         self.assertEqual(yaml.safe_load((ROOT / 'framework.yaml').read_bytes())['version'], '0.5.0')
         for path in ['workflow/revisions.md', 'workflow/routing.md', 'workflow/documents.md',
                      'workflow/output-layout.md', 'workflow/handoff.md', 'workflow/execution-contract.md',

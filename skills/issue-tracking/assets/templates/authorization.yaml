@@ -1,3 +1,4 @@
+# 仅历史协议识别；协议3不生成此记录。
 schema_version: 2
 target: null # 实际核实的{provider,host,repository,issue_number}
 feature_id: null

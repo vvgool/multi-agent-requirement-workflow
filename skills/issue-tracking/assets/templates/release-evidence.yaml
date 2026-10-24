@@ -1,3 +1,4 @@
+# 仅历史协议识别；协议3不生成此记录。
 kind: null # 真实对象package / service / none；不因manual无需发布伪改none
 status: unknown # succeeded / failed / partial / rolled_back / revoked / unknown / unpublished / not_required；实际状态独立于完成条件
 occurred_at: null

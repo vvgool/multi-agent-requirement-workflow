@@ -1,3 +1,4 @@
+# 仅历史协议识别；协议3不生成此记录。
 # 校验器close接口；各读取结论必须由协调实际核实，不是自动事实探测。
 mode: automatic # automatic / manual
 policy: {binding: optional, sync: milestones, close: after_release}
