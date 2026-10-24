@@ -30,7 +30,7 @@
 
 ## 安装与版本
 
-候选源码 **0.6.0，协议3**，尚不代表发布或消费者升级。当前源码仓库仍以自己的workflow.lock.yaml及原缓存执行现有协议2任务。新包不得解释/续写旧task；显式升级必须先确认旧调用结束，保留旧包和历史，完成旧任务后才能采用新契约。
+已发布 [**0.6.0，协议3**](https://github.com/vvgool/multi-agent-requirement-workflow/releases/tag/v0.6.0)，本源码项目的Codex/OpenCode文件安装已升级，具体来源提交及摘要以workflow.lock.yaml为准。升级后的本项目原生角色激活需新会话验证，未沿用其他项目的通过回执。本次发布验证范围为Codex/OpenCode；Claude Code适配保留，真实运行未纳入本次验收。其他消费者不会自动升级。新包不得解释/续写旧task；显式升级必须先确认旧调用结束，保留旧包和历史，完成旧任务后才能采用新契约。
 
 Codex、Claude Code、OpenCode共享规则，以各宿主原生角色薄文件适配；文件安装、真实角色激活和业务闭环分别报告。不能用一个宿主的结果替代另一个，也不能用模板存在证明原生调用。详情见 [包规则](workflow/package.md)、[安装Skill](skills/setup-requirement-workflow/SKILL.md)、[宿主适配](workflow/host-adapters.md)。
 
