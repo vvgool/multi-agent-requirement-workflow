@@ -1,7 +1,7 @@
 # OpenCode 宿主入口
 
-项目初始化先读 [通用setup Skill](../../skills/setup-requirement-workflow/SKILL.md)，按 [包规则](../package.md) 取得锁定版本，再执行 [OpenCode适配](../../skills/setup-requirement-workflow/references/opencode-adapter.md)。按通用选择规则为目标宿主生成薄角色，共用主会话入口；本说明负责本宿主的四个薄原生角色；完整框架放项目忽略缓存，不提交整包。
+项目初始化先读 [通用setup Skill](../../skills/setup-requirement-workflow/SKILL.md)，按 [包规则](../package.md) 取得锁定版本，再执行 [OpenCode适配](../../skills/setup-requirement-workflow/references/opencode-adapter.md)。按通用选择规则为目标宿主生成薄角色，共用主会话入口；本说明涵盖当前宿主的四个薄原生角色；完整框架保存在项目已忽略的缓存目录中，不提交整包。
 
-运行时已有任务文档需要时才读；一次性局部低风险小修在当前会话直接定位、最小修复、相关回归并简短返回，无需新建文档或原生任务；需要其他专长才按 [宿主映射](../host-adapters.md) 委派原生角色。消息带项目根、文档路径、目标及允许范围，无机器任务包。原生任务记录派发与结束事实，未知先查不重派。
+运行时仅在需要时读取已有任务文档；一次性局部低风险小修在当前会话直接定位、最小修复、相关回归并简短返回，无需新建文档或原生任务；需要其他专长才按 [宿主映射](../host-adapters.md) 委派原生角色。消息带项目根、文档路径、目标及允许范围，无机器任务包。原生任务记录派发与结束事实，调用结果未知时先查询原调用，不重复派发。
 
 文件安装、当前宿主真实角色激活和业务闭环分别报告，不能以文件存在代替真实调用。旧锁旧任务用原包解释，不静默迁移；换宿主前核实原调用已结束。

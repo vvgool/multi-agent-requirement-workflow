@@ -10,7 +10,7 @@
 
 V2 使用 `agents`、`system`、`disabled` 和有序 `permissions` 列表，V1 常见字段为 `agent`、`prompt`、`disable`、`permission`。先核对当前发行版；兼容读取不代表应把V1字段写入V2。薄Markdown仍仅使用共同的description/mode和正文，不生成整份JSON配置。
 
-先检查实际加载的配置来源与原始同名声明，再核对有效角色。OpenCode 2.0.32实测：合法JSONC中 `agent` 与 `agents` 均可读，但项目Markdown可能盖过JSON同名description乃至disabled字段；因此仅看 `debug agents` 中角色存在/未禁用会漏掉用户意图冲突。同名声明即停止整批安装，不能以“最终加载的角色正确”接管它。全局配置只读核对相关角色/权限/入口字段，日志不复制凭据或整份配置；不能可靠取得来源时报告预检能力不足。
+先检查实际加载的配置来源与原始同名声明，再核对有效角色。OpenCode 2.0.32实测：合法JSONC中 `agent` 与 `agents` 均可读，但项目Markdown可能盖过JSON同名description乃至disabled字段；因此仅看 `debug agents` 中角色存在/未禁用会漏掉用户意图冲突。同名声明即停止整批安装，不能以“最终加载的角色正确”接管它。只读核对全局配置中的相关角色、权限和入口字段，日志不复制凭据或整份配置；不能可靠取得来源时报告预检能力不足。
 
 ## 生效与调用
 
@@ -22,6 +22,8 @@ V2 使用 `agents`、`system`、`disabled` 和有序 `permissions` 列表，V1 �
 
 实际Task/委派工具的名称、参数、同步等待和会话恢复按当前版本说明使用，不把某版sessionID字段写成公共协议。协议3由宿主原生会话/任务保留真实host及ID，仅在恢复需要时引用，不创建业务host.yaml；旧协议1/2任务的host.yaml只由原锁定包解释。不支持查询旧任务时报告unknown/blocked，不伪造恢复。所有阶段遵守实际权限，不安装JS插件来绕过缺少的原生委派能力。
 
+断连与服务崩溃按[恢复判定与接续](../../../workflow/host-adapters.md#恢复判定与接续)处理。v2.1.4隔离实测中，私有服务进程退出后原消息可残留streaming，重启不会自动补成最终结果；结合原进程退出和实际活动查询（该版GET /api/session/active）确认无活动执行后，可在原会话接续尚未完成的只读工作。该实测不代表获得终止共享服务的授权，也不能证明其他版本接口或外部写入可以安全重试。文件安装或激活通过，不能视为自动恢复通过。
+
 V2 的原生工具为 `subagent`，V1 常见为 `task`；父角色的实际委派权限同样必须允许该原生名称。`run --agent` 只选主角色，`debug agents` 只证明发现，均不能替代具名子角色调用。不得使用 `--auto` 或临时放开权限来让探测通过。
 
-依据：[V1 Agents](https://opencode.ai/docs/agents/)、[V2 Agents](https://opencode.ai/v2/docs/agents/)、[V2迁移](https://opencode.ai/v2/docs/migrate-v1/)（2026-10-19核对）。机制依据、文件层适配和绑定包摘要的实际原生验收分别记录；不据文档宣称闭环通过。
+依据：[V1 Agents](https://opencode.ai/docs/agents/)、[V2 Agents](https://opencode.ai/v2/docs/agents/)、[V2迁移](https://opencode.ai/v2/docs/migrate-v1/)（2026-10-19核对）。机制依据、文件层适配和绑定包摘要的实际原生验收分别记录；不单凭文档说明宣称业务闭环通过。

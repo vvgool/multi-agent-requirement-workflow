@@ -4,9 +4,9 @@
 
 ## 包与内容身份
 
-框架包包含根 framework.yaml、AGENTS.md、README.md、workflow.yaml、LICENSE（存在时必须纳入），以及 agents/、skills/、workflow/、templates/ 内的全部普通文件。排除 docs/、agent-features/、Git 元数据、宿主安装目录及本机回执。包内不接受符号链接或特殊文件，未知根文件不纳入包，不让整个开发仓库扫描成为安装步骤。
+框架包包含根 framework.yaml、AGENTS.md、README.md、workflow.yaml、LICENSE（存在时必须纳入），以及 agents/、skills/、workflow/、templates/ 内的全部普通文件。排除 docs/、agent-features/、Git 元数据、宿主安装目录及本机回执。包内不接受符号链接或特殊文件，未知根文件不纳入包；安装时无需扫描整个开发仓库。
 
-framework.yaml 仅含 schema_version=1、name、非空 version、protocol_version=3（本包）；它声明版本而非已发布事实。包名固定为 multi-agent-requirement-workflow。使用宿主文件/计算工具实际生成清单：所有包文件按相对 POSIX 路径升序，取 `[相对路径,原字节SHA256]`，将全部条目编码为 UTF-8 紧凑 JSON 数组（ensure_ascii=false、无额外空格），整体 SHA-256 为 package.sha256。framework.yaml 自身也参与，不在其中存自引用摘要。文本不转换换行；同名同版本不同字节按不同内容身份处理，不能自动接受。
+framework.yaml 仅含 schema_version=1、name、非空 version、protocol_version=3（本包）；它声明版本而非已发布事实。包名固定为 multi-agent-requirement-workflow。使用宿主文件/计算工具实际生成清单：所有包文件按相对 POSIX 路径升序，取 `[相对路径,原字节SHA256]`，将全部条目编码为 UTF-8 紧凑 JSON 数组（ensure_ascii=false、无额外空格），整体 SHA-256 为 package.sha256。framework.yaml 自身也参与摘要计算，因此不在其中存储自引用摘要。文本不转换换行；同名同版本不同字节按不同内容身份处理，不能自动接受。
 
 ## GitHub URL 与固定提交
 
@@ -20,13 +20,13 @@ framework.yaml 仅含 schema_version=1、name、非空 version、protocol_versio
 
 锁文件使用 [模板](../skills/setup-requirement-workflow/assets/templates/workflow.lock.yaml)，只含 schema_version、package、source。package.name/version/protocol_version 必须与真实包一致，sha256 为64位小写十六进制。source.kind 为 git/manual：git 的 location 是用户明确的 HTTPS/SSH Git 地址、revision 是完整提交哈希，拒绝嵌入口令/令牌和本机路径；manual 的 location 是 `包名@版本` 分发标识、revision=null。手动包由同事提供或用户另行下载，标识不能自动解析为下载地址。没有真实仓库信息时使用 manual，不编造 Git URL/tag。Git 来源须从指定提交实际取包并复核内容，不将当前脏工作树冒称为该提交。
 
-锁文件是跨机器绑定；本机绝对路径只进入任务/回执，不写锁文件或薄角色。另一个人拉项目后按锁定来源取得包、核对摘要并本地初始化；提交配置不等于其机器已经安装。缺包时主会话先按 [启动恢复](bootstrap.md) 从锁定来源恢复并核验；子角色直接返回 framework_not_installed。无法恢复则阻塞，不自动使用最新全局包或其他项目的包。
+锁文件是跨机器绑定；本机绝对路径只进入任务/回执，不写锁文件或薄角色。其他成员拉取项目后，须按锁定来源取得包、核对摘要并在本地初始化；提交配置不等于其机器已经安装。缺包时主会话先按 [启动恢复](bootstrap.md) 从锁定来源恢复并核验；子角色直接返回 framework_not_installed。无法恢复则阻塞，不自动使用最新全局包或其他项目的包。
 
 ## 运行与版本
 
 新轻量安装的框架根目录固定为项目根下 `.agents/requirement-workflow-cache/<锁定sha256>`；当前会话实际使用框架能力前首次完整校验包清单、当前宿主薄角色与入口及其实际生效状态；后续按下节复用未变化的环境核验。缓存或薄角色被修改返回 framework_integrity_mismatch/adapter_modified。读取不同宿主的回执不能证明当前宿主生效。初始化 pending 存在时先恢复，不能运行半安装结果。
 
-0.6.0候选采用协议3，一次性局部低风险小修可直接在当前会话完成，需要持久文档时只维护一份当前入口，需要委派才用原生任务；不创建机器状态/调用/交付，不沿用协议2的schema/layout。协议1/2旧任务必须读取原锁定包，不被本包续写、迁移或重新审批。源码仓库的旧受管入口只代表其当前锁，分发时使用新入口模板，不复制该区块作为新协议运行要求。
+0.6.1采用协议3，一次性局部低风险小修可直接在当前会话完成，需要持久文档时只维护一份当前入口，需要委派才用原生任务；不创建机器状态/调用/交付，不沿用协议2的schema/layout。协议1/2的旧任务必须使用原锁定包，不得用本包续写、迁移或重新审批。源码仓库的旧受管入口只代表其当前锁，分发时使用新入口模板，不复制该区块作为新协议运行要求。
 
 显式升级前确认原生活动调用已经结束，旧协议还须按原包核对其active_run。旧包、旧需求版本和审批原样保留。升级不静默迁移历史；如果需要继续旧任务先保持原绑定直到其结束。
 
@@ -38,6 +38,6 @@ framework.yaml 仅含 schema_version=1、name、非空 version、protocol_versio
 
 ## 升级、离线与旧安装
 
-默认按锁复用，源目录变了不等于用户要求升级。显式升级先确认无未结束任务，获取新包并验证协议和适配器变化；按初始化 pending 的 before/after 规则更新锁和本框架拥有的薄入口，保留旧包及全部需求证据。修改过的拥有文件先列差异，不覆盖。不自动升级其他项目，也不自动清理旧包或卸载。
+默认按锁复用，源目录变了不等于用户要求升级。显式升级先确认无未结束任务，获取新包并验证协议和适配器变化；按初始化 pending 的 before/after 规则更新锁和本框架拥有的薄入口，保留旧包及全部需求证据。若本框架拥有的文件已被修改，应先列出差异，不直接覆盖。不自动升级其他项目，也不自动清理旧包或卸载。
 
 旧 `.agents/requirement-workflow/installation.json` 是快照安装：沿用旧入口与原字节，另见 [旧 Codex 快照流程](../skills/setup-requirement-workflow/references/codex-installation.md)。不因运行新版 setup 而自动迁移、删快照或改历史任务；无新锁且有旧完整清单时先报告 legacy_snapshot，只有用户明确要求迁移才另列差异。旧 pending 优先按旧记录恢复。离线用户可分发相同内容的手动包；旧快照模式保留为兼容选项，不是新项目默认。

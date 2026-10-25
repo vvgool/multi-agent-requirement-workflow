@@ -601,7 +601,7 @@ class IncrementalTests(unittest.TestCase):
             self.assertIn('无需先建文档、清单、原生任务或派其他角色', route)
             self.assertNotIn('接单先读当前事项的任务文档', route)
             self.assertIn('角色不是强制阶段链', route)
-            self.assertIn('补充、修改验收、修复、重试、普通继续与完成后续改', revisions)
+            self.assertIn('补充、修改验收、修复、重试、普通继续及完成后的修改', revisions)
             self.assertIn('只有独立目标才新建事项', revisions)
             self.assertIn('未知不等于结束', execution)
             self.assertIn('旧锁/旧任务', revisions)
@@ -624,7 +624,7 @@ class IncrementalTests(unittest.TestCase):
             self.assertEqual(yaml.safe_load((ROOT / f'templates/{name}.yaml').read_bytes())['layout_version'], 4)
         framework = yaml.safe_load((ROOT / 'framework.yaml').read_bytes())
         if framework['protocol_version'] == 3:
-            self.assertEqual(framework['version'], '0.6.0')
+            self.assertRegex(framework['version'], r'^\d+\.\d+\.\d+$')
             lock = yaml.safe_load((ROOT / 'skills/setup-requirement-workflow/assets/templates/workflow.lock.yaml').read_bytes())
             self.assertEqual(lock['package']['protocol_version'], framework['protocol_version'])
             template = (ROOT / 'templates/task.md').read_text()

@@ -293,7 +293,7 @@ class LifecycleChecks(unittest.TestCase):
             self.assertEqual(set(template('close-context.yaml')) - set(context()), set())
             text = (SKILL / 'SKILL.md').read_text()
             self.assertIn('不新增绑定/事件/授权/result YAML或同步目录', text)
-            self.assertIn('未知写先查询原调用及远端', text)
+            self.assertIn('写入结果未知时先查询原调用及远端状态', text)
             self.assertIn('默认关闭', text)
             self.assertIn('历史协议', (SKILL / 'references/lifecycle.md').read_text())
             return

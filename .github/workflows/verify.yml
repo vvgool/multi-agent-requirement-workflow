@@ -1,0 +1,58 @@
+name: Source verification
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-verification-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source:
+    name: Source checks (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Set up Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
+        with:
+          python-version: '3.11'
+      - name: Install verification dependency
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Run source regressions
+        run: python -B -m unittest discover -s tests
+      # Discovery intentionally skips these tests until fixture writes are
+      # authorized by a scratch directory; execute them explicitly here.
+      - name: Run experiment-control regressions in an isolated directory
+        run: |
+          scratch="$(mktemp -d)"
+          scratch="$(cd "$scratch" && pwd -P)"
+          python -B tests/test_experiment_control.py --scratch-root "$scratch"
+      - name: Check rule and template loading
+        run: python -B scripts/verify-rule-loading.py --source-root .
+      - name: Check adapter templates and configuration protection
+        run: |
+          scratch="$(mktemp -d)"
+          scratch="$(cd "$scratch" && pwd -P)"
+          python -B scripts/verify-host-adapters.py --source-root . --scratch "$scratch"
+      - name: Check whitespace
+        run: git show --format= --check --first-parent HEAD

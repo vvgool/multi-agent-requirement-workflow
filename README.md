@@ -6,19 +6,40 @@
 
 在目标项目中要求Agent从 https://github.com/vvgool/multi-agent-requirement-workflow 获取框架，读取 `skills/setup-requirement-workflow/SKILL.md`，为当前宿主初始化，保留项目已有规则。首次安装固定实际完整提交和包摘要；已有锁按原锁恢复，不自动升级。
 
-安装后直接说明目标，例如“调整签到奖励”；需要持久跟踪时，当前会话维护 `agent-features/签到奖励/task.md`：
+安装后直接说明目标，例如“调整签到奖励”；需要持久跟踪时，当前会话维护 `agent-features/签到奖励/task.md`。文档先给人看的摘要、范围和验收，再记录任务和真实验证：
 
 ```markdown
 # 签到奖励
 
-目标与范围：每账号每天首次签到奖励10积分，北京时间零点刷新。
+| 项目 | 内容 |
+| --- | --- |
+| 当前状态 | 进行中 |
+| 最近更新 | 2026-10-25 |
+
+## 目标与范围
+
+每天首次签到奖励10积分，北京时间零点刷新。
+
+### 验收标准
+
+- [ ] 首次签到获得10积分。
+- [ ] 同日重复签到不重复发放。
+- [ ] 跨北京时间零点后可再次领取。
+
+## 任务
 
 - [ ] 调整奖励规则并验证首次、重复及跨日行为。
 
-验证与未决项：待执行。
+## 验证记录
+
+| 检查 | 状态 | 证据或说明 |
+| --- | --- | --- |
+| 首次、重复及跨日行为 | 未执行 | 待实现后验证 |
 ```
 
 这是唯一当前入口。补充、修复、重试、普通继续与完成后续改都更新它；不生成v2/v3目录、重复需求稿或平行进度索引。需要保留重要旧结论时在文档简述或引用Git历史。现有历史目录保留，旧锁旧任务继续原包，不批量迁移。
+
+实际产稿时按 [格式规范](workflow/documents.md#人读文档格式) 组织结论、图示和证据：流程用流程图，模块关系用架构图，调用交互用时序图，接口/配置/命令用带语言标识的代码块。小修无需为套模板而写文档。
 
 ## 协作边界
 
@@ -30,7 +51,7 @@
 
 ## 安装与版本
 
-已发布 [**0.6.0，协议3**](https://github.com/vvgool/multi-agent-requirement-workflow/releases/tag/v0.6.0)，本源码项目的Codex/OpenCode文件安装已升级，具体来源提交及摘要以workflow.lock.yaml为准。升级后的本项目原生角色激活需新会话验证，未沿用其他项目的通过回执。本次发布验证范围为Codex/OpenCode；Claude Code适配保留，真实运行未纳入本次验收。其他消费者不会自动升级。新包不得解释/续写旧task；显式升级必须先确认旧调用结束，保留旧包和历史，完成旧任务后才能采用新契约。
+当前源码版本为 [**0.6.1，协议3**](https://github.com/vvgool/multi-agent-requirement-workflow/releases/tag/v0.6.1)，改进文档模板、图示指引和中断接续说明，并增加源码持续集成。本源码项目的安装仍为0.6.0，具体来源提交及摘要以workflow.lock.yaml为准。0.6.1发布包执行源码与模板回归；此前Codex/OpenCode原生验收绑定其各自候选包，详见验证摘要，不视为0.6.1包的原生重验。Claude Code适配保留，真实运行未纳入本次验收。其他消费者不会自动升级。新包不得解释/续写旧task；显式升级必须先确认旧调用结束，保留旧包和历史，完成旧任务后才能采用新契约。
 
 Codex、Claude Code、OpenCode共享规则，以各宿主原生角色薄文件适配；文件安装、真实角色激活和业务闭环分别报告。不能用一个宿主的结果替代另一个，也不能用模板存在证明原生调用。详情见 [包规则](workflow/package.md)、[安装Skill](skills/setup-requirement-workflow/SKILL.md)、[宿主适配](workflow/host-adapters.md)。
 
@@ -40,9 +61,12 @@ Codex、Claude Code、OpenCode共享规则，以各宿主原生角色薄文件�
 
 ## 源码验证
 
+以下为源码维护检查，使用现有 Python 及 PyYAML；不作为业务运行依赖。当前候选的验证结论与宿主限制见 [验证摘要](docs/verification/README.md)，历史测试通过不自动覆盖当前候选。
+
 - `python3 -B -m unittest discover -s tests -p 'test_codex_registry.py'`：既有配置合并回归。
 - `python3 -B scripts/verify-host-adapters.py --source-root . --scratch /已授权的空目录`：三宿主真实模板/正文与配置保留检查，不是原生激活。
-- `python3 -B scripts/verify-rule-loading.py --source-root . --baseline-root /旧包目录`：规则体积与代表场景静态检查，不测token或耗时。
+- `python3 -B scripts/verify-rule-loading.py --source-root .`：协议3规则、文档读取入口和模板一致性静态检查，不代表模型实际执行。
+- 体积比较可追加 `--baseline-root /完整旧包目录`；只报告变化。精简实验需强制缩小时另加 `--require-smaller`，不作为普通改动的发布门槛，不测token或耗时。
 
 历史机器协议相关模板、实验和验证记录仅供原版本解释/维护，不是协议3入口。历史检查不证明新协议实际业务闭环。运行包含根framework.yaml、AGENTS.md、README.md、workflow.yaml、LICENSE及agents/、skills/、workflow/、templates/；scripts/tests/docs不进入业务运行包。
 
