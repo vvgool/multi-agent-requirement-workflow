@@ -51,7 +51,7 @@
 
 ## 安装与版本
 
-当前源码版本为 [**0.6.1，协议3**](https://github.com/vvgool/multi-agent-requirement-workflow/releases/tag/v0.6.1)，改进文档模板、图示指引和中断接续说明，并增加源码持续集成。本源码项目的安装仍为0.6.0，具体来源提交及摘要以workflow.lock.yaml为准。0.6.1发布包执行源码与模板回归；此前Codex/OpenCode原生验收绑定其各自候选包，详见验证摘要，不视为0.6.1包的原生重验。Claude Code适配保留，真实运行未纳入本次验收。其他消费者不会自动升级。新包不得解释/续写旧task；显式升级必须先确认旧调用结束，保留旧包和历史，完成旧任务后才能采用新契约。
+当前源码版本为 [**0.6.1，协议3**](https://github.com/vvgool/multi-agent-requirement-workflow/releases/tag/v0.6.1)，改进文档模板、图示指引和中断接续说明，并增加源码持续集成。本源码项目的安装已更新至0.6.1，具体来源提交及摘要以workflow.lock.yaml为准。0.6.1发布包执行源码与模板回归；此前Codex/OpenCode原生验收绑定其各自候选包，详见验证摘要，不视为0.6.1包的原生重验。Claude Code适配保留，真实运行未纳入本次验收。其他消费者不会自动升级。新包不得解释/续写旧task；显式升级必须先确认旧调用结束，保留旧包和历史，完成旧任务后才能采用新契约。
 
 Codex、Claude Code、OpenCode共享规则，以各宿主原生角色薄文件适配；文件安装、真实角色激活和业务闭环分别报告。不能用一个宿主的结果替代另一个，也不能用模板存在证明原生调用。详情见 [包规则](workflow/package.md)、[安装Skill](skills/setup-requirement-workflow/SKILL.md)、[宿主适配](workflow/host-adapters.md)。
 
