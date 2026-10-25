@@ -1,6 +1,6 @@
 # 项目配置
 
-用户明确目标工作空间；根workflow.yaml不存在时使用默认配置，框架目录不是业务工作空间。workspace.features_dir默认agent-features，只接受不含..且不经链接越界的非空项目相对路径。需要持久跟踪的事项使用 `<features_dir>/<事项名称>/task.md`，一次性局部低风险小修不要求建文档，已有文档直接作为唯一入口时不转录副本。
+用户明确目标工作空间；根workflow.yaml不存在时使用默认配置，框架目录不是业务工作空间。workspace.features_dir默认agent-features，只接受不含..且不经链接越界的非空项目相对路径。需要持久跟踪的事项使用 `<features_dir>/<事项名称>/task.md`，一次性局部低风险小修不要求建文档，已有文档按职责引用，已有协调入口不转录副本；复杂事项按 [文档分工](documents.md#按复杂度选择文档) 拆分需求、设计及实施。
 
 workflow.lock.yaml按 [包规则](package.md) 校验；协议3不建立业务配置快照、documents.yaml覆盖层或授权版本。旧配置/任务由原包解释，不批量重写。
 
