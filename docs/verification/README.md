@@ -2,7 +2,15 @@
 
 本页汇总各基线已验证的范围和仍待完成项。原始执行记录、测试项目快照及日志保留在维护者本地，不属于安装内容。
 
-## v0.7.0 发布准备（2026-10-27）
+## v0.7.0 正式发布与本项目安装（2026-10-27）
+
+[正式Release](https://github.com/vvgool/multi-agent-requirement-workflow/releases/tag/v0.7.0)已发布为Latest，非draft、非prerelease；标签与源提交均为 `fe0d0e655f9976572152775819f0af78ebd5378f`。运行包102文件，摘要 `fa28b09251ed4fdb3a4d09b135fad0dddf364d384c2782bd232faeebe8402742`。归档、manifest、SHA256SUMS下载后逐字节回验通过；[Linux/macOS托管CI](https://github.com/vvgool/multi-agent-requirement-workflow/actions/runs/40460701854)两端通过。
+
+本项目已按setup升级Codex/OpenCode，包缓存严格匹配发布提交/摘要，锁与共用入口一致，薄角色和registry模板无需改写；用户配置/块外内容保持、无pending。旧0.6.2缓存及两端probe_history保留，新增回执历史各一项；当前file_installation通过，新会话入口/四角色原生激活与end_to_end均pending，未沿用候选结果。未升级其他项目。当前AGENTS受管区块因本项目安装改变，故当前工作树包身份可不同于标签；分发与安装始终取锁定源提交，不重新绑定moving HEAD。
+
+证据根 `/private/tmp/workflow-release-070-zcrtojqm/`：release-review.md、release-identity.json、download-verification.json、install-result.json。完整业务仍绑定前节已验212候选；正式字节仅四文件版本/说明差异，范围见下述准备记录。真实原生激活、Claude、生产/真实平台及恢复未因发布自动通过。
+
+## v0.7.0 发布准备记录（历史，2026-10-27）
 
 正式源码版本为0.7.0/协议3，运行包102文件，SHA256 `fa28b09251ed4fdb3a4d09b135fad0dddf364d384c2782bd232faeebe8402742`。相对下述完整业务已验212候选仅framework.yaml版本、AGENTS源码版本、workflow/package版本字面及README发布/验证说明四文件变化，未改变业务规则/模板/方法。完整业务结果保持原候选身份，不冒称正式字节重跑全部业务。
 
