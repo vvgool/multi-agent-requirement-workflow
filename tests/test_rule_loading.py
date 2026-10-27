@@ -63,6 +63,22 @@ class RuleLoadingTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             RULES.check(self.root)
 
+    def test_missing_linked_design_method_is_detected(self):
+        (self.root / 'skills/feature-development/references/design-and-decomposition.md').unlink()
+        with self.assertRaisesRegex(AssertionError, 'linked_rule_missing'):
+            RULES.check(self.root)
+
+    def test_broken_link_in_shared_workflow_is_detected(self):
+        path = self.root / 'workflow/routing.md'
+        path.write_text(path.read_text() + '\n[必要设计方法](absent-design-method.md)\n')
+        with self.assertRaisesRegex(AssertionError, 'linked_rule_missing'):
+            RULES.check(self.root)
+
+    def test_external_links_and_document_fragments_are_not_file_paths(self):
+        path = self.root / 'workflow/routing.md'
+        path.write_text(path.read_text() + '\n[外部](https://example.invalid/missing.md) [本页](#路径选择)\n')
+        RULES.check(self.root)
+
     def test_second_progress_checklist_fails(self):
         path = self.root / 'skills/feature-development/assets/templates/implementation-plan.md'
         original = path.read_text()

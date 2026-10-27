@@ -23,6 +23,23 @@ ENTRY_FILES = [
 ]
 
 
+def check_local_rule_links(root):
+    """Validate package document pointers, not agent behavior or prose quality."""
+    checked = 0
+    for directory in ['agents', 'skills', 'workflow', 'templates']:
+        for path in sorted((root / directory).rglob('*.md')):
+            for target in re.findall(r'\]\(([^)\s]+)\)', path.read_text(encoding='utf-8')):
+                if target.startswith('#') or re.match(r'^[A-Za-z][A-Za-z0-9+.-]*:', target):
+                    continue
+                # Templates may contain a destination to be supplied by the consumer.
+                if '{' in target:
+                    continue
+                checked += 1
+                destination = path.parent / target.split('#', 1)[0]
+                assert destination.is_file(), f'linked_rule_missing: {path.relative_to(root)} -> {target}'
+    return checked
+
+
 def check(root, baseline=None, *, require_smaller=False):
     texts = {p: (root / p).read_text(encoding="utf-8") for p in ENTRY_FILES}
     framework = yaml.safe_load((root / "framework.yaml").read_text(encoding="utf-8"))
@@ -72,6 +89,7 @@ def check(root, baseline=None, *, require_smaller=False):
         # A linked template must still be available if its file was removed.
         for link in re.findall(r'\]\((assets/templates/[^)#]+\.md)\)', body):
             assert (skill.parent / link).is_file(), link
+    local_rule_links = check_local_rule_links(root)
     before = (sum((baseline / p).stat().st_size for p in ENTRY_FILES)
               if baseline is not None else None)
     after = sum(len(t.encode("utf-8")) for t in texts.values())
@@ -79,6 +97,7 @@ def check(root, baseline=None, *, require_smaller=False):
         assert before is not None, 'size_baseline_required'
         assert after < before, f'rule_size_not_reduced: {before} -> {after}'
     return dict(framework=framework, protocol=framework['protocol_version'], entry_files=len(texts),
+                local_rule_links=local_rule_links,
                 scenarios=["simple-document-or-known-fix", "same-item-continued-after-completion",
                            "cross-role-single-writer", "risk-confirmation-independent-verification",
                            "unknown-external-operation-no-replay", "old-lock-no-migration"],

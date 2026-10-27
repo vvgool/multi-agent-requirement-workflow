@@ -50,9 +50,17 @@ agent-features/飞书群机器人消息自动处理/
 └── verification.md          # 验收结果和证据
 ```
 
+复杂需求的 requirements.md 承载PRD：先分析问题、角色旅程和产品方案，再明确功能规则及验收；技术设计按职责与数据归属拆模块，实施计划按可验证交付拆任务。实施前检查需求覆盖、契约一致及模板适用内容，已有格式可映射使用，小修路径保持。
+
 完整规则见 [文档分工](workflow/documents.md#按复杂度选择文档)。一个事项可包含多个实施任务，确需委派时才建立对应原生任务。详细规则、设计和证据各自维护，task.md 只汇总进度及链接；一般事项仍可只用 task.md，小修直接完成。
 
 实际产稿时按 [格式规范](workflow/documents.md#人读文档格式) 组织结论、图示和证据：流程用流程图，模块关系用架构图，调用交互用时序图，接口/配置/命令用带语言标识的代码块。小修无需为套模板而写文档。
+
+## 执行路径与交付门槛
+
+协调Agent按 [路由](workflow/routing.md) 核实工作性质、业务确定性、职责依赖、状态副作用、风险及交付验证：明确局部小修直接完成，一般需求补局部决策，复杂需求主动形成PRD、模块分析及实施计划，Bug先诊断再决定修复深度。不按行数打分，不让用户负责提醒拆分。模块分析可以得出复用现有边界的结论。
+
+复杂需求必须满足 [实施与完成门槛](workflow/execution-contract.md#实施与完成门槛)：实施前独立审查、分批交付及最终独立验收；产品拆功能、开发拆模块、协调组织交付和集成。复杂语义变化时补 [领域建模](skills/requirement-analysis/references/domain-modeling.md)，架构影响型Bug或重复失败时补 [架构审查](skills/feature-development/references/architecture-review.md)。技术审查复用独立开发专长，测试检查可验收性及实际业务，角色不是固定阶段链。可自动验证的业务代码默认 [测试先行](workflow/test-first.md)，原因不清的Bug按 [系统化诊断](skills/bug-fixing/references/systematic-debugging.md)，完成前按 [证据门槛](skills/acceptance-testing/references/completion-gate.md)，例外说明原因与替代验证，TDD不替代整体验收。
 
 ## 协作边界
 
@@ -66,7 +74,7 @@ agent-features/飞书群机器人消息自动处理/
 
 本版本支持复杂需求按需求、技术设计、实施计划和验收分工，task.md 作为唯一协调与进度入口；同编号任务关联实施计划，独立验收有明确待办和完成条件。一次性局部低风险小修仍由当前会话直接完成。
 
-当前源码版本为 [**0.6.2，协议3**](https://github.com/vvgool/multi-agent-requirement-workflow/releases/tag/v0.6.2)。Codex、OpenCode 的四角色、复杂需求独立验收、同事项完成后续改、小修、unknown不重放及人工接续已在冻结候选上实际验证；发布整理的字节差异及各项证据见 [验证摘要](docs/verification/README.md)，不将候选结果改称为发布摘要重跑。Claude Code真实运行、自动崩溃恢复和真实外部平台不在本轮已验范围。本项目安装以workflow.lock.yaml为准，其他消费者须明确升级；保留旧包和历史，旧任务继续使用原锁定包。
+本次发布版本为 **0.7.0，协议3**，新增主动路由、领域PRD与模块设计门槛、按行为TDD、系统化Bug诊断和完成前验证方法。发布事实以 [GitHub Release](https://github.com/vvgool/multi-agent-requirement-workflow/releases) 的标签、提交与包摘要为准；本项目安装以workflow.lock.yaml为准，其他消费者须明确升级。最终212候选已在Codex/OpenCode完成四角色及完整本地业务独立验收；0.7.0仅作版本/发布说明调整，候选结果不冒称新发布字节重新跑过完整业务。各候选和正式包的实际范围见 [验证摘要](docs/verification/README.md)。Claude Code真实运行、自动崩溃恢复和真实外部平台须单列；保留旧包和历史，旧任务继续使用原锁定包。
 
 Codex、Claude Code、OpenCode共享规则，以各宿主原生角色薄文件适配；文件安装、真实角色激活和业务闭环分别报告。不能用一个宿主的结果替代另一个，也不能用模板存在证明原生调用。详情见 [包规则](workflow/package.md)、[安装Skill](skills/setup-requirement-workflow/SKILL.md)、[宿主适配](workflow/host-adapters.md)。
 
