@@ -2,9 +2,13 @@
 
 本页汇总各基线已验证的范围和仍待完成项。原始执行记录、测试项目快照及日志保留在维护者本地，不属于安装内容。
 
-## v0.7.1 发布前收口（2026-10-30）
+## v0.7.1 正式发布与验收收口（2026-10-30）
 
-**当前本地限定范围验收通过，待远程CI和发布。** 两端已知list子类缺陷均修复并独立复验；Codex剩余文档证据归属已由主会话更正，原独立测试会话 `ses_e7426b2ecffez06PqNLEQjQmrP` 最终只读复核通过，确认无本地限定发布准备阻断。用户本轮已明确授权提交、推送和GitHub正式发布；不包含升级消费者或生产部署。
+**限定范围验收已收口，v0.7.1已正式发布。** [Release](https://github.com/vvgool/multi-agent-requirement-workflow/releases/tag/v0.7.1)非draft、非prerelease，发布为Latest；标签源提交 `9347aaa7cc2dc967b9f41903486019b10741b48c`，[该提交Linux/macOS托管CI](https://github.com/vvgool/multi-agent-requirement-workflow/actions/runs/41026518463)两端通过。运行包、manifest、SHA256SUMS从GitHub重新下载，资产字节、校验和、tar路径／普通文件类型、102文件清单、整体包摘要与标签提交文件逐字节回验全部通过。
+
+两端已知list子类缺陷均修复并独立复验；Codex剩余文档证据归属已由主会话更正，原独立测试会话 `ses_e7426b2ecffez06PqNLEQjQmrP` 最终只读复核通过。用户本轮授权的提交、推送和GitHub正式发布已执行；未升级消费者或部署生产。发布后本页更新为包外事实补记，不移动已发布标签、不改变运行包或锁。
+
+发布归档SHA256为 `864963d4aadf702bc13c5d5915f7e1e383b434130d40084378ac8beb414dae80`；manifest为 `2077c90f776f0f6faff4eef5ce89d3f71d6e5c30dea5426c65db3d72d7f35f66`。本地上传证据 `v071-release-final/`，下载回验证据 `v071-release-download.3LmIQR/download-verification.json`（均在下述批准的opencode临时证据根）。首次本地预备归档ab16摘要保留为历史，最终归档因Git提交元数据改变而不同，解包运行文件仍完全相同；不混淆归档摘要与运行包摘要。
 
 | 最终对象 | 当前实际证据 |
 | --- | --- |
