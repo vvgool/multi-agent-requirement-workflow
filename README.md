@@ -11,9 +11,9 @@
 ```markdown
 # 签到奖励
 
-| 项目 | 内容 |
-| --- | --- |
-| 当前状态 | 进行中 |
+| 项目     | 内容       |
+| -------- | ---------- |
+| 当前状态 | 进行中     |
 | 最近更新 | 2026-10-25 |
 
 ## 目标与范围
@@ -32,8 +32,8 @@
 
 ## 验证记录
 
-| 检查 | 状态 | 证据或说明 |
-| --- | --- | --- |
+| 检查                 | 状态   | 证据或说明   |
+| -------------------- | ------ | ------------ |
 | 首次、重复及跨日行为 | 未执行 | 待实现后验证 |
 ```
 
@@ -74,7 +74,7 @@ agent-features/飞书群机器人消息自动处理/
 
 本版本支持复杂需求按需求、技术设计、实施计划和验收分工，task.md 作为唯一协调与进度入口；同编号任务关联实施计划，独立验收有明确待办和完成条件。一次性局部低风险小修仍由当前会话直接完成。
 
-本次发布版本为 **0.7.0，协议3**，新增主动路由、领域PRD与模块设计门槛、按行为TDD、系统化Bug诊断和完成前验证方法。发布事实以 [GitHub Release](https://github.com/vvgool/multi-agent-requirement-workflow/releases) 的标签、提交与包摘要为准；本项目安装以workflow.lock.yaml为准，其他消费者须明确升级。最终212候选已在Codex/OpenCode完成四角色及完整本地业务独立验收；0.7.0仅作版本/发布说明调整，候选结果不冒称新发布字节重新跑过完整业务。各候选和正式包的实际范围见 [验证摘要](docs/verification/README.md)。Claude Code真实运行、自动崩溃恢复和真实外部平台须单列；保留旧包和历史，旧任务继续使用原锁定包。
+本次发布版本为 **0.7.1，协议3**，在0.7.0基础上补齐代码库证据优先、单一workflow控制、实施单元契约、完成证据、失败熔断、交接终态及worktree身份边界。发布事实以 [GitHub Release](https://github.com/vvgool/multi-agent-requirement-workflow/releases) 的标签、提交与包摘要为准；本项目安装以workflow.lock.yaml为准，其他消费者须明确升级。历史候选的Codex/OpenCode验收仍绑定各自旧包摘要；不将旧候选结果冒称为0.7.1新发布字节的宿主验收结果。各候选和正式包的实际范围见 [验证摘要](docs/verification/README.md)。Claude Code真实运行、自动崩溃恢复和真实外部平台须单列；保留旧包和历史，旧任务继续使用原锁定包。
 
 Codex、Claude Code、OpenCode共享规则，以各宿主原生角色薄文件适配；文件安装、真实角色激活和业务闭环分别报告。不能用一个宿主的结果替代另一个，也不能用模板存在证明原生调用。详情见 [包规则](workflow/package.md)、[安装Skill](skills/setup-requirement-workflow/SKILL.md)、[宿主适配](workflow/host-adapters.md)。
 
