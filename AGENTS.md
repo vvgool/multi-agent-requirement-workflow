@@ -6,7 +6,7 @@
 
 存在范围或验收分歧时，先在对话中确认；付款、权限、数据删除或大范围共享逻辑变更先确认具体范围，再独立验证。跨角色与恢复只交接当前目标、改动、已验、未决项及原生任务引用；未知外部写先查原调用，不重放。每个共享文件保持单写，不将未执行的检查标记为通过。
 
-下方受管区块是本项目按workflow.lock.yaml锁定的0.7.0/协议3入口。已结束的旧协议任务及其原包绑定保留，不迁移、不删除历史；若需恢复旧任务，仅使用其记录的原锁定包，不以新协议续写。分发安装使用 [入口模板](skills/setup-requirement-workflow/assets/templates/project-entry-light.md)，不复制源码仓库自身安装记录作为业务项目入口。
+下方受管区块是本项目按workflow.lock.yaml锁定的0.7.1/协议3入口。已结束的旧协议任务及其原包绑定保留，不迁移、不删除历史；若需恢复旧任务，仅使用其记录的原锁定包，不以新协议续写。分发安装使用 [入口模板](skills/setup-requirement-workflow/assets/templates/project-entry-light.md)，不复制源码仓库自身安装记录作为业务项目入口。
 
 <!-- requirement-workflow:begin -->
 
