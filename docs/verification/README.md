@@ -2,6 +2,44 @@
 
 本页汇总各基线已验证的范围和仍待完成项。原始执行记录、测试项目快照及日志保留在维护者本地，不属于安装内容。
 
+## v0.7.1 发布前收口（2026-10-30）
+
+**当前本地限定范围验收通过，待远程CI和发布。** 两端已知list子类缺陷均修复并独立复验；Codex剩余文档证据归属已由主会话更正，原独立测试会话 `ses_e7426b2ecffez06PqNLEQjQmrP` 最终只读复核通过，确认无本地限定发布准备阻断。用户本轮已明确授权提交、推送和GitHub正式发布；不包含升级消费者或生产部署。
+
+| 最终对象 | 当前实际证据 |
+| --- | --- |
+| 固定运行包 | 0.7.1／协议3，102文件，包摘要 `e0ee852b77b35a7aa1b6699f1f35e260bffb34337d04a45a0e15e6efae71030f`，来源提交 `0a7e5f80786c0e061789da11a3d30b5130a258bc`；发布标签可指向后续仅包外docs变化的提交，须逐文件证明相同运行包，不更换消费者锁。 |
+| 源码 | 111个不同测试通过：发现89通过／22按隔离规则跳过，另跑22通过；17入口、196规则链接、12宿主角色模板／配置保护通过。 |
+| OpenCode当前夹具 | 原开发16测试／9子场景失败RED → 原生list切片修复16项GREEN → 原测试会话独立16项及额外钩子／隔离断言通过。当前app／test摘要 `364a40b82bffb6776ab4f3bb7a762441f38374ace86e26cba21b9def9d3f8e63`／`c77a32ccd8830615dabcf844b45ea1d2b9fe0bd45e1f756736308c6888af8661`。 |
+| Codex当前夹具 | 原开发9项／1失败RED → 原生list切片修复10项GREEN → 原独立测试10项及额外实验通过；外层独立测试再跑10项、316条内存断言通过。当前app／test摘要 `de57240923f087a68e929c45e5d5991cb9294d53531d54092a5e61063efe1aaa`／`f5204330a0be2031eb0616e00fe8a7151ec36581cbf1e8f09451dcdf5e111f71`。 |
+| Codex文档修正 | 首次4项RED→4项GREEN→8项GREEN分清；首次所谓额外独立内存断言改为原8方法摘要；10方法不含多参数同时非法及完整失败无副作用矩阵，改为外层316断言证据；三具名子类属于unittest，额外脚本是另外两类探针。不把外层检查回填Codex历史。 |
+| 激活与回执 | 源项目Codex0.165.0和OpenCode2.2.1主入口／四具名角色真实探测通过；源码项目未运行业务，end_to_end仍pending。Codex隔离项目沙箱拒写.agents，回执仍pending，未通过外层工具升级；真实业务结果由原日志和验证文档证明。 |
+
+本轮不修改运行包README的历史“待发布”文字，以保持已验包字节；标签、Release、manifest和本页发布事实优先，归档README该措辞视为冻结时状态。不会将111源码测试、双端单函数夹具扩称复杂实施依赖、模型运行时强制拦截、自动崩溃恢复、Claude、真实外部系统或生产通过。先前验收不足与失败过程保留如下，以下“待返回／需修正／暂不推送”是被本节新证据取代的历史状态。
+
+### 本轮历史过程（保留，不代表当前状态）
+
+子类续验最新进度：OpenCode原开发新增反例得到16测试／9子场景失败RED，修复为 `list.__getitem__(items, slice(None, limit))` 后16项GREEN；原独立测试会话实际复跑16项及额外钩子／容器隔离断言通过，已关闭该端子类缺陷，记录 `v071-opencode-subclass-fix.jsonl`／`v071-opencode-subclass-recheck.jsonl`。当前代码／测试摘要分别为 `364a40b82bffb6776ab4f3bb7a762441f38374ace86e26cba21b9def9d3f8e63`／`c77a32ccd8830615dabcf844b45ea1d2b9fe0bd45e1f756736308c6888af8661`。Codex同事项接续修复尚待终态，故整体仍需修正；下文首次通过和外层发现失败作为历史保留。
+
+**最新外层复核：需修正。** Codex 新主入口及四具名角色已完成真实只读探测（主线程 `01a18bc0-7ab1-78d2-af11-69eaf9e0f704`，四角色 `/root/probe_product`、`/root/probe_development`、`/root/probe_testing`、`/root/probe_bug` 均返回completed/passed），源码项目激活回执已按实际证据更新。随后同包Codex新隔离业务线程 `01a18bca-6430-7d80-b4fe-e163624b3705` 首报8测试和独验通过，但外层只读测试 `ses_e7426b2ecffez06PqNLEQjQmrP` 复现 list 子类重写切片使返回tuple或原输入对象，违反普通新list/上限/隔离契约；226条普通路径补充断言通过不能抵消该反例。其verification“独立内存断言”未找到原8方法之外实际脚本，不将新复核回填原证据。OpenCode夹具同样直接切片，也须补子类反例。两端均已在原会话按新证据接续修复／重验，未关闭前不得以此前业务通过外推本轮全部完成。Codex隔离项目`.agents`写入被其沙箱拒绝，回执仍pending，不通过外层工具重放升级；主项目end_to_end仍pending。
+
+当前锁定包为0.7.1／协议3，来源提交 `0a7e5f80786c0e061789da11a3d30b5130a258bc`，102文件摘要 `e0ee852b77b35a7aa1b6699f1f35e260bffb34337d04a45a0e15e6efae71030f`；源码检查基线为 `6d3fd0395e0f37d06ffd028691008e6675e6b595`。本节是包外验证记录，不将未推送的本地提交称为已发布来源。
+
+| 验证范围 | 本轮实际证据与结果 |
+| --- | --- |
+| 源码回归 | unittest发现111项，89通过、22因隔离授权跳过；随后22项在批准的现存隔离目录单独全部通过，共111个不同测试通过。首次补跑因scratch子目录尚不存在被参数校验拒绝，创建正确目录后通过，非业务失败。 |
+| 规则与宿主模板 | verify-rule-loading核对17入口、196规则链接；verify-host-adapters核对12角色模板、Codex registry与配置保护；当前提交空白检查通过。模板检查不等于跨宿主激活。 |
+| 包与本地归档 | 锁、102文件缓存与本地固定Git提交逐字节一致；生成tar.gz、manifest、SHA256SUMS，路径和普通文件类型检查、解包逐字节与校验和回读通过。归档SHA256为 `ab16b6afc58c92c9b10777c3296872073cc152a0bdae320fb363e486334f1a41`；不是远程下载回验。 |
+| OpenCode新主入口 | 全新build主会话 `ses_e744ed2ccffePXrCzjdBphl2g2` 只读探测通过，实际核对自动加载AGENTS、锁包、本地Git提交和四角色模板。 |
+| OpenCode四角色 | 产品、开发、测试既有同包原生探测保留；Bug新复验 `ses_e744e36f9ffegz2j09pPpohrDo` 通过。旧Bug会话 `ses_e746c566fffdygdOf1vcvM3jeK` 实际因回执旧摘要阻塞，曾被错误记passed；本轮已在历史纠正为失败／阻塞，不倒填旧调用成功。当前入口及四角色齐备，原生激活汇总passed。 |
+| OpenCode合成业务闭环 | 隔离项目真实产品 `ses_e7458d70dffeeMWEn6I2tbx8Ke` → 开发 `ses_e745554f6ffepIKgua9NWFuYdJ` → 独立测试 `ses_e744f0d20ffecA3GSPkeoAeEJL`。单函数allocate覆盖N1–N4、B1–B6、E1–E5，开发真实RED/GREEN与最终13测试通过；独立测试实际复跑13项及内存断言通过。首次独验因授权来源措辞P2给“需修正”，主会话仅修正文档，同一测试会话复核关闭P2、最终“通过”。 |
+
+业务契约由协调主会话批准用于合成夹具，不冒称终端用户曾逐项确认。app.py SHA256为 `5991d66932463c3fc4c18843b977db8d6ee10f37d66874cf797a67c40191b0aa`，tests/test_app.py为 `6427affbbaacb281d71e5ad18832c878b4cd77f7ba18a966c3ecd8c0a385e713`；独立复核时未变。测试包装命令曾误用zsh只读变量status而在单元测试通过后中断，改用unit_rc后完成独立断言；不隐去该命令失败。
+
+本地证据根 `/private/var/folders/p7/6lh96zx51qz0ksknm0qj5v3r0000gp/T/opencode/`：v071-entry-probe.jsonl、v071-independent-testing.jsonl、v071-independent-recheck.jsonl、v071-release-assets/。业务项目为同一临时父目录下 `workflow-v071-e2e-GefmaC`，沿其原task.md与verification.md收口；不将从源码项目复制的回执历史当作临时项目激活证明。源码项目本身未运行业务，故其回执end_to_end保持pending，本节仅记录该同包隔离业务通过。
+
+**尚未满足完整上线：** PATH外Zed目录的codex-cli 0.165.0已完成真实主入口与四角色激活，未安装程序、改认证或全局trust；codexhost委派程序不存在。两端隔离业务正根据新子类缺陷修复重验：OpenCode开发已取得16测试／9失败子场景RED，原生list切片最小修复后16项GREEN，独立验收待返回；Codex接续修复待返回。Claude未验。最新失败熔断、复杂实施单元依赖和交接规则仅有既有定向静态证据，本单函数闭环不证明模型运行时强制拦截、复杂需求或自动恢复。远程main本轮核对仍为 `34d7fec822f2ef66de8c28bce65f383132c014b4`，最新托管CI不覆盖当前修复；v0.7.1 tag／Release不存在。用户选择暂不推送；未提交本轮验证记录、打标签、创建Release、远程下载回验、升级消费者或操作生产，这些事实不能因本地通过自动提升。
+
 ## v0.7.0 正式发布与本项目安装（2026-10-27）
 
 [正式Release](https://github.com/vvgool/multi-agent-requirement-workflow/releases/tag/v0.7.0)已发布为Latest，非draft、非prerelease；标签与源提交均为 `fe0d0e655f9976572152775819f0af78ebd5378f`。运行包102文件，摘要 `fa28b09251ed4fdb3a4d09b135fad0dddf364d384c2782bd232faeebe8402742`。归档、manifest、SHA256SUMS下载后逐字节回验通过；[Linux/macOS托管CI](https://github.com/vvgool/multi-agent-requirement-workflow/actions/runs/40460701854)两端通过。
