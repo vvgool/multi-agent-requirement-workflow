@@ -74,7 +74,7 @@ agent-features/飞书群机器人消息自动处理/
 
 本版本支持复杂需求按需求、技术设计、实施计划和验收分工，task.md 作为唯一协调与进度入口；同编号任务关联实施计划，独立验收有明确待办和完成条件。一次性局部低风险小修仍由当前会话直接完成。
 
-本次发布版本为 **0.7.1，协议3**，在0.7.0基础上补齐代码库证据优先、单一workflow控制、实施单元契约、完成证据、失败熔断、交接终态及worktree身份边界。发布事实以 [GitHub Release](https://github.com/vvgool/multi-agent-requirement-workflow/releases) 的标签、提交与包摘要为准；本项目安装以workflow.lock.yaml为准，其他消费者须明确升级。历史候选的Codex/OpenCode验收仍绑定各自旧包摘要；不将旧候选结果冒称为0.7.1新发布字节的宿主验收结果。各候选和正式包的实际范围见 [验证摘要](docs/verification/README.md)。Claude Code真实运行、自动崩溃恢复和真实外部平台须单列；保留旧包和历史，旧任务继续使用原锁定包。
+当前源码版本为 **0.7.1，协议3**，在0.7.0基础上补齐代码库证据优先、单一workflow控制、实施单元契约、完成证据、失败熔断、交接终态及worktree身份边界。正式发布事实仍以 [GitHub Release](https://github.com/vvgool/multi-agent-requirement-workflow/releases) 的标签、提交与包摘要为准；本项目安装以workflow.lock.yaml为准，其他消费者须明确升级。当前源码和本项目锁已固定到待发布的0.7.1提交，未将其表述为远程已发布。历史候选的Codex/OpenCode验收仍绑定各自旧包摘要；不将旧候选结果冒称为0.7.1新发布字节的宿主验收结果。各候选和正式包的实际范围见 [验证摘要](docs/verification/README.md)。Claude Code真实运行、自动崩溃恢复和真实外部平台须单列；保留旧包和历史，旧任务继续使用原锁定包。
 
 Codex、Claude Code、OpenCode共享规则，以各宿主原生角色薄文件适配；文件安装、真实角色激活和业务闭环分别报告。不能用一个宿主的结果替代另一个，也不能用模板存在证明原生调用。详情见 [包规则](workflow/package.md)、[安装Skill](skills/setup-requirement-workflow/SKILL.md)、[宿主适配](workflow/host-adapters.md)。
 
