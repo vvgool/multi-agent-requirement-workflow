@@ -4,6 +4,8 @@
 Development regression only: no installation, receipt, lifecycle scheduler or
 native invocation. Optional --opencode checks discovery via an existing CLI;
 it does not grant permissions, invoke a model or prove native delegation.
+The Zed check covers the rules-only adapter and shared AGENTS entry; it does
+not prove a Zed session loaded the rules.
 """
 import argparse
 import hashlib
@@ -63,6 +65,17 @@ def main():
     adapter = (root / "skills/setup-requirement-workflow/references/opencode-adapter.md").read_text()
     assert "不创建业务host.yaml" in adapter
     assert "业务host.yaml记录真实host及ID" not in adapter
+    zed_adapter = (root / "skills/setup-requirement-workflow/references/zed-adapter.md").read_text()
+    zed_entry = (root / "workflow/hosts/zed.md").read_text()
+    for zed_text in (zed_adapter, zed_entry):
+        assert "规则型宿主" in zed_text
+        assert "AGENTS.md" in zed_text
+        assert "native_role_probes" in zed_text
+        assert "not_applicable" in zed_text
+    assert "不生成 Zed 角色文件" in zed_adapter
+    assert "不生成 `.zed/agents`" in zed_entry
+    entry = (root / "AGENTS.md").read_text()
+    assert "requirement-workflow:begin" in entry and "requirement-workflow:end" in entry
     bridge = (templates / "claude-entry.md").read_text()
     assert "需求、续改、小修及初始化验证" in bridge and "无需文档、任务" in bridge
     assert "无需先读锁、缓存或框架包" in bridge and "旧任务仍原锁原包" in bridge
@@ -117,7 +130,8 @@ def main():
     opencode_config = scratch / "opencode.jsonc"
     opencode_config.write_bytes(user_jsonc)
     result = dict(scope="template/helper regression, not setup installation or native activation",
-                  host_roles=12, codex_registry="passed", markdown_minimal_fields="passed",
+                  host_roles=12, rules_hosts=1, zed_rules_adapter="passed",
+                  codex_registry="passed", markdown_minimal_fields="passed",
                   opencode_discovery="not_requested", config_preserved=True)
     if args.opencode:
         # Read actual configuration sources first; do not persist full output

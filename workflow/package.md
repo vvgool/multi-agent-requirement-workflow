@@ -14,7 +14,7 @@ framework.yaml 仅含 schema_version=1、name、非空 version、protocol_versio
 
 ## 项目内的两类文件
 
-需提交的最小内容为 workflow.yaml、workflow.lock.yaml、AGENTS.md 中的入口区块、目标宿主各自的四个薄角色文件、.gitignore 的本地目录忽略区块；Claude Code 如需读取入口另加 CLAUDE.md 的短桥接区块。不修改无关设置；默认安装当前宿主及项目检测到的宿主，用户显式选择范围优先；未检测且未选择的宿主不生成文件。具体见 [宿主选择](../skills/setup-requirement-workflow/references/installation.md#宿主选择与批量初始化)。事项文档及实际成果按 [成果规则](output-layout.md) 共享，不默认建立本机业务执行记录。
+需提交的最小内容为 workflow.yaml、workflow.lock.yaml、AGENTS.md 中的入口区块、具名角色宿主各自的四个薄角色文件、.gitignore 的本地目录忽略区块；Claude Code 如需读取入口另加 CLAUDE.md 的短桥接区块。规则型宿主（当前为 Zed）复用 AGENTS.md，不新增宿主角色文件。具名角色宿主不修改无关设置；默认安装当前宿主及项目检测到的宿主，用户显式选择范围优先；未检测且未选择的宿主不生成文件。具体见 [宿主选择](../skills/setup-requirement-workflow/references/installation.md#宿主选择与批量初始化)。事项文档及实际成果按 [成果规则](output-layout.md) 共享，不默认建立本机业务执行记录。
 
 本地不提交：`.agents/requirement-workflow-cache/<package.sha256>/`（完整只读包）、`.agents/requirement-workflow.local.json`（各宿主安装与探测回执）、`.agents/requirement-workflow.pending.json`（中断意图）及任意层级的 `.workflow/`（本机执行现场）。不忽略整个 .agents、.codex、.claude、.opencode 或 agent-features，保留用户配置和共享成果。不创建 Skill 符号链接或复制阶段 Skill 到宿主目录；原生角色按明确包内路径读取完整 Skill 及模板，属于文件加载，不宣称原生 Skill 发现已验证。
 
@@ -26,7 +26,7 @@ framework.yaml 仅含 schema_version=1、name、非空 version、protocol_versio
 
 新轻量安装的框架根目录固定为项目根下 `.agents/requirement-workflow-cache/<锁定sha256>`；当前会话实际使用框架能力前首次完整校验包清单、当前宿主薄角色与入口及其实际生效状态；后续按下节复用未变化的环境核验。缓存或薄角色被修改返回 framework_integrity_mismatch/adapter_modified。读取不同宿主的回执不能证明当前宿主生效。初始化 pending 存在时先恢复，不能运行半安装结果。
 
-0.7.1采用协议3，一次性局部低风险小修可直接在当前会话完成，需要持久文档时维护一个协调入口并按复杂度拆分职责文档，需要委派才用原生任务；不创建机器状态/调用/交付，不沿用协议2的schema/layout。协议1/2的旧任务必须使用原锁定包，不得用本包续写、迁移或重新审批。源码仓库的旧受管入口只代表其当前锁，分发时使用新入口模板，不复制该区块作为新协议运行要求。
+0.7.2采用协议3，一次性局部低风险小修可直接在当前会话完成，需要持久文档时维护一个协调入口并按复杂度拆分职责文档，需要委派才用原生任务；不创建机器状态/调用/交付，不沿用协议2的schema/layout。协议1/2的旧任务必须使用原锁定包，不得用本包续写、迁移或重新审批。源码仓库的旧受管入口只代表其当前锁，分发时使用新入口模板，不复制该区块作为新协议运行要求。
 
 显式升级前确认原生活动调用已经结束，旧协议还须按原包核对其active_run。旧包、旧需求版本和审批原样保留。升级不静默迁移历史；如果需要继续旧任务先保持原绑定直到其结束。
 

@@ -74,11 +74,11 @@ agent-features/飞书群机器人消息自动处理/
 
 本版本支持复杂需求按需求、技术设计、实施计划和验收分工，task.md 作为唯一协调与进度入口；同编号任务关联实施计划，独立验收有明确待办和完成条件。一次性局部低风险小修仍由当前会话直接完成。
 
-当前源码版本为 **0.7.1，协议3**，在0.7.0基础上补齐代码库证据优先、单一workflow控制、实施单元契约、完成证据、失败熔断、交接终态及worktree身份边界。正式发布事实仍以 [GitHub Release](https://github.com/vvgool/multi-agent-requirement-workflow/releases) 的标签、提交与包摘要为准；本项目安装以workflow.lock.yaml为准，其他消费者须明确升级。当前源码和本项目锁已固定到待发布的0.7.1提交，未将其表述为远程已发布。历史候选的Codex/OpenCode验收仍绑定各自旧包摘要；不将旧候选结果冒称为0.7.1新发布字节的宿主验收结果。各候选和正式包的实际范围见 [验证摘要](docs/verification/README.md)。Claude Code真实运行、自动崩溃恢复和真实外部平台须单列；保留旧包和历史，旧任务继续使用原锁定包。
+当前源码版本为 **0.7.2，协议3**，在0.7.0基础上补齐代码库证据优先、单一workflow控制、实施单元契约、完成证据、失败熔断、交接终态及worktree身份边界。正式发布事实仍以 [GitHub Release](https://github.com/vvgool/multi-agent-requirement-workflow/releases) 的标签、提交与包摘要为准；本项目安装以workflow.lock.yaml为准，其他消费者须明确升级。当前工作树包含待发布的 Zed 规则型宿主适配，版本已升级为0.7.2；`workflow.lock.yaml` 将在包内容提交后绑定0.7.2的实际提交和摘要。发布前不能将工作树直接当作已发布内容，Zed适配须独立验收。历史候选的Codex/OpenCode验收仍绑定各自旧包摘要；不将旧候选结果冒称为0.7.2新发布字节的宿主验收结果。各候选和正式包的实际范围见 [验证摘要](docs/verification/README.md)。Claude Code真实运行、自动崩溃恢复和真实外部平台须单列；保留旧包和历史，旧任务继续使用原锁定包。
 
-Codex、Claude Code、OpenCode共享规则，以各宿主原生角色薄文件适配；文件安装、真实角色激活和业务闭环分别报告。不能用一个宿主的结果替代另一个，也不能用模板存在证明原生调用。详情见 [包规则](workflow/package.md)、[安装Skill](skills/setup-requirement-workflow/SKILL.md)、[宿主适配](workflow/host-adapters.md)。
+Codex、Claude Code、OpenCode共享规则，以各宿主原生角色薄文件适配；Zed 是规则型宿主，复用根目录 `AGENTS.md`，由当前 Agent 直接执行，不生成或伪造项目级原生子角色。Zed 只有在用户明确指定或当前会话确认为 Zed 时参与宿主选择。文件安装、真实规则生效、原生角色激活和业务闭环分别报告。不能用一个宿主的结果替代另一个，也不能用模板存在证明原生调用。详情见 [包规则](workflow/package.md)、[安装Skill](skills/setup-requirement-workflow/SKILL.md)、[宿主适配](workflow/host-adapters.md)。
 
-项目提交workflow.yaml、workflow.lock.yaml、AGENTS入口、选定宿主的四个薄角色及精确.gitignore区块；Claude按需增加CLAUDE桥接。完整包缓存在 `.agents/requirement-workflow-cache/<sha256>/`，安装回执及pending留本机。安装完整性校验仍保留，它不要求逐个业务任务建立机器账本。
+项目提交workflow.yaml、workflow.lock.yaml、AGENTS入口、具名角色宿主的四个薄角色及精确.gitignore区块；规则型宿主（当前为 Zed）不新增角色文件，Claude按需增加CLAUDE桥接。完整包缓存在 `.agents/requirement-workflow-cache/<sha256>/`，安装回执及pending留本机。安装完整性校验仍保留，它不要求逐个业务任务建立机器账本。
 
 可选外部文档/Issue按项目已有连接能力和用户具体授权使用，不主动发消息、评论或发布。配置默认外部写关闭，见 [配置](workflow/config.md) 与 [Issue](workflow/issue-tracking.md)。
 
@@ -87,7 +87,7 @@ Codex、Claude Code、OpenCode共享规则，以各宿主原生角色薄文件�
 以下为源码维护检查，使用现有 Python 及 PyYAML；不作为业务运行依赖。当前候选的验证结论与宿主限制见 [验证摘要](docs/verification/README.md)，历史测试通过不自动覆盖当前候选。
 
 - `python3 -B -m unittest discover -s tests -p 'test_codex_registry.py'`：既有配置合并回归。
-- `python3 -B scripts/verify-host-adapters.py --source-root . --scratch /已授权的空目录`：三宿主真实模板/正文与配置保留检查，不是原生激活。
+- `python3 -B scripts/verify-host-adapters.py --source-root . --scratch /已授权的空目录`：三具名角色宿主模板/正文、Zed 规则型适配与配置保留检查，不是原生激活。
 - `python3 -B scripts/verify-rule-loading.py --source-root .`：协议3规则、文档读取入口和模板一致性静态检查，不代表模型实际执行。
 - 体积比较可追加 `--baseline-root /完整旧包目录`；只报告变化。精简实验需强制缩小时另加 `--require-smaller`，不作为普通改动的发布门槛，不测token或耗时。
 

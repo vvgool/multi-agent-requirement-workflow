@@ -6,6 +6,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES = ROOT / "skills/setup-requirement-workflow/assets/templates"
+ZED_ADAPTER = ROOT / "skills/setup-requirement-workflow/references/zed-adapter.md"
 ROLES = {
     "product": ("product-agent", "requirement-analysis", "澄清需求并输出验收标准"),
     "development": ("development-agent", "feature-development", "实现已批准需求并完成自验"),
@@ -27,6 +28,15 @@ class InstalledAdapterTests(unittest.TestCase):
         end = "<!-- requirement-workflow:end -->"
         block = actual[actual.index(begin):actual.index(end) + len(end)] + "\n"
         self.assertEqual(block, (TEMPLATES / "project-entry-light.md").read_text(encoding="utf-8"))
+
+    def test_zed_rules_adapter_matches_contract(self):
+        adapter = ZED_ADAPTER.read_text(encoding="utf-8")
+        self.assertIn("规则型宿主", adapter)
+        self.assertIn("AGENTS.md", adapter)
+        self.assertIn("不生成 Zed 角色文件", adapter)
+        self.assertIn("native_role_probes", adapter)
+        self.assertIn("not_applicable", adapter)
+        self.assertIn(".zed/agents", adapter)
 
     def test_codex_and_opencode_roles_match_templates(self):
         body_template = (TEMPLATES / "role-body.md").read_text(encoding="utf-8")
