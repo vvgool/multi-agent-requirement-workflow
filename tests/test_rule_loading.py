@@ -19,7 +19,7 @@ class RuleLoadingTests(unittest.TestCase):
         self.addCleanup(self.scratch.cleanup)
         self.root = Path(self.scratch.name) / 'source'
         self.root.mkdir()
-        for name in ['framework.yaml']:
+        for name in ['framework.yaml', 'AGENTS.md']:
             shutil.copyfile(ROOT / name, self.root / name)
         for name in ['agents', 'skills', 'workflow', 'templates']:
             shutil.copytree(ROOT / name, self.root / name)
@@ -57,6 +57,31 @@ class RuleLoadingTests(unittest.TestCase):
         path.write_text(path.read_text().replace('../../workflow/documents.md', '../../workflow/absent.md'))
         with self.assertRaises(AssertionError):
             RULES.check(self.root)
+
+    def test_evidence_free_retry_allowance_is_rejected(self):
+        path = self.root / 'skills/bug-fixing/references/systematic-debugging.md'
+        path.write_text(path.read_text().replace(
+            '没有改变假设、失败类别或验证范围时停止修改',
+            '三次没有新证据的失败后停止盲改'))
+        with self.assertRaises(AssertionError):
+            RULES.check(self.root)
+
+    def test_native_receipt_requires_actual_child_relationship(self):
+        path = self.root / 'skills/setup-requirement-workflow/SKILL.md'
+        path.write_text(path.read_text().replace('回读宿主实际子任务记录', '仅看命令成功'))
+        with self.assertRaises(AssertionError):
+            RULES.check(self.root)
+
+    def test_root_and_distributed_entry_guards_are_required(self):
+        for name in ['AGENTS.md', 'skills/setup-requirement-workflow/assets/templates/project-entry-light.md']:
+            path = self.root / name
+            original = path.read_text()
+            for guard in ['**修改前判断**', '不执行或实现自动重放、补偿']:
+                with self.subTest(path=name, guard=guard):
+                    path.write_text(original.replace(guard, '已移除守卫'))
+                    with self.assertRaises(AssertionError):
+                        RULES.check(self.root)
+            path.write_text(original)
 
     def test_missing_stage_template_fails(self):
         (self.root / 'skills/feature-development/assets/templates/technical-plan.md').unlink()
