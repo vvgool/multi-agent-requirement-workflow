@@ -2,7 +2,11 @@
 
 本页汇总各基线已验证的范围和仍待完成项。原始执行记录、测试项目快照及日志保留在维护者本地，不属于安装内容。
 
-## v0.7.4 发布准备与验证范围（2026-11-09）
+## v0.7.4 正式发布与本项目安装（2026-11-09）
+
+[v0.7.4正式发布](https://github.com/vvgool/multi-agent-requirement-workflow/releases/tag/v0.7.4)已完成：非draft、非prerelease、Latest；标签指向 `c99456bb8ff7febf7137dacf2a81f920288c79d6`。运行包来源为 `62b021d3cb94b3038374d02bd4b9a20ebbd9204b`，两个提交的104个运行文件逐字节相同；[该发行目标的Linux/macOS CI](https://github.com/vvgool/multi-agent-requirement-workflow/actions/runs/42563514965)均通过。三个资产已从GitHub重新下载，上传/下载字节、SHA256SUMS、API资产摘要、归档安全路径和普通文件类型、104文件清单、整体包摘要、来源/标签提交及本项目缓存原字节全部回验通过。包摘要仍为 `7d62981886262359da080f076fd5a2906accf6d02285520202a33c20b21ebd91`。证据：`/private/tmp/workflow-release-074-d3hf0vfk/download-verification.json`。
+
+首次直接shell启动的推送退出137保留为历史失败；同一Git可执行文件经标准子进程启动后dry-run及正常非强制推送成功，未修改权限、hook或远端保护。此前“尚未推送/未发布”的准备记录已被本节实际结果取代。仅补记包外文档，不移动标签、不改变运行包及项目锁。安装文件已升级，当前原生激活及E2E仍pending；不以正式发布改写历史架构未验项。
 
 本次为协议3的轻量方法增量：最高风险反例及无适用反例出口、按需证据字段、已有架构/契约证据触发复杂设计复核。修复新增规则测试夹具相互污染。保留小修直接路径，不新增角色、阶段、账本或权限。
 
@@ -14,7 +18,7 @@
 
 本地准备结果：源码提交 `62b021d3cb94b3038374d02bd4b9a20ebbd9204b`，安装绑定提交 `7b55a00`。最终104文件运行包摘要 `7d62981886262359da080f076fd5a2906accf6d02285520202a33c20b21ebd91`，来源为上述源码完整提交；安装绑定提交与源码提交的全部运行文件原字节相同。本项目Codex/OpenCode文件安装已完成，8个角色文件和3个受管区块无需变化，旧缓存与探测历史保留，当前入口/角色/E2E全部pending，无遗留pending事务。安装回执首次清单顺序使用Path排序导致与相对POSIX排序不一致，已按事务纠正并独立重算与包摘要匹配；保留初次失败，不称首次全绿。
 
-**正式发布阻塞：推送进程立即退出137，远端仍为 `4df9b37018978d3ce49fe1dcdae04f8d46079bbb`。** 只读dry-run同样被终止，GIT_TRACE文件未生成；GitHub认证正常，无启用的pre-push hook，未取得明确终止原因。没有通过其他远程写路径绕过。未创建v0.7.4标签或Release，当前提交的远端CI和发布资产下载回验未执行，不宣称正式发布。
+**历史阻塞（现已解除）：推送进程立即退出137，当时远端仍为 `4df9b37018978d3ce49fe1dcdae04f8d46079bbb`。** 直接shell启动的只读dry-run同样被终止，GIT_TRACE文件未生成；GitHub认证正常，无启用的pre-push hook，未取得明确终止原因。当时未创建v0.7.4标签或Release，CI和下载回验未执行。后续通过标准子进程执行同一Git命令完成正常推送，正式发布及回验事实见本节开头，不删除首次失败。
 
 三个本地资产已准备并回读：`multi-agent-requirement-workflow-0.7.4.tar.gz`、同名`.manifest.json`、`SHA256SUMS`；归档安全路径、104普通文件、清单摘要及源码字节通过。归档SHA256 `c827a712a6105640f84a7731b7c7b7302dd432efdfac4037a082812c27007939`，manifest SHA256 `f96d41c0b50770380dd1bfe800c57f8c963492c6fc00c1ff48f1de31f995f9c7`。本地证据及恢复输入：`/private/tmp/workflow-release-074-d3hf0vfk/`；恢复推送前先核对远端refs/已有Release及当前工作树，确认来源提交与锁、归档保持一致后续接CI/发布/下载回验，不覆盖已发布标签或未知结果。
 
