@@ -91,7 +91,10 @@ def check(root, baseline=None, *, require_smaller=False):
     assert "默认路径" in entry
     assert "执行前风险" in entry
     assert "原因不明先由同一角色诊断，再按新证据调整路由" in entry
-    for label, body in [("distribution entry", entry), ("project entry", project_entry)]:
+    for label, body in [
+        ("distribution entry", entry),
+        ("project entry", project_entry),
+    ]:
         if not body:
             continue
         assert "**修改前判断**" in body, label
@@ -139,12 +142,45 @@ def check(root, baseline=None, *, require_smaller=False):
     assert "付款、权限、数据删除或大范围共享逻辑变更" in execution
     assert "另由一名角色独立验证" in execution
     assert "未知不等于结束" in execution and "不重复派发或重放外部操作" in execution
-    debugging = (root / "skills/bug-fixing/references/systematic-debugging.md").read_text(encoding="utf-8")
+    local_rule_links = check_local_rule_links(root)
+    completion_gate_path = (
+        root / "skills/acceptance-testing/references/completion-gate.md"
+    )
+    completion_gate = (
+        completion_gate_path.read_text(encoding="utf-8")
+        if completion_gate_path.is_file()
+        else ""
+    )
+    assert "最高风险行为" in completion_gate
+    assert "无适用反例" in completion_gate
+    assert "只有跨环境、多条证据组合或容易误报完整闭环时" in completion_gate
+    design_path = (
+        root / "skills/feature-development/references/design-and-decomposition.md"
+    )
+    design = design_path.read_text(encoding="utf-8") if design_path.is_file() else ""
+    assert "先取证真实模块、调用链、状态和已有约束" in design
+    assert "不建立阶段状态" in design
+    assert "明确局部小修不使用该提示" in design
+    test_report_path = (
+        root / "skills/acceptance-testing/assets/templates/test-report.md"
+    )
+    test_report = (
+        test_report_path.read_text(encoding="utf-8")
+        if test_report_path.is_file()
+        else ""
+    )
+    assert "按需证据绑定" in test_report
+    assert "普通明确小修继续使用简短返回" in test_report
+    debugging = (
+        root / "skills/bug-fixing/references/systematic-debugging.md"
+    ).read_text(encoding="utf-8")
     for body in [execution, debugging]:
         assert "每次失败后先分类并写出能区分根因的新证据" in body
         assert "没有改变假设、失败类别或验证范围时停止修改" in body
         assert "三次没有新证据" not in body
-    setup = (root / "skills/setup-requirement-workflow/SKILL.md").read_text(encoding="utf-8")
+    setup = (root / "skills/setup-requirement-workflow/SKILL.md").read_text(
+        encoding="utf-8"
+    )
     assert "回读宿主实际子任务记录" in setup
     assert "核对父会话关系、指定角色、目标项目及成功终态" in setup
     assert "即使四个命令都成功也不能填 native_role_invocation=passed" in setup
@@ -183,7 +219,6 @@ def check(root, baseline=None, *, require_smaller=False):
         # A linked template must still be available if its file was removed.
         for link in re.findall(r"\]\((assets/templates/[^)#]+\.md)\)", body):
             assert (skill.parent / link).is_file(), link
-    local_rule_links = check_local_rule_links(root)
     before = (
         sum((baseline / p).stat().st_size for p in ENTRY_FILES)
         if baseline is not None
@@ -203,6 +238,9 @@ def check(root, baseline=None, *, require_smaller=False):
             "same-item-continued-after-completion",
             "cross-role-single-writer",
             "risk-confirmation-independent-verification",
+            "highest-risk-counterexample-or-not-applicable",
+            "evidence-bound-to-claim-when-needed",
+            "complex-design-reconsider-on-new-evidence",
             "preflight-risk-before-change",
             "route-switch-on-new-evidence",
             "unknown-external-operation-no-replay",
