@@ -7,11 +7,11 @@
 | codex       | requirement_product / requirement_development / requirement_testing / requirement_bug | .codex/config.toml 受管registry区块 + .codex/agents/*.toml | [Codex](../skills/setup-requirement-workflow/references/codex-adapter.md)             |
 | claude-code | requirement-product / requirement-development / requirement-testing / requirement-bug | .claude/agents/*.md                                        | [Claude Code](../skills/setup-requirement-workflow/references/claude-code-adapter.md) |
 | opencode    | requirement-product / requirement-development / requirement-testing / requirement-bug | .opencode/agents/*.md                                      | [OpenCode](../skills/setup-requirement-workflow/references/opencode-adapter.md)       |
-| zed         | 无项目级原生角色注册；使用当前 Agent                                                  | `AGENTS.md`（规则型宿主入口）                              | [Zed](../skills/setup-requirement-workflow/references/zed-adapter.md)                 |
+| zed | 无项目级具名注册；自带Agent可按实测能力显式派发非具名专业子Agent | `AGENTS.md`（规则型宿主入口） | [Zed及ACP边界](../skills/setup-requirement-workflow/references/zed-adapter.md) |
 
 ## 规则型宿主约定
 
-规则型宿主不生成四个原生角色文件，也不创建虚假的角色注册。其安装/探测只核对共享 `AGENTS.md` 入口；回执中的 `native_role_probes` 为空，`native_role_invocation` 为 `not_applicable`，不能将规则读取报告为原生角色激活。Zed 当前属于规则型宿主；需要独立专长时由当前 Agent 直接处理，不能冒称已完成原生委派。
+规则型宿主不生成四个原生角色文件，也不创建虚假的角色注册。其安装/探测核对共享 `AGENTS.md` 入口；回执中的 `native_role_probes` 为空，`native_role_invocation` 为 `not_applicable`，不能将规则读取报告为具名角色激活。Zed自带Agent若实际提供独立上下文，可按Zed适配显式加载包内专业角色/完整Skill并核验父子任务及结果，满足独立性后计入适用审查/验收，不能以同Agent自审替代；业务协作证据留原验证文档，不扩回执schema。Zed经ACP使用Codex另核执行层配置及真实调用，不用自带Agent或规则入口证据代替。
 
 ## 确定的模板参数
 
@@ -33,7 +33,7 @@ current host 必须来自实际会话或用户明确选定，不能从项目名�
 
 ## 业务派发和恢复
 
-仅在确需另一专长时按当前host映射调用原生角色，消息带项目根、目标和允许范围、已有结果及未决项，已有文档需要时引用；不以缺文档阻塞一次性小修。角色加载共享角色和完整Skill，不要求task.yaml、invocation_id、host/result、授权版本或delivery。原生任务保存调用与结束事实；文档仅在恢复确有需要时引用任务，不重复建立账本。只有在需要创建、切换或在指定 worktree 中执行时，才核对真实仓库根、当前分支、`GIT_DIR` 与 `GIT_COMMON_DIR`，并确认不是子模块；已处于 linked worktree 时禁止再次创建。普通当前仓库中的读取、测试和小修不触发 worktree 创建流程。项目根、worktree 根和框架缓存根分别解析，不通过字符串拼接推断；命令、测试和文件证据必须绑定已确认的执行根。
+仅在确需另一专长时按当前host映射调用原生角色；Codex实际缺具名选择参数但有独立子会话能力时，按[业务独立协作](../skills/setup-requirement-workflow/references/codex-adapter.md#无具名选择参数时的业务独立协作)显式加载专业角色，不计具名激活通过。消息带项目根、目标和允许范围、已有结果及未决项，已有文档需要时引用；不以缺文档阻塞一次性小修。角色加载共享角色和完整Skill，不要求task.yaml、invocation_id、host/result、授权版本或delivery。原生任务保存调用与结束事实；文档仅在恢复确有需要时引用任务，不重复建立账本。只有在需要创建、切换或在指定 worktree 中执行时，才核对真实仓库根、当前分支、`GIT_DIR` 与 `GIT_COMMON_DIR`，并确认不是子模块；已处于 linked worktree 时禁止再次创建。普通当前仓库中的读取、测试和小修不触发 worktree 创建流程。项目根、worktree 根和框架缓存根分别解析，不通过字符串拼接推断；命令、测试和文件证据必须绑定已确认的执行根。
 
 旧锁旧任务由原包解释，禁止跨协议续写。更换宿主前先核实原任务已结束，新宿主角色激活另行验证；未知外部操作先查询，不重放。主会话能完成的简单工作可以直接执行；缺委派能力只阻塞实际需要的委派，不能冒称原生角色已激活。
 

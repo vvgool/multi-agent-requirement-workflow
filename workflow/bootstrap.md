@@ -27,6 +27,6 @@
 | 旧计划与锁不符或目标中途变化 | 保留pending，说明冲突；不清除业务状态 |
 | manual来源没有同摘要包 | framework_not_installed，等待用户提供包 |
 | 当前宿主尚未初始化 | host_not_initialized，要求明确初始化该宿主 |
-| 文件恢复通过但缺原生角色选择能力 | 保持激活pending，需要委派时报告host_role_selection_unavailable；主会话可直接完成的简单任务不被阻塞 |
+| 文件恢复通过但缺原生角色选择能力 | 保持激活pending并报告host_role_selection_unavailable；Codex业务委派按[业务独立协作](../skills/setup-requirement-workflow/references/codex-adapter.md#无具名选择参数时的业务独立协作)核对实际能力，主会话可直接完成的简单任务不被阻塞 |
 
 恢复成功后加载协调角色、读取当前任务文档及原生任务并选择下一动作。已完整核验且本机环境未变的同会话后续派发，按 [会话复用规则](package.md#会话内核验复用) 检查变化，不重复进入restore流程。恢复缓存不是需求完成证据，也不替代具体范围确认。

@@ -13,6 +13,14 @@ ZED_ADAPTER = ROOT / "skills/setup-requirement-workflow/references/zed-adapter.m
 
 
 class ZedRulesHostTests(unittest.TestCase):
+    def test_native_and_external_execution_paths_are_distinct(self):
+        adapter = ZED_ADAPTER.read_text(encoding="utf-8")
+        for guard in ["spawn_agent", "独立上下文", "Profile", ".rules", "ACP", "真实Zed"]:
+            with self.subTest(guard=guard):
+                self.assertIn(guard, adapter)
+        self.assertIn("非具名", adapter)
+        self.assertIn("实际线程", adapter)
+
     def test_host_entry_and_adapter_define_rules_only_semantics(self):
         entry = ZED_ENTRY.read_text(encoding="utf-8")
         adapter = ZED_ADAPTER.read_text(encoding="utf-8")

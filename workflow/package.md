@@ -8,6 +8,8 @@
 
 framework.yaml 仅含 schema_version=1、name、非空 version、protocol_version=3（本包）；它声明版本而非已发布事实。包名固定为 multi-agent-requirement-workflow。使用宿主文件/计算工具实际生成清单：所有包文件按相对 POSIX 路径升序，取 `[相对路径,原字节SHA256]`，将全部条目编码为 UTF-8 紧凑 JSON 数组（ensure_ascii=false、无额外空格），整体 SHA-256 为 package.sha256。framework.yaml 自身也参与摘要计算，因此不在其中存储自引用摘要。文本不转换换行；同名同版本不同字节按不同内容身份处理，不能自动接受。
 
+受信任项目入口中的固定只读命令见 [入口模板](../skills/setup-requirement-workflow/assets/templates/project-entry-light.md)。排序对象是完成后的相对POSIX路径字符串，不能用Path对象的组件排序代替；首次核验使用入口已携带的命令，不执行待核验缓存中的代码。命令只证明内容摘要，其余锁身份、来源和环境核验继续按本规则执行。
+
 ## GitHub URL 与固定提交
 
 官方源码：https://github.com/vvgool/multi-agent-requirement-workflow。新项目可以直接向宿主提供仓库 URL；初始化按 [Git 获取步骤](../skills/setup-requirement-workflow/references/installation.md#githubgit-url-获取) 取得完整代码并解析实际提交。未指定版本时仅首次安装解析默认分支，最终锁中保存完整提交 SHA，后续恢复固定该提交，不跟随分支。官方仓库公开，可匿名读取；用户自行使用的私有来源仍需已有权限。仓库 URL 不是插件协议或工作流执行入口；仍须读取 setup Skill 并完成当前宿主适配。

@@ -7,6 +7,9 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
+import shlex
+import shutil
 import socket
 import subprocess
 import sys
@@ -15,6 +18,7 @@ import unittest
 from unittest.mock import patch
 
 SCRIPTS = Path(__file__).resolve().parents[1] / 'scripts'
+ENTRY_TEMPLATE = SCRIPTS.parent / 'skills/setup-requirement-workflow/assets/templates/project-entry-light.md'
 sys.path.insert(0, str(SCRIPTS))
 from experiment_control import Rejected, compare, prepare
 from package_digest import digest
@@ -109,6 +113,111 @@ class ControlTests(unittest.TestCase):
         self.assertNotEqual(wrong_sha, self.package_sha)
         self.assertEqual(digest(self.package), {'file_count': 10, 'sha256': self.package_sha})
         self.assertEqual(digest(self.package), digest(self.package))
+
+    def entry_digest(self, expected=None, root=None, shell=None):
+        # Execute the distributed command itself, including its shell quoting.
+        blocks = re.findall(r'```sh\n(python3 -I -B -c .*?)\n```',
+                            ENTRY_TEMPLATE.read_text(encoding='utf-8'), re.DOTALL)
+        self.assertEqual(len(blocks), 1, 'trusted entry must carry one standalone digest command')
+        command = blocks[0]
+        arguments = shlex.split(command)
+        self.assertEqual(arguments[:4], ['python3', '-I', '-B', '-c'])
+        self.assertEqual(arguments[5:], ['<cache-root>', '<locked-sha256>'])
+        command = command.replace('"<cache-root>"', shlex.quote(str(root or self.package)))
+        command = command.replace('"<locked-sha256>"', shlex.quote(
+            self.package_sha if expected is None else expected))
+        env = os.environ.copy()
+        # A heredoc would need a temporary file in zsh; this command must not.
+        env['TMPDIR'] = str(self.root / 'missing-tmp')
+        env['TMPPREFIX'] = str(self.root / 'missing-tmp' / 'zsh')
+        return subprocess.run([shell or '/bin/sh', '-c', command], cwd=self.root,
+                              env=env, capture_output=True, timeout=10)
+
+    def test_entry_digest_posix_order_and_readonly_execution(self):
+        def snapshot():
+            return {p.relative_to(self.root).as_posix():
+                    (p.lstat().st_mode, p.lstat().st_size, p.lstat().st_mtime_ns,
+                     p.lstat().st_ctime_ns) for p in [self.root, *self.root.rglob('*')]}
+        before = snapshot()
+        shells = ['/bin/sh']
+        if shutil.which('zsh'):
+            shells.append(shutil.which('zsh'))
+        for shell in shells:
+            with self.subTest(shell=shell):
+                result = self.entry_digest(shell=shell)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads(result.stdout), {
+                    'file_count': 10, 'sha256': self.package_sha, 'matches_expected': True})
+                self.assertEqual(result.stderr, b'')
+        self.assertEqual(snapshot(), before)
+
+    def test_entry_digest_rejects_path_component_sort_and_content_change(self):
+        paths = [p for p in self.package.rglob('*') if p.is_file()]
+        wrong = [[p.relative_to(self.package).as_posix(), sha(p.read_bytes())] for p in sorted(paths)]
+        wrong_sha = sha(json.dumps(wrong, ensure_ascii=False, separators=(',', ':')).encode())
+        self.assertNotEqual(wrong_sha, self.package_sha)
+        for expected in [wrong_sha, '0' * 64]:
+            result = self.entry_digest(expected=expected)
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertFalse(json.loads(result.stdout)['matches_expected'])
+        (self.package / 'agents/a.txt').write_bytes(b'changed')
+        result = self.entry_digest()
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertFalse(json.loads(result.stdout)['matches_expected'])
+
+    def test_entry_digest_raw_bytes_unicode_and_quoted_paths(self):
+        path = self.package / 'skills/原样.bin'
+        path.write_bytes(b'\x00\xff\r\nraw\n')
+        rows = [[p.relative_to(self.package).as_posix(), sha(p.read_bytes())]
+                for p in self.package.rglob('*') if p.is_file()]
+        expected = sha(json.dumps(sorted(rows), ensure_ascii=False, separators=(',', ':')).encode())
+        renamed = self.root / 'package with space and \' quote $dollar'
+        self.package.rename(renamed)
+        result = self.entry_digest(expected=expected, root=renamed)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)['sha256'], expected)
+
+    def test_entry_digest_rejects_structure_links_and_special_files(self):
+        def rejected():
+            result = self.entry_digest()
+            self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+            self.assertEqual(result.stdout, b'')
+            self.assertIn('error', json.loads(result.stderr))
+        extra = self.package / 'extra'
+        extra.mkdir(); rejected(); extra.rmdir()
+        extra.write_bytes(b'extra'); rejected(); extra.unlink()
+        entry = self.package / 'AGENTS.md'
+        content = entry.read_bytes()
+        entry.unlink(); rejected()
+        entry.mkdir(); rejected(); entry.rmdir()
+        entry.symlink_to(self.prompt); rejected(); entry.unlink()
+        os.mkfifo(entry); rejected(); entry.unlink()
+        entry.write_bytes(content)
+        subtree = self.package / 'agents/a.txt'
+        subtree.unlink(); subtree.symlink_to(self.prompt); rejected(); subtree.unlink()
+        os.mkfifo(subtree); rejected(); subtree.unlink(); subtree.write_bytes(b'A')
+        link = self.root / 'package-link'
+        link.symlink_to(self.package, target_is_directory=True)
+        self.assertEqual(self.entry_digest(root=link).returncode, 2)
+        self.assertEqual(self.entry_digest(root=self.prompt).returncode, 2)
+
+    def test_entry_digest_optional_license_and_invalid_expected_digest(self):
+        (self.package / 'LICENSE').unlink()
+        rows = [[p.relative_to(self.package).as_posix(), sha(p.read_bytes())]
+                for p in self.package.rglob('*') if p.is_file()]
+        expected = sha(json.dumps(sorted(rows), ensure_ascii=False, separators=(',', ':')).encode())
+        self.assertEqual(self.entry_digest(expected=expected).returncode, 0)
+        for invalid in ['', 'A' * 64, '0' * 63, '0' * 64 + '\n']:
+            with self.subTest(expected=invalid):
+                result = self.entry_digest(expected=invalid)
+                self.assertEqual(result.returncode, 2)
+                self.assertEqual(result.stdout, b'')
+
+    def test_entry_digest_ignores_untrusted_python_path(self):
+        (self.root / 'json.py').write_text('raise RuntimeError("must not execute")\n')
+        with patch.dict(os.environ, {'PYTHONPATH': str(self.root)}):
+            result = self.entry_digest()
+        self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_complete_gate_enters_once_without_network_and_payload_is_exact(self):
         calls = []

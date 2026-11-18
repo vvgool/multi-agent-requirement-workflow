@@ -2,11 +2,19 @@
 
 ## 需求协作入口
 
-**默认路径**：先确认目标、允许范围和执行前风险，再查看相关规则、代码和已有事项；明确局部且低风险的小修直接定位→最小修改→相关验证→返回结果。发现业务歧义、跨模块契约、持久状态或高风险副作用时，沿现有四类路由调整；原因不明先由同一角色诊断，再按新证据调整路由；恢复需求按恢复规则处理。摘要不替代下方受管规则。
+**默认路径**：先确认目标、允许范围、执行前风险和当前有效批准，再查看相关规则、代码和已有事项。需要需求或方案的事项，开始工作时说明本轮下一交付物及其确认点，按下方人工确认推进；明确局部且低风险的小修直接定位→最小修改→相关验证→返回结果。发现业务歧义、跨模块契约、持久状态或高风险副作用时，沿现有四类路由调整；原因不明先由同一角色诊断，再按新证据调整路由；恢复需求按恢复规则处理。摘要不替代下方受管规则。
 
 **修改前判断**：先读取与本次行为相关的现有规则、代码和必要证据，再决定是否适用小修免加载。发现业务规则未决、需要自行定义用户可观察状态或跨服务契约时，暂停依赖这些决策的实现，继续只读诊断，给出已知事实与具体待确认项；决策与契约明确后再选现有路由，需要设计、协作或持久跟踪时按下文核验锁包并读取 `workflow/routing.md`。文件少或局部测试通过不能替代这一步；既有规则与契约内的明确局部低风险修复仍直接完成，无需分类报告。
 
 **外部结果未知**：先按原请求查询或核对已有证据；仍未知且幂等性未确认时，保持受影响实现及数据不变，报告阻塞，不执行或实现自动重放、补偿，也不自行新增业务状态或成功判定。已有请求的重入/重试与正常新请求须分别验证；仅合成的新请求测试通过，不能宣称未知结果问题已修复。
+
+**人工确认**：明确既有契约内局部低风险小修直通。新功能、行为调整或架构性修复，按当前有效批准选择下一步；一般事项可用短稿：
+
+1. **需求未批准**：先澄清未决业务规则，展示完整当前需求，单独请求需求批准后停止。用户只回答业务问题时，将答案合入需求、重新展示并单独请求需求批准，停在此步。
+2. **需求已批准、当前设计未批准**：形成设计。状态性设计先按路由核对审查适用性，完成适用独立审查、解决阻断后，展示当前设计并请求设计批准，停在此步。
+3. **当前需求和设计均已批准**：核对适用独立审查及执行权限等前置条件满足后，才实施。
+
+在第1、2步以确认问题结束本轮，等待真实用户回复；提问工具的受理回执不是答案。AI审查和旧授权不替代当前人审，实质变化只重确认受影响部分；批准对象、原回复及恢复判定按核验包内 `workflow/execution-contract.md#人工确认` 执行。流程约束不是工具层绝对拦写。
 
 先依据当前请求和已知任务背景判断是否需要框架能力，不为此扫描历史需求。对于独立一次性、目标明确且局部低风险、并非旧任务续接的小修，直接遵循已载入的项目规则及本入口的授权、风险和未知操作边界，在当前会话定位→最小修复→相关回归→简短返回；无需读取workflow.lock.yaml、检查缓存、加载package/bootstrap/coordinator或核验完整框架包，也不新建文档/任务。不因原因未知自动进入阶段链，先同一角色诊断；出现范围分歧、付款/权限/删除/大范围共享逻辑风险时先确认并按需要独立验证，未知外部结果先查原调用，不重放。无法判断是否旧任务续接时先核实归属，不能借此跳过旧协议。
 
@@ -15,6 +23,56 @@
 需要上述框架能力时，以本项目为目标根，先读workflow.lock.yaml，缓存为 `.agents/requirement-workflow-cache/<package.sha256>/`。锁含schema_version=1、固定包身份与source；sha256为64位小写十六进制，Git来源须完整提交SHA，拒绝重复键及凭据URL。未知协议阻塞；协议1/2旧任务只由原包解释，协议3不续写旧task。
 
 实际使用框架能力前首次完整核验缓存：根framework.yaml/AGENTS.md/README.md/workflow.yaml/LICENSE（存在时）及agents/、skills/、workflow/、templates/普通文件按相对POSIX路径排序，生成[路径,原字节SHA256]的UTF-8紧凑JSON数组（无额外空格），整体SHA256须等于锁。拒绝链接、特殊/额外文件，内容或来源提交不符返回framework_integrity_mismatch，不覆盖。缺缓存时主会话只从锁定来源/完整提交获取并核实HEAD，不跟随分支或执行下载脚本；manual等待同摘要包。只读或initialization_probe=true不下载/修复。已有pending先恢复原计划，身份不符停止。
+
+**只读摘要命令**：需要完整核包且有Python 3时，原样执行下方命令，仅将末尾两个占位参数替换为缓存根绝对路径与已读取锁中的sha256。命令来自本受信任入口，不执行未核验缓存中的脚本；无需临时文件。退出0且matches_expected=true才表示内容摘要通过；退出1表示摘要不符，退出2表示输入或包结构无效，均按framework_integrity_mismatch停止。缺Python 3时用等价只读计算工具落实上述算法，不能跳过。锁身份、来源提交、pending及宿主适配仍须分别核对。
+
+```sh
+python3 -I -B -c '
+import hashlib, json, re, stat, sys
+from pathlib import Path
+
+try:
+    if len(sys.argv) != 3 or not re.fullmatch("[0-9a-f]{64}", sys.argv[2]):
+        raise ValueError("expected cache root and 64 lowercase hex digest")
+    root = Path(sys.argv[1])
+    if not stat.S_ISDIR(root.lstat().st_mode):
+        raise ValueError("package root must be an ordinary directory")
+    files = {"framework.yaml", "AGENTS.md", "README.md", "workflow.yaml"}
+    dirs = {"agents", "skills", "workflow", "templates"}
+    names = {p.name for p in root.iterdir()}
+    if (files | dirs) - names or names - files - dirs - {"LICENSE"}:
+        raise ValueError("missing or unexpected package root entry")
+    rows = []
+
+    def visit(path):
+        mode = path.lstat().st_mode
+        if stat.S_ISREG(mode):
+            rows.append([path.relative_to(root).as_posix(),
+                         hashlib.sha256(path.read_bytes()).hexdigest()])
+        elif stat.S_ISDIR(mode):
+            for child in path.iterdir():
+                visit(child)
+        else:
+            raise ValueError("link or special file rejected")
+
+    for name in names:
+        path = root / name
+        expected_type = stat.S_ISDIR if name in dirs else stat.S_ISREG
+        if not expected_type(path.lstat().st_mode):
+            raise ValueError("unexpected package entry type")
+        visit(path)
+    rows.sort(key=lambda row: row[0])
+    payload = json.dumps(rows, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    actual = hashlib.sha256(payload).hexdigest()
+    matches = actual == sys.argv[2]
+    print(json.dumps({"file_count": len(rows), "sha256": actual,
+                      "matches_expected": matches}, separators=(",", ":")))
+except (OSError, ValueError) as error:
+    print(json.dumps({"error": str(error)}, ensure_ascii=False), file=sys.stderr)
+    sys.exit(2)
+sys.exit(0 if matches else 1)
+' "<cache-root>" "<locked-sha256>"
+```
 
 以下路径均相对于已核验的锁定缓存根。身份核验后读取 `workflow/package.md`、`workflow/bootstrap.md` 与 `agents/coordinator-agent.md`；只在缺环境时读取setup Skill按restore_only=true补缓存/回执，不自动升级、扩宿主或覆盖配置与用户文件。同会话按包规则复用未变化环境，不重复全量哈希。
 

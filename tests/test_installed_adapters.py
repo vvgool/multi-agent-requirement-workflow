@@ -1,5 +1,7 @@
 """Regression checks for the source repository's generated host adapters."""
 import importlib.util
+import subprocess
+import yaml
 from pathlib import Path
 import unittest
 
@@ -22,12 +24,43 @@ def render(template, values):
 
 
 class InstalledAdapterTests(unittest.TestCase):
+    def _locked_entry_template(self):
+        lock = yaml.safe_load((ROOT / "workflow.lock.yaml").read_text(encoding="utf-8"))
+        package = lock["package"]
+        package_sha = package["sha256"]
+        cached = (
+            ROOT / ".agents" / "requirement-workflow-cache" / package_sha
+            / "skills/setup-requirement-workflow/assets/templates/project-entry-light.md"
+        )
+        if cached.is_file():
+            return cached.read_text(encoding="utf-8"), "locked cache"
+
+        revision = lock["source"].get("revision")
+        if lock["source"].get("kind") == "git" and revision:
+            path = "skills/setup-requirement-workflow/assets/templates/project-entry-light.md"
+            try:
+                content = subprocess.check_output(
+                    ["git", "show", f"{revision}:{path}"],
+                    cwd=ROOT,
+                    stderr=subprocess.DEVNULL,
+                    text=True,
+                )
+            except (OSError, subprocess.CalledProcessError):
+                content = None
+            if content is not None:
+                return content, f"locked Git revision {revision}"
+
+        return None, "locked package cache and Git revision are unavailable"
+
     def test_managed_entry_matches_template(self):
         actual = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
         begin = "<!-- requirement-workflow:begin -->"
         end = "<!-- requirement-workflow:end -->"
         block = actual[actual.index(begin):actual.index(end) + len(end)] + "\n"
-        self.assertEqual(block, (TEMPLATES / "project-entry-light.md").read_text(encoding="utf-8"))
+        expected, source = self._locked_entry_template()
+        if expected is None:
+            self.skipTest(source)
+        self.assertEqual(block, expected)
 
     def test_zed_rules_adapter_matches_contract(self):
         adapter = ZED_ADAPTER.read_text(encoding="utf-8")

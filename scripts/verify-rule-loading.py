@@ -114,6 +114,65 @@ def check(root, baseline=None, *, require_smaller=False):
     execution = texts["workflow/execution-contract.md"]
     routing = texts["workflow/routing.md"]
     revisions = texts["workflow/revisions.md"]
+    for guard in [
+        "需求确认后进入正式设计", "设计确认后实施", "批准不追溯覆盖",
+        "业务澄清不等于需求批准", "提问受理不等于用户答案",
+        "等待真实用户回复后再判断批准",
+    ]:
+        assert guard in execution, f"confirmation_contract_missing: {guard}"
+    consumers = [
+        "workflow/routing.md", "workflow/handoff.md", "workflow/bugfix.md",
+        *[p for p in ENTRY_FILES if p.startswith("agents/")],
+        *[p for p in ENTRY_FILES if p.endswith("/SKILL.md")],
+    ]
+    for path in consumers:
+        body = (root / path).read_text(encoding="utf-8")
+        assert "execution-contract.md#人工确认" in body, f"confirmation_pointer_missing: {path}"
+    assert "**人工确认**" in entry and "workflow/execution-contract.md#人工确认" in entry
+    assert "以确认问题结束本轮，等待真实用户回复" in entry, "confirmation_wait_missing"
+    assert "状态性设计先按路由核对审查适用性" in entry, "review_applicability_pointer_missing"
+    assert "设计确认前核对审查适用性" in execution, "review_applicability_gate_missing"
+    assert "单一服务或文件少不能作为免审依据" in routing, "review_applicability_basis_missing"
+    codex_adapter = (root / "skills/setup-requirement-workflow/references/codex-adapter.md").read_text()
+    for guard in ["execution-contract.md#人工确认", "accepted:true", "仅证明问题已受理", "核对后续真实用户答案"]:
+        assert guard in codex_adapter, f"codex_confirmation_contract_missing: {guard}"
+    # Required edges must survive even when a replacement link still resolves.
+    host_adapter = (root / "workflow/host-adapters.md").read_text()
+    for path, body, pointer in [
+        ("agents/coordinator-agent.md", texts["agents/coordinator-agent.md"],
+         "../workflow/routing.md"),
+        ("workflow/routing.md", routing, "host-adapters.md"),
+        ("workflow/host-adapters.md", host_adapter,
+         "../skills/setup-requirement-workflow/references/codex-adapter.md#无具名选择参数时的业务独立协作"),
+    ]:
+        assert f"]({pointer})" in body, f"professional_delegation_pointer_missing: {path}"
+    assert "读取锁定包内 {{role_file}} 和完整 {{skill_file}}" in role, (
+        "professional_delegation_role_loading_missing"
+    )
+    # Check the linked section itself; the same words elsewhere are not its contract.
+    _, heading, remainder = codex_adapter.partition(
+        "### 无具名选择参数时的业务独立协作\n"
+    )
+    assert heading, "professional_delegation_section_missing"
+    fallback = re.split(r"(?m)^ {0,3}#{1,3}[ \t]+", remainder, maxsplit=1)[0]
+    for guard in [
+        "对应包内角色和完整Skill路径",
+        "实际工具支持独立上下文时选择独立上下文",
+        "子会话自己核对包身份、读取对应角色和完整Skill",
+        "父会话回读真实子任务标识、父子关系、加载与执行证据及结果",
+        "缺独立上下文、必要加载或实际结果时，受影响审查/验收仍阻塞",
+        "不将其计为具名激活探测通过",
+    ]:
+        assert guard in fallback, f"professional_delegation_contract_missing: {guard}"
+    obsolete = [
+        "不增加统一人工阶段审批", "审查不新增统一人工批准",
+        "小需求目标清楚即可执行，不强制再写需求稿和统一批准",
+    ]
+    for path in [*ENTRY_FILES, "skills/feature-development/assets/templates/technical-plan.md"]:
+        source = root / path
+        assert source.is_file(), f"linked_rule_missing: {path}"
+        body = source.read_text(encoding="utf-8")
+        assert not any(term in body for term in obsolete), f"obsolete_confirmation_bypass: {path}"
     if project_entry:
         assert "默认路径" in project_entry
         assert "执行前风险" in project_entry
@@ -234,6 +293,8 @@ def check(root, baseline=None, *, require_smaller=False):
         entry_files=len(texts),
         local_rule_links=local_rule_links,
         scenarios=[
+            "separate-human-confirmations",
+            "professional-delegation-loading-chain",
             "simple-document-or-known-fix",
             "same-item-continued-after-completion",
             "cross-role-single-writer",
