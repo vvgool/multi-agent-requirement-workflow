@@ -10,7 +10,7 @@
 - **任务类型与角色**：实施单元 `T2`（`development-agent`）｜当前状态：`ready_to_implement`（批准定位：`technical-design.md` 首屏）
 - **目标与关联 AC**：实现订单超时释放库存，满足 `AC-02`、`AC-04`
 - **允许写入文件（单写边界）**：`src/order/expire.py`、`tests/test_order_expire.py`（`task.md` 只读回读，严禁修改）
-- **上下游契约与已有证据**：复用 `InventoryRepo.release(order_id)`（幂等键定义见 `technical-design.md#数据与接口定义`）；`T1` 已通过 `pytest tests/test_inventory.py`
+- **上下游契约与已有证据**：复用 `InventoryRepo.release(order_id)`（幂等键定义见 `technical-design.md#接口签名与异常契约`）；`T1` 已通过 `pytest tests/test_inventory.py`
 - **完成条件与待查风险**：先 RED 后 GREEN 验证并发重复回调不双倍返还库存；完成后只读回读 `task.md` 与 `AC-02/04` 核对无缩水并返回结果卡片
 ```
 
@@ -27,6 +27,7 @@
    - 每个共享文档或源码文件在同一批次只有一个写入责任人；**`task.md` 始终由主会话（Coordinator）统一单写更新勾选**，子角色仅只读回读 `task.md` 首屏目标与关联 `AC` 完成自检。
    - 并行派发多个实施子角色时，它们的允许写入文件集合必须**完全正交无交集**。
    - 审查与独立验收角色默认**只读代码与文档 + 运行必要检查命令**，不直接改写业务源码。
+   - **验证报告唯一写入人**：`verification.md` 同批次仅一人写入——默认由主会话汇总开发 RED→GREEN 卡片与独立验收结果，或在验收派发卡片中显式授权 `testing-agent` 单写 `verification.md` 与 `evidence/*`（业务源码、`task.md`、`requirements.md`、`technical-design.md` 仍只读）；并行开发单元严禁并写，开发阶段不得把结论填 `通过`。
 2. **结构化终态返回**：
    - **实施/修复返回**：完成内容与关联 `T/AC`、实际修改文件、RED/GREEN 或回归命令及真实输出摘要、锚点回读核对结果、遗留限制，终态标明 `通过 | 需修正 | 阻塞`。
    - **独立审查/验收返回**：固定先给四项规格对齐诊断（`遗漏AC | 擅自扩权 | 契约冲突 | 未证假设与边界风险`），再给真实运行反例证据与严重级别（`P1 阻断 / P2 重要 / P3 建议`），终态标明 `可推进 | 需修正复审 | 阻塞`（验收对应 `通过 | 有条件通过 | 未完成 | 阻塞`）。

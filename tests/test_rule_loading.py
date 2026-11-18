@@ -31,14 +31,14 @@ class RuleLoadingTests(unittest.TestCase):
             shutil.copytree(ROOT / name, self.root / name, ignore=ignore)
 
     def test_protocol4_source_and_size_budgets(self):
-        self.assertEqual(RULES.MAX_PACKAGE_FILES, 60)
-        self.assertEqual(RULES.MAX_PACKAGE_BYTES, 163840)
+        self.assertEqual(RULES.MAX_PACKAGE_FILES, 58)
+        self.assertEqual(RULES.MAX_PACKAGE_BYTES, 162373)
         result = RULES.check(self.root)
         self.assertEqual(result["framework"]["protocol_version"], 4)
-        self.assertEqual(result["framework"]["version"], "1.0.0")
+        self.assertEqual(result["framework"]["version"], "1.0.1")
         self.assertLessEqual(result["entry_lines"], 60)
-        self.assertLessEqual(result["package_file_count"], 60)
-        self.assertLessEqual(result["package_total_bytes"], 163840)
+        self.assertLessEqual(result["package_file_count"], 58)
+        self.assertLessEqual(result["package_total_bytes"], 162373)
         self.assertIsNone(result["selected_rule_utf8_bytes"]["before"])
 
     def test_runtime_hash_dead_words_and_agent_line_budget_enforced(self):
@@ -163,7 +163,7 @@ class RuleLoadingTests(unittest.TestCase):
             ("skills/requirement-analysis/assets/templates/requirements.md", "表面解法"),
             ("skills/feature-development/references/design-and-decomposition.md", "先删减、再下沉、后新增"),
             ("skills/feature-development/references/design-and-decomposition.md", "机械约束下沉"),
-            ("skills/feature-development/assets/templates/technical-plan.md", "先删减、再下沉、后新增"),
+            ("skills/feature-development/assets/templates/technical-design.md", "先删减、再下沉、后新增"),
             ("skills/feature-development/references/architecture-review.md", "第一性原理与防叠补丁"),
             ("skills/bug-fixing/references/systematic-debugging.md", "拒绝经验类比盲试"),
             ("skills/bug-fixing/references/systematic-debugging.md", "破坏不变量"),
@@ -266,13 +266,107 @@ class RuleLoadingTests(unittest.TestCase):
             RULES.check(self.root)
 
     def test_second_progress_checklist_in_non_task_template_fails(self):
-        path = self.root / "skills/feature-development/assets/templates/implementation-plan.md"
+        path = self.root / "skills/feature-development/assets/templates/technical-design.md"
         original = path.read_text(encoding="utf-8")
         for checkbox in ["- [ ] 待办", "* [ ] 待办", "1. [ ] 有序待办", "> - [x] 引用中的任务"]:
             with self.subTest(checkbox=checkbox):
                 path.write_text(original + "\n" + checkbox + "\n", encoding="utf-8")
                 with self.assertRaises(AssertionError):
                     RULES.check(self.root)
+
+    def test_template_set_is_five_orthogonal_templates_and_old_paths_retired(self):
+        result = RULES.check(self.root)
+        self.assertLessEqual(result["package_file_count"], 58)
+        self.assertLess(result["package_total_bytes"], 162373)
+        for rel in RULES.RETIRED_TEMPLATES:
+            with self.subTest(retired=rel):
+                path = self.root / rel
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("# stale\n阶段状态\n", encoding="utf-8")
+                try:
+                    with self.assertRaisesRegex(AssertionError, "retired_template_present"):
+                        RULES.check(self.root)
+                finally:
+                    path.unlink()
+
+    def test_confirmation_hard_cap_and_self_check_filler_cannot_return(self):
+        caps = [
+            "≤ 5 条", "≤5条", "<= 5 条", "≤５条", "≤ 5 个", "≤ 5 项", "≤5 questions", "<=5 Qs",
+            "不超过5条", "不得超过 5 个必答项", "最多 5 项", "最多5条", "至多5条", "上限 5 条",
+            "五条以内", "5 条以内", "≦5条", "no more than 5 items", "at most 5 items", "max 5 items",
+        ]
+        for cap in caps:
+            for rel in ("templates/task.md", "workflow/documents.md", "README.md", "AGENTS.md"):
+                with self.subTest(cap=cap, path=rel):
+                    path = self.root / rel
+                    original = path.read_text(encoding="utf-8")
+                    try:
+                        path.write_text(original + f"\n本次请确认（{cap}）\n", encoding="utf-8")
+                        with self.assertRaisesRegex(AssertionError, "confirmation_hard_cap_forbidden"):
+                            RULES.check(self.root)
+                    finally:
+                        path.write_text(original, encoding="utf-8")
+        for ok in ("≤ 100 行", "最多 50 项", "至多生效一次", "≤ 15 条"):
+            with self.subTest(allowed=ok):
+                self.assertIsNone(RULES.HARD_CAP.search(ok))
+
+        for rel, bad, pattern in (
+            ("skills/requirement-analysis/assets/templates/requirements.md", "\n- **起草者自查**：已核对\n", "template_self_check_filler_forbidden"),
+            ("templates/task.md", "\n## 自查清单\n", "template_self_check_filler_forbidden"),
+            ("skills/requirement-analysis/assets/templates/requirements.md", "\n作者自检：ok\n", "template_self_check_filler_forbidden"),
+        ):
+            with self.subTest(path=rel, bad=bad):
+                path = self.root / rel
+                original = path.read_text(encoding="utf-8")
+                try:
+                    path.write_text(original + bad, encoding="utf-8")
+                    with self.assertRaisesRegex(AssertionError, pattern):
+                        RULES.check(self.root)
+                finally:
+                    path.write_text(original, encoding="utf-8")
+
+        boxes = ["| a | [ ] | b |", "|[x]|", "| [ ] T1 | foo |", "| - [ ] T1 | foo |", "| x | [ ]", "| <br>- [ ] x |"]
+        for box in boxes:
+            for rel in (
+                "skills/acceptance-testing/assets/templates/verification.md",
+                "skills/feature-development/assets/templates/technical-design.md",
+                "templates/task.md",
+            ):
+                with self.subTest(box=box, path=rel):
+                    path = self.root / rel
+                    original = path.read_text(encoding="utf-8")
+                    try:
+                        path.write_text(original + "\n" + box + "\n", encoding="utf-8")
+                        with self.assertRaisesRegex(AssertionError, "table_checkbox_forbidden"):
+                            RULES.check(self.root)
+                    finally:
+                        path.write_text(original, encoding="utf-8")
+        for ok in ("| [P] |", "| T1 [P] |", "| [AC-01] |", "| [Q1 | x] |"):
+            with self.subTest(allowed=ok):
+                self.assertIsNone(RULES.TABLE_CHECKBOX.search(ok))
+
+    def test_anchors_single_writer_and_approval_roundtrip_guards(self):
+        for rel, guard in (
+            ("templates/task.md", "requirements.md#功能与验收标准"),
+            ("skills/requirement-analysis/assets/templates/requirements.md", "## 功能与验收标准"),
+            ("skills/feature-development/assets/templates/technical-design.md", "## 文件变更与单元切分"),
+            ("skills/feature-development/assets/templates/technical-design.md", "## 接口签名与异常契约"),
+            ("workflow/handoff.md", "technical-design.md#接口签名与异常契约"),
+            ("workflow/handoff.md", "验证报告唯一写入人"),
+            ("workflow/documents.md", "验证报告唯一写入人"),
+            ("skills/acceptance-testing/SKILL.md", "验证报告唯一写入人"),
+            ("workflow/documents.md", "临时恢复"),
+        ):
+            with self.subTest(path=rel, guard=guard):
+                path = self.root / rel
+                original = path.read_text(encoding="utf-8")
+                self.assertIn(guard, original)
+                try:
+                    path.write_text(original.replace(guard, "已移除守卫"), encoding="utf-8")
+                    with self.assertRaises(AssertionError):
+                        RULES.check(self.root)
+                finally:
+                    path.write_text(original, encoding="utf-8")
 
     def test_lock_template_protocol_must_match_source(self):
         path = self.root / "skills/setup-requirement-workflow/assets/templates/workflow.lock.yaml"

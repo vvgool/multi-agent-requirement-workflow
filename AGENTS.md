@@ -1,6 +1,6 @@
 # 需求协作 Agent 框架（源码仓自举说明）
 
-本仓库是 `multi-agent-requirement-workflow`（**1.0.0 / 协议 4 轻内核**）的框架源码仓。运行包仅由根 `framework.yaml`、`AGENTS.md`、`README.md`、`workflow.yaml`、`LICENSE` 及 `agents/`、`skills/`、`workflow/`、`templates/` 组成；`scripts/`、`tests/`、`docs/`、`agent-features/` 不进入分发包。
+本仓库是 `multi-agent-requirement-workflow`（**1.0.1 / 协议 4 轻内核**）的框架源码仓。运行包仅由根 `framework.yaml`、`AGENTS.md`、`README.md`、`workflow.yaml`、`LICENSE` 及 `agents/`、`skills/`、`workflow/`、`templates/` 组成；`scripts/`、`tests/`、`docs/`、`agent-features/` 不进入分发包。
 
 - 安装、升级与恢复见 [setup Skill](skills/setup-requirement-workflow/SKILL.md)（`skills/setup-requirement-workflow/scripts/install_helper.py`）；`agent-features/` 与 `docs/verification/` 历史档案保持只读。
 - **两步锁提交**：修改包文件后，先重跑 `install_helper.py install --upgrade` 同步受管块与缓存并提交包内容取得 commit SHA，再更新 `workflow.lock.yaml` 的 `source.revision`。

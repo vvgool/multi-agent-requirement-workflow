@@ -7,6 +7,7 @@ sys.dont_write_bytecode = True
 
 import argparse  # noqa: E402
 import json  # noqa: E402
+import unicodedata  # noqa: E402
 import re  # noqa: E402
 from pathlib import Path  # noqa: E402
 
@@ -34,21 +35,31 @@ ENTRY_FILES = [
     "skills/setup-requirement-workflow/assets/templates/project-entry-light.md",
 ]
 
-MAX_PACKAGE_FILES = 60
-MAX_PACKAGE_BYTES = 163840  # <= 160 KiB hard budget (~49% reduction vs v0.7.4 322,300 bytes)
+MAX_PACKAGE_FILES = 58
+MAX_PACKAGE_BYTES = 162373  # template consolidation must stay below the pre-consolidation package
 MAX_ENTRY_LINES = 60
 MAX_AGENT_LINES = 20
-FORBIDDEN_RUNTIME_HASH_TERMS = (
-    "package_digest",
-    ".local.json",
-    "codex-bootstrap",
-    "bootstrap.md",
-    "package.md",
-    "sha256sum",
-    "shasum",
-    "hashlib.sha256",
-    "安装回执",
+FORBIDDEN_RUNTIME_HASH_TERMS = ("package_digest", ".local.json", "codex-bootstrap", "bootstrap.md", "package.md", "sha256sum", "shasum", "hashlib.sha256", "安装回执")
+RETIRED_TEMPLATES = (
+    "skills/feature-development/assets/templates/implementation-plan.md",
+    "skills/feature-development/assets/templates/technical-plan.md",
+    "skills/feature-development/assets/templates/verification.md",
+    "skills/acceptance-testing/assets/templates/test-report.md",
 )
+REQUIRED_TEMPLATES = (
+    "templates/task.md",
+    "skills/requirement-analysis/assets/templates/requirements.md",
+    "skills/feature-development/assets/templates/technical-design.md",
+    "skills/acceptance-testing/assets/templates/verification.md",
+    "skills/bug-fixing/assets/templates/bug-report.md",
+)
+HARD_CAP = re.compile(
+    r"(?:[≤≦<]=?|不(?:得)?超过|最多|至多|上限|no more than|at most|max(?:imum)?(?:\s+of)?)\s*[5五]\s*"
+    r"(?:条|个|项|items?|questions?|Qs?\b)|[5五]\s*(?:条|个|项)\s*以内",
+    re.I,
+)
+SELF_CHECK_FILLER = re.compile(r"起草者自查|自查清单|自检清单|作者自检")
+TABLE_CHECKBOX = re.compile(r"(?:\||<br\s*/?>)[ \t]*(?:[-+*][ \t]+)?\[[ xX]\](?=[ \t|]|$)", re.M)
 
 
 def _iter_package_files(root: Path):
@@ -88,8 +99,6 @@ def check_local_rule_links(root: Path) -> int:
                     continue
                 if "{" in target or target.startswith("<"):
                     continue
-                if path.name == "implementation-plan.md" and target == "task.md":
-                    continue
                 checked += 1
                 destination = path.parent / target.split("#", 1)[0]
                 assert destination.is_file(), (
@@ -101,6 +110,10 @@ def check_local_rule_links(root: Path) -> int:
 def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -> dict:
     for rel in ENTRY_FILES:
         assert (root / rel).is_file(), f"linked_rule_missing: {rel}"
+    for rel in RETIRED_TEMPLATES:
+        assert not (root / rel).exists(), f"retired_template_present: {rel}"
+    for rel in REQUIRED_TEMPLATES:
+        assert (root / rel).is_file(), f"required_template_missing: {rel}"
     texts = {p: (root / p).read_text(encoding="utf-8") for p in ENTRY_FILES}
 
     framework = yaml.safe_load((root / "framework.yaml").read_text(encoding="utf-8"))
@@ -247,7 +260,7 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
         "Lite / Standard / Complex",
         "Lite、Standard、Complex",
     )
-    for path in [*ENTRY_FILES, "skills/feature-development/assets/templates/technical-plan.md"]:
+    for path in [*ENTRY_FILES, "skills/feature-development/assets/templates/technical-design.md"]:
         body = (root / path).read_text(encoding="utf-8")
         assert not any(term in body for term in obsolete), f"obsolete_confirmation_bypass: {path}"
 
@@ -288,7 +301,7 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
     design_decomp = (root / "skills/feature-development/references/design-and-decomposition.md").read_text(
         encoding="utf-8"
     )
-    tech_tpl = (root / "skills/feature-development/assets/templates/technical-plan.md").read_text(
+    tech_tpl = (root / "skills/feature-development/assets/templates/technical-design.md").read_text(
         encoding="utf-8"
     )
     for guard in ("先删减、再下沉、后新增", "机械约束下沉"):
@@ -349,6 +362,33 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
             ), f"non_task_template_checkbox_forbidden: {template}"
         for link in re.findall(r"\]\((assets/templates/[^)#]+\.md)\)", body):
             assert (skill.parent / link).is_file(), link
+
+
+    # Template consolidation (7 -> 5): retired paths, orthogonal set, anchors & single-writer
+    for path in _iter_package_files(root):
+        if path.suffix != ".md":
+            continue
+        rel = path.relative_to(root).as_posix()
+        body = path.read_text(encoding="utf-8")
+        assert not HARD_CAP.search(unicodedata.normalize("NFKC", body)), (
+            f"confirmation_hard_cap_forbidden: {rel}"
+        )
+        if "/assets/templates/" in rel or rel.startswith("templates/"):
+            if "setup-requirement-workflow" in rel:
+                continue
+            assert not SELF_CHECK_FILLER.search(body), f"template_self_check_filler_forbidden: {rel}"
+            assert not TABLE_CHECKBOX.search(body), f"table_checkbox_forbidden: {rel}"
+    assert "requirements.md#功能与验收标准" in task_tpl, "task_template_requirements_anchor_missing"
+    assert "## 功能与验收标准" in req_tpl, "requirements_template_merged_section_missing"
+    design_tpl_text = (root / "skills/feature-development/assets/templates/technical-design.md").read_text(
+        encoding="utf-8"
+    )
+    for heading in ("## 文件变更与单元切分", "## 接口签名与异常契约"):
+        assert heading in design_tpl_text, f"technical_design_section_missing: {heading}"
+    assert "technical-design.md#接口签名与异常契约" in handoff, "handoff_design_anchor_stale"
+    for rel in ("workflow/documents.md", "workflow/handoff.md", "skills/acceptance-testing/SKILL.md"):
+        assert "验证报告唯一写入人" in texts[rel], f"verification_single_writer_missing: {rel}"
+    assert "批准记录" in documents and "临时恢复" in documents, "approval_record_roundtrip_missing"
 
     before = (
         sum((baseline / p).stat().st_size for p in ENTRY_FILES)
