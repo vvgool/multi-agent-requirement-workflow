@@ -21,7 +21,7 @@ SPEC.loader.exec_module(L)
 
 
 def template(name):
-    return yaml.safe_load((SKILL / 'assets/templates' / name).read_text())
+    return yaml.safe_load((SKILL / 'assets/templates' / name).read_text(encoding='utf-8'))
 
 
 def binding(provider='github'):
@@ -163,7 +163,6 @@ class LifecycleChecks(unittest.TestCase):
         x = copy.deepcopy(c)
         x['authorization']['event_kinds'].remove('release_succeeded')
         self.reject(L.close, x, 'event_not_authorized')
-        # Failure leaves caller-owned business records untouched.
         before = copy.deepcopy(x)
         self.reject(L.close, x, 'event_not_authorized')
         self.assertEqual(x, before)
@@ -242,72 +241,44 @@ class LifecycleChecks(unittest.TestCase):
     def test_cli_duplicate_keys_and_no_writes(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp) / 'input.json'
-            p.write_text('{"close":"off","close":"after_release"}')
-            cmd = [sys.executable, str(SKILL / 'scripts/lifecycle.py'), 'config', str(p)]
+            p.write_text('{"close":"off","close":"after_release"}', encoding='utf-8')
+            cmd = [sys.executable, '-B', str(SKILL / 'scripts/lifecycle.py'), 'config', str(p)]
             r = subprocess.run(cmd, capture_output=True, text=True)
             self.assertEqual(r.returncode, 1)
             self.assertIn('duplicate_json_key', r.stdout)
-            p.write_text(json.dumps(context()))
+            p.write_text(json.dumps(context()), encoding='utf-8')
             before = p.read_bytes()
-            r = subprocess.run(cmd[:2] + ['close', str(p)], capture_output=True, text=True)
+            r = subprocess.run(cmd[:3] + ['close', str(p)], capture_output=True, text=True)
             self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
             self.assertTrue(json.loads(r.stdout)['ok'])
             self.assertEqual(p.read_bytes(), before)
             self.assertEqual([x.name for x in Path(tmp).iterdir()], ['input.json'])
 
     def test_real_phase_mapping_and_snapshot_contract(self):
-        if yaml.safe_load((ROOT / 'framework.yaml').read_text())['protocol_version'] == 3:
-            text = (ROOT / 'workflow/issue-tracking.md').read_text()
+        proto = yaml.safe_load((ROOT / 'framework.yaml').read_text(encoding='utf-8'))['protocol_version']
+        if proto in (3, 4):
+            text = (ROOT / 'workflow/config.md').read_text(encoding='utf-8')
             self.assertIn('默认关闭', text)
-            self.assertIn('不创建本地事件流、sync目录', text)
-            self.assertIn('未知先查原调用/远端事实', text)
-            self.assertIn('配置和本地完成不替代关闭授权', text)
-            self.assertIn('旧记录按原包解释', text)
+            self.assertIn('可选Issue关联', text)
+            self.assertIn('不新建本地同步目录或重复机器账本', text)
+            self.assertIn('先查询原请求与远端状态', text)
+            self.assertIn('严禁盲目重发', text)
             return
-        text = (ROOT / 'workflow/issue-tracking.md').read_text()
-        rows = [line for line in text.splitlines() if line.startswith('|')]
-        mapping = {event: next(row for row in rows if event in row) for event in L.EVENTS}
-        self.assertIn('实际修复开始', mapping['repair_started'])
-        self.assertIn('上一交付失败、当前待重验', mapping['repair_started'])
-        self.assertIn('测试调用开始', mapping['testing_started'])
-        self.assertIn('保留原阶段', mapping['workflow_waiting_user'])
-        self.assertIn('独立验收通过', mapping['feature_completed'])
-        self.assertIn('已核实发布', mapping['release_succeeded'])
-        route = (ROOT / 'workflow/routing.md').read_text()
-        self.assertIn('unknown不伪造开始或失败', route)
-        self.assertIn('无新事实不新增事件', route)
-        self.assertIn('业务事实先', route)
-        self.assertIn('平台 state 仅打开/关闭', text)
-        comment = (SKILL / 'assets/templates/comment.md').read_text()
-        for phrase in ('事件快照', 'stage / execution_status', '发布', '后续', 'sync_key'):
-            self.assertIn(phrase, comment)
-        for path in (ROOT / 'templates/feature-readme.md', ROOT / 'workflow/output-layout.md'):
-            for phrase in ('独立验收', '发布', 'open/closed', '进度', 'unknown'):
-                self.assertIn(phrase, path.read_text())
+        self.fail(f'unexpected protocol_version: {proto}')
 
     def test_shipped_templates_and_references_agree(self):
-        if yaml.safe_load((ROOT / 'framework.yaml').read_text())['protocol_version'] == 3:
-            # Keep historical fixture structures and all corruption checks intact.
+        proto = yaml.safe_load((ROOT / 'framework.yaml').read_text(encoding='utf-8'))['protocol_version']
+        if proto in (3, 4):
             self.assertEqual(template('sync-record.yaml')['schema_version'], 2)
             self.assertIn('remote_state', template('binding.yaml'))
             self.assertEqual(set(template('close-context.yaml')) - set(context()), set())
-            text = (SKILL / 'SKILL.md').read_text()
-            self.assertIn('不新增绑定/事件/授权/result YAML或同步目录', text)
-            self.assertIn('写入结果未知时先查询原调用及远端状态', text)
+            text = (SKILL / 'SKILL.md').read_text(encoding='utf-8')
+            self.assertIn('不新建本地同步目录或日常机器账本', text)
+            self.assertIn('先查询原请求与远端当前状态', text)
             self.assertIn('默认关闭', text)
-            self.assertIn('历史协议', (SKILL / 'references/lifecycle.md').read_text())
+            self.assertIn('历史协议', (SKILL / 'references/lifecycle.md').read_text(encoding='utf-8'))
             return
-        self.assertEqual(template('sync-record.yaml')['schema_version'], 2)
-        self.assertIn('remote_state', template('binding.yaml'))
-        self.assertIn('close: "off"', (ROOT / 'workflow/config.md').read_text())
-        for path in [ROOT / 'workflow/issue-tracking.md', SKILL / 'SKILL.md', SKILL / 'references/lifecycle.md']:
-            text = path.read_text()
-            self.assertNotIn('不新建/关闭 Issue', text)
-        text = (ROOT / 'workflow/issue-tracking.md').read_text()
-        for kind in L.EVENTS:
-            self.assertIn(kind, text)
-        # Real templates are filled by context(), not replaced with test-only schemas.
-        self.assertEqual(set(template('close-context.yaml')) - set(context()), set())
+        self.fail(f'unexpected protocol_version: {proto}')
 
 
 if __name__ == '__main__':

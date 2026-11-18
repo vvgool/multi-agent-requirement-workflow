@@ -1,9 +1,31 @@
-# 项目配置
+# 项目配置与外部边界
 
-用户明确目标工作空间；根workflow.yaml不存在时使用默认配置，框架目录不是业务工作空间。workspace.features_dir默认agent-features，只接受不含..且不经链接越界的非空项目相对路径。需要持久跟踪的事项使用 `<features_dir>/<事项名称>/task.md`，一次性局部低风险小修不要求建文档，已有文档按职责引用，已有协调入口不转录副本；复杂事项按 [文档分工](documents.md#按复杂度选择文档) 拆分需求、设计及实施。
+业务项目根目录下的 `workflow.yaml` 定义工作区路径与外部协同开关；文件不存在时按默认安全值运行（外部写入全部默认关闭）。
 
-workflow.lock.yaml按 [包规则](package.md) 校验；协议3不建立业务配置快照、documents.yaml覆盖层或授权版本。旧配置/任务由原包解释，不批量重写。
+## 配置字段说明
 
-支持schema_version=1；documents.provider默认local，也可为feishu；documents.feishu的parent_node_url为可选HTTPS父节点，write_enabled默认false。approval.channel=coordinator是已有对话确认渠道，需求和设计的适用确认按 [人工确认](execution-contract.md#人工确认) 执行，不为每个实施单元重复审批，也不增加配置开关。issue_tracking的binding为off/optional/required，sync为off/milestones，close为off/after_release，默认均off，须字符串而非布尔值。documents已有requirements/references/design/test_report来源项可继续只读引用（path或HTTPS url及access），不生成转录/覆盖层；read_write仍需具体授权。binding=off不得配置sync/close开启，sync=off不得配置after_release。发现重复键、未知字段或错误类型时，先说明问题，不隐式改用新的默认值。
+```yaml
+schema_version: 1
+workspace:
+  features_dir: agent-features        # 事项文档相对根目录，禁止包含 .. 或经符号链接越界
+documents:
+  provider: local                     # local | feishu
+  feishu:
+    parent_node_url: null             # 可选 HTTPS 节点链接
+    write_enabled: false              # 默认关闭远端写入
+approval:
+  channel: coordinator                # 主会话对话确认渠道，具体门禁见 execution-contract.md#人工确认
+issue_tracking:
+  binding: "off"                      # "off" | "optional" | "required"（新项目默认 "off"）
+  sync: "off"                         # "off" | "milestones"
+```
 
-外部文档配置仅说明来源及可用能力，不授予写入；实际目标、范围和权限按 [文档](documents.md) 与 [Issue](issue-tracking.md)核对。项目已有明确策略继续尊重，真实外部操作未知先恢复。凭据使用已有连接，不进入配置或任务文档。改变features_dir不自动搬迁历史。
+- 发现重复键、未知字段或非法类型（如用布尔值代替 `"off"` 字符串，`binding: "off"` 却开启 `sync`）时先报告配置异常，不静默篡改用户配置文件。
+- 修改 `features_dir` 仅作用于新事项，不自动搬迁已有历史目录。外部凭据走宿主已有连接环境，严禁写入配置文件或事项文档。
+
+## 可选Issue关联
+
+默认关闭（`binding: "off"`），不主动询问、读取远端或发表评论。仅当项目明确配置 `required`，或配置 `optional` 且用户明确要求关联/操作 Issue 时，才按需读取 [Issue Skill](../skills/issue-tracking/SKILL.md)。
+
+- **明确身份与逐项授权**：以完整主机、仓库与 Issue 编号定位目标；发表评论、关闭 Issue、触发发布均须各自获得用户具体授权，用户仅提供参考链接或本地测试全绿均不代表获得远端写入/关闭授权。
+- **最小留痕与防重放**：确有真实远端写入时，仅在原 `task.md` 记录目标编号、调用结果链接与未决状态，不新建本地同步目录或重复机器账本；远端调用结果未知时先查询原请求与远端状态，查清前保持阻塞，严禁盲目重发。

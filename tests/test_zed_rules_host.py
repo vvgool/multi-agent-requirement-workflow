@@ -1,28 +1,24 @@
-"""Executable contract fixtures for the Zed rules-only host.
-
-These tests validate the documented pending/receipt shape and selection boundary.
-They do not claim to run the Zed desktop application or implement installation.
-"""
+"""Executable contract fixtures for the Zed rules-only host."""
 import unittest
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ZED_ENTRY = ROOT / "workflow/hosts/zed.md"
+HOST_ADAPTERS = ROOT / "workflow/host-adapters.md"
 ZED_ADAPTER = ROOT / "skills/setup-requirement-workflow/references/zed-adapter.md"
 
 
 class ZedRulesHostTests(unittest.TestCase):
     def test_native_and_external_execution_paths_are_distinct(self):
         adapter = ZED_ADAPTER.read_text(encoding="utf-8")
-        for guard in ["spawn_agent", "独立上下文", "Profile", ".rules", "ACP", "真实Zed"]:
+        for guard in ["spawn_agent", "独立上下文", "Profile", ".rules", "ACP", "真实 Zed"]:
             with self.subTest(guard=guard):
                 self.assertIn(guard, adapter)
         self.assertIn("非具名", adapter)
         self.assertIn("实际线程", adapter)
 
     def test_host_entry_and_adapter_define_rules_only_semantics(self):
-        entry = ZED_ENTRY.read_text(encoding="utf-8")
+        entry = HOST_ADAPTERS.read_text(encoding="utf-8")
         adapter = ZED_ADAPTER.read_text(encoding="utf-8")
         for text in (entry, adapter):
             self.assertIn("规则型宿主", text)

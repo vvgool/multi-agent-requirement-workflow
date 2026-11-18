@@ -2,81 +2,27 @@
 
 ## 需求协作入口
 
-**默认路径**：先确认目标、允许范围、执行前风险和当前有效批准，再查看相关规则、代码和已有事项。需要需求或方案的事项，开始工作时说明本轮下一交付物及其确认点，按下方人工确认推进；明确局部且低风险的小修直接定位→最小修改→相关验证→返回结果。发现业务歧义、跨模块契约、持久状态或高风险副作用时，沿现有四类路由调整；原因不明先由同一角色诊断，再按新证据调整路由；恢复需求按恢复规则处理。摘要不替代下方受管规则。
+### 1. 复杂度分流与前期合并提问
+- **明确局部低风险小修**：目标、方案、边界明确且在既有契约内时，当前会话直接**定位 → 最小修改 → 相关回归 → 简短返回**（零新建文档、零子角色派发、无需读取下方框架文件）。原因不明的 Bug 先由当前角色沿真实调用链取证复现。
+- **前期先查代码、合并必答提问（第一性原理穿透 XY 表象）**：涉及新功能、行为变更或跨模块契约时，提问前先读相关代码与配置，剥离口述“表面解法”追问“根本矛盾与硬约束”（治标不治本时直指本质方案）；能从代码确认或属常规实现细节的不打断用户，**所有影响范围或验收的必答业务决策一次性合并提出**。
 
-**修改前判断**：先读取与本次行为相关的现有规则、代码和必要证据，再决定是否适用小修免加载。发现业务规则未决、需要自行定义用户可观察状态或跨服务契约时，暂停依赖这些决策的实现，继续只读诊断，给出已知事实与具体待确认项；决策与契约明确后再选现有路由，需要设计、协作或持久跟踪时按下文核验锁包并读取 `workflow/routing.md`。文件少或局部测试通过不能替代这一步；既有规则与契约内的明确局部低风险修复仍直接完成，无需分类报告。
+### 2. 两道 `<HARD-GATE>` 确认门禁与高危护栏
+需对齐事项按显式**阶段状态**推进：`pending_req_approval` → `req_approved` → `pending_design_approval` → `ready_to_implement` → `verified`。
+1. **`STOP 1`（需求未批）**：展示当前完整需求与验收标准（`AC`），单独请求需求批准后结束本轮。**业务澄清不等于批准**（用户仅回答业务参数，或提问工具仅返回 `accepted:true` 等受理回执均不算批准，须合入需求重新展示待批）。
+2. **`STOP 2`（设计未批）**：`req_approved` 后遵循“先删减冗余假设、机械约束下沉脚本/代码”形成设计；状态性或复杂设计须先完成独立四项规格对齐审查（查遗漏 AC、扩权、契约冲突、未证假设）并消除阻断，再展示设计请求批准并结束本轮。**未获明确设计批准前严禁编写业务实现代码**。
+3. **局部重确认与未知外部操作**：实质变更仅重确认受影响部分；涉及**支付、权限、数据删除或大范围共享逻辑变更**须先确认具体范围并由独立角色验证；**结果未知的外部操作**先查原请求，幂等性未确认前保持阻塞，严禁自动重放或补偿。
 
-**外部结果未知**：先按原请求查询或核对已有证据；仍未知且幂等性未确认时，保持受影响实现及数据不变，报告阻塞，不执行或实现自动重放、补偿，也不自行新增业务状态或成功判定。已有请求的重入/重试与正常新请求须分别验证；仅合成的新请求测试通过，不能宣称未知结果问题已修复。
+### 3. 静音连续巡航与长跑抗偏航
+进入 `ready_to_implement` 后开启**全链路静音连续巡航**（连续完成各实施单元 → 联调自验 → 拉起独立对抗验收 → 内部修复缺陷闭环，一次性交付）：
+- **中途打断白名单**：除 **① 新证据证伪已批需求/核心契约、② 触及未授权高危副作用/未知外部写、③ 缺少外部凭据/环境（须先跑完其余独立单元后集中反馈）** 三类真阻塞外，严禁因进度汇报、切换子任务或常规报错修复中途询问“是否继续”。
+- **抗偏航四道锁**：① 每单元完成后执行者**只读回读** `task.md` 首屏与关联 `AC` 锚点核对无缩水，由主会话统一**单写勾选** `<features_dir>/<事项名称>/task.md`（保持 ≤ 100 行当前态，同事项续改用 Delta 差量更新，不建 `v2/v3` 目录）；② 多单元复杂任务按需派发干净上下文子角色隔离日志污染；③ 同一故障连续 2～3 次修复无新根因证据立即熔断转系统化诊断；④ 交付前必须通过独立角色真实运行 `AC` 与最高风险反例验收。
 
-**人工确认**：明确既有契约内局部低风险小修直通。新功能、行为调整或架构性修复，按当前有效批准选择下一步；一般事项可用短稿：
+### 4. 按需规则索引（日常零核包开销）
+框架文件位于 `.agents/requirement-workflow-cache/<lock.sha256>/`（`lock.sha256` 见 `workflow.lock.yaml`）。该目录存在时**无需运行时计算包哈希或读取回执**，按实际职责读取该缓存根下的文件：
+- 路由与升降级：`workflow/routing.md` ｜ 门禁与巡航细则：`workflow/execution-contract.md`
+- 文档首屏与 Delta 规范：`workflow/documents.md` ｜ 最小派发卡片与恢复：`workflow/handoff.md`
+- 四宿主派发与降级：`workflow/host-adapters.md` ｜ 配置与可选 Issue：`workflow/config.md`
+- 专业方法按需读缓存根下 `agents/*-agent.md` 与 `skills/{requirement-analysis,feature-development,bug-fixing,acceptance-testing}/SKILL.md`。
+- **克隆缺缓存一次性恢复**：仅当本地缺失 `.agents/requirement-workflow-cache/<lock.sha256>/` 时，按 `workflow.lock.yaml` 检出 `source.location` 的 `source.revision` 至临时目录，执行一次 `python3 -B <tmp>/skills/setup-requirement-workflow/scripts/install_helper.py restore --source-root <tmp> --target-root .` 补齐缓存（`manual` 源阻塞待包）。
 
-1. **需求未批准**：先澄清未决业务规则，展示完整当前需求，单独请求需求批准后停止。用户只回答业务问题时，将答案合入需求、重新展示并单独请求需求批准，停在此步。
-2. **需求已批准、当前设计未批准**：形成设计。状态性设计先按路由核对审查适用性，完成适用独立审查、解决阻断后，展示当前设计并请求设计批准，停在此步。
-3. **当前需求和设计均已批准**：核对适用独立审查及执行权限等前置条件满足后，才实施。
-
-在第1、2步以确认问题结束本轮，等待真实用户回复；提问工具的受理回执不是答案。AI审查和旧授权不替代当前人审，实质变化只重确认受影响部分；批准对象、原回复及恢复判定按核验包内 `workflow/execution-contract.md#人工确认` 执行。流程约束不是工具层绝对拦写。
-
-先依据当前请求和已知任务背景判断是否需要框架能力，不为此扫描历史需求。对于独立一次性、目标明确且局部低风险、并非旧任务续接的小修，直接遵循已载入的项目规则及本入口的授权、风险和未知操作边界，在当前会话定位→最小修复→相关回归→简短返回；无需读取workflow.lock.yaml、检查缓存、加载package/bootstrap/coordinator或核验完整框架包，也不新建文档/任务。不因原因未知自动进入阶段链，先同一角色诊断；出现范围分歧、付款/权限/删除/大范围共享逻辑风险时先确认并按需要独立验证，未知外部结果先查原调用，不重放。无法判断是否旧任务续接时先核实归属，不能借此跳过旧协议。
-
-以下锁与包步骤仅在实际使用文档协作、原生角色、任务恢复、安装/升级等框架能力前执行；已有旧任务仍按原锁原包续接，不适用上述免加载路径。
-
-需要上述框架能力时，以本项目为目标根，先读workflow.lock.yaml，缓存为 `.agents/requirement-workflow-cache/<package.sha256>/`。锁含schema_version=1、固定包身份与source；sha256为64位小写十六进制，Git来源须完整提交SHA，拒绝重复键及凭据URL。未知协议阻塞；协议1/2旧任务只由原包解释，协议3不续写旧task。
-
-实际使用框架能力前首次完整核验缓存：根framework.yaml/AGENTS.md/README.md/workflow.yaml/LICENSE（存在时）及agents/、skills/、workflow/、templates/普通文件按相对POSIX路径排序，生成[路径,原字节SHA256]的UTF-8紧凑JSON数组（无额外空格），整体SHA256须等于锁。拒绝链接、特殊/额外文件，内容或来源提交不符返回framework_integrity_mismatch，不覆盖。缺缓存时主会话只从锁定来源/完整提交获取并核实HEAD，不跟随分支或执行下载脚本；manual等待同摘要包。只读或initialization_probe=true不下载/修复。已有pending先恢复原计划，身份不符停止。
-
-**只读摘要命令**：需要完整核包且有Python 3时，原样执行下方命令，仅将末尾两个占位参数替换为缓存根绝对路径与已读取锁中的sha256。命令来自本受信任入口，不执行未核验缓存中的脚本；无需临时文件。退出0且matches_expected=true才表示内容摘要通过；退出1表示摘要不符，退出2表示输入或包结构无效，均按framework_integrity_mismatch停止。缺Python 3时用等价只读计算工具落实上述算法，不能跳过。锁身份、来源提交、pending及宿主适配仍须分别核对。
-
-```sh
-python3 -I -B -c '
-import hashlib, json, re, stat, sys
-from pathlib import Path
-
-try:
-    if len(sys.argv) != 3 or not re.fullmatch("[0-9a-f]{64}", sys.argv[2]):
-        raise ValueError("expected cache root and 64 lowercase hex digest")
-    root = Path(sys.argv[1])
-    if not stat.S_ISDIR(root.lstat().st_mode):
-        raise ValueError("package root must be an ordinary directory")
-    files = {"framework.yaml", "AGENTS.md", "README.md", "workflow.yaml"}
-    dirs = {"agents", "skills", "workflow", "templates"}
-    names = {p.name for p in root.iterdir()}
-    if (files | dirs) - names or names - files - dirs - {"LICENSE"}:
-        raise ValueError("missing or unexpected package root entry")
-    rows = []
-
-    def visit(path):
-        mode = path.lstat().st_mode
-        if stat.S_ISREG(mode):
-            rows.append([path.relative_to(root).as_posix(),
-                         hashlib.sha256(path.read_bytes()).hexdigest()])
-        elif stat.S_ISDIR(mode):
-            for child in path.iterdir():
-                visit(child)
-        else:
-            raise ValueError("link or special file rejected")
-
-    for name in names:
-        path = root / name
-        expected_type = stat.S_ISDIR if name in dirs else stat.S_ISREG
-        if not expected_type(path.lstat().st_mode):
-            raise ValueError("unexpected package entry type")
-        visit(path)
-    rows.sort(key=lambda row: row[0])
-    payload = json.dumps(rows, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-    actual = hashlib.sha256(payload).hexdigest()
-    matches = actual == sys.argv[2]
-    print(json.dumps({"file_count": len(rows), "sha256": actual,
-                      "matches_expected": matches}, separators=(",", ":")))
-except (OSError, ValueError) as error:
-    print(json.dumps({"error": str(error)}, ensure_ascii=False), file=sys.stderr)
-    sys.exit(2)
-sys.exit(0 if matches else 1)
-' "<cache-root>" "<locked-sha256>"
-```
-
-以下路径均相对于已核验的锁定缓存根。身份核验后读取 `workflow/package.md`、`workflow/bootstrap.md` 与 `agents/coordinator-agent.md`；只在缺环境时读取setup Skill按restore_only=true补缓存/回执，不自动升级、扩宿主或覆盖配置与用户文件。同会话按包规则复用未变化环境，不重复全量哈希。
-
-协议3一次性、局部低风险且目标明确的小修由当前会话直接定位、最小修复、相关回归并简短返回，无需先建文档、清单、计划或原生任务，不默认全量测试或无意义新增测试。原因未知先同一角色定位，不自动全链。跨会话恢复/交接/多步持久跟踪确需文档时，在 `<features_dir>/<事项名称>/task.md` 维护唯一协调入口；需要其他专长才按缓存workflow/host-adapters.md委派；不强制产品开发测试全链，不建立status/task/host/result、逐轮快照或重复索引。一般/复杂需求、Bug和续改按缓存workflow/routing.md主动判断和切换；复杂需求按缓存workflow/execution-contract.md的实施与完成门槛落实模块分析、实施前独立审查和最终独立验收，适用行为按缓存workflow/test-first.md执行测试先行。复杂需求按缓存workflow/documents.md主动拆分需求、技术设计、实施计划及验收文档，一个事项可含多个实施任务；task.md只管协调、进度与链接。同事项补充、修复、重试、继续及完成后续改都更新对应原文档，不生成v2/v3版本目录。已有历史和旧锁旧任务保留原样，不静默迁移。
-
-项目规则统筹流程，通用Skill只补方法，不因文档或角色切换重复选择执行方式、叠加审批；同一事项只允许一个主流程控制者，外部端到端workflow不得接管已生效的本项目流程。范围/验收有分歧先确认；付款、权限、数据删除或大范围共享逻辑变更先确认范围并独立验证。原生任务记录派发/结束事实；跨角色与恢复只交接当前目标、改动、已验、未决和必要任务引用，共享文件单写。完成声明须绑定当前范围和最近实际证据，局部验证不得外推整体完成。未知外部操作先查原调用，查不清阻塞不重放；没有新增证据不得重复修改或轮询。Issue默认关闭，外部写/发布须具体授权。
 <!-- requirement-workflow:end -->

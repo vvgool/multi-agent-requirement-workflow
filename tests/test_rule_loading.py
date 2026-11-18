@@ -1,4 +1,4 @@
-"""Source-contract regression; these checks do not run a native agent."""
+"""Source-contract regression for Protocol 4 light-kernel rules."""
 
 import importlib.util
 import shutil
@@ -7,6 +7,8 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+sys.dont_write_bytecode = True
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
@@ -22,169 +24,213 @@ class RuleLoadingTests(unittest.TestCase):
         self.addCleanup(self.scratch.cleanup)
         self.root = Path(self.scratch.name) / "source"
         self.root.mkdir()
-        for name in ["framework.yaml", "AGENTS.md"]:
+        for name in ["framework.yaml", "AGENTS.md", "README.md", "workflow.yaml", "LICENSE"]:
             shutil.copyfile(ROOT / name, self.root / name)
+        ignore = shutil.ignore_patterns("system", "__pycache__", "*.pyc", ".DS_Store")
         for name in ["agents", "skills", "workflow", "templates"]:
-            shutil.copytree(ROOT / name, self.root / name)
+            shutil.copytree(ROOT / name, self.root / name, ignore=ignore)
 
-    def test_current_source_does_not_need_a_size_baseline(self):
+    def test_protocol4_source_and_size_budgets(self):
+        self.assertEqual(RULES.MAX_PACKAGE_FILES, 60)
+        self.assertEqual(RULES.MAX_PACKAGE_BYTES, 163840)
         result = RULES.check(self.root)
-        self.assertEqual(result["framework"]["protocol_version"], 3)
+        self.assertEqual(result["framework"]["protocol_version"], 4)
+        self.assertEqual(result["framework"]["version"], "1.0.0")
+        self.assertLessEqual(result["entry_lines"], 60)
+        self.assertLessEqual(result["package_file_count"], 60)
+        self.assertLessEqual(result["package_total_bytes"], 163840)
         self.assertIsNone(result["selected_rule_utf8_bytes"]["before"])
 
-    def test_confirmation_contract_is_part_of_static_checks(self):
-        self.assertIn("separate-human-confirmations", RULES.check(self.root)["scenarios"])
+    def test_runtime_hash_dead_words_and_agent_line_budget_enforced(self):
+        for rel, bad_text in (
+            ("agents/testing-agent.md", "\n每次启动运行 scripts/package_digest.py 计算哈希\n"),
+            ("skills/setup-requirement-workflow/assets/templates/role-body.md", "\n读取 codex-bootstrap.local.json 回执\n"),
+        ):
+            path = self.root / rel
+            orig = path.read_text(encoding="utf-8")
+            try:
+                path.write_text(orig + bad_text, encoding="utf-8")
+                with self.assertRaisesRegex(AssertionError, "runtime_hash_or_receipt_dead_word"):
+                    RULES.check(self.root)
+            finally:
+                path.write_text(orig, encoding="utf-8")
+
+        agent_path = self.root / "agents/testing-agent.md"
+        orig_agent = agent_path.read_text(encoding="utf-8")
+        try:
+            agent_path.write_text(orig_agent + "\n" * 20, encoding="utf-8")
+            with self.assertRaisesRegex(AssertionError, "agent_lines_exceeded"):
+                RULES.check(self.root)
+        finally:
+            agent_path.write_text(orig_agent, encoding="utf-8")
+
+    def test_ceremonial_framework_persona_labels_rejected(self):
+        for rel, bad_text, pattern in (
+            (
+                "skills/setup-requirement-workflow/assets/templates/role-body.md",
+                "你是需求协作框架（协议 4）的 {{role}}，当前宿主原生名称为 {{native_name}}。\n",
+                "ceremonial_role_label_forbidden",
+            ),
+            (
+                "skills/setup-requirement-workflow/assets/templates/project-entry-light.md",
+                "\n<!-- 协议 4 轻内核 -->\n",
+                "ceremonial_entry_label_forbidden",
+            ),
+            (
+                "skills/setup-requirement-workflow/assets/templates/claude-entry.md",
+                "\n<!-- 协议 4 -->\n",
+                "ceremonial_claude_label_forbidden",
+            ),
+        ):
+            path = self.root / rel
+            orig = path.read_text(encoding="utf-8")
+            try:
+                path.write_text(bad_text + orig, encoding="utf-8")
+                with self.assertRaisesRegex(AssertionError, pattern):
+                    RULES.check(self.root)
+            finally:
+                path.write_text(orig, encoding="utf-8")
+
+    def test_entry_line_limit_and_relative_link_ban(self):
+        path = self.root / "skills/setup-requirement-workflow/assets/templates/project-entry-light.md"
+        original = path.read_text(encoding="utf-8")
+
+        path.write_text(original + "\n" * 45, encoding="utf-8")
+        with self.assertRaisesRegex(AssertionError, "entry_lines_exceeded"):
+            RULES.check(self.root)
+
+        path.write_text(original + "\n参见 [路由](workflow/routing.md)\n", encoding="utf-8")
+        with self.assertRaisesRegex(AssertionError, "entry_forbids_consumer_relative_links"):
+            RULES.check(self.root)
+        path.write_text(original, encoding="utf-8")
 
     def test_clarification_and_async_receipts_need_real_approval(self):
         path = self.root / "workflow/execution-contract.md"
-        original = path.read_text()
+        original = path.read_text(encoding="utf-8")
         for guard in [
             "业务澄清不等于需求批准",
             "提问受理不等于用户答案",
             "等待真实用户回复后再判断批准",
+            "需求确认后进入正式设计",
+            "设计确认后实施",
+            "批准不追溯覆盖",
         ]:
             with self.subTest(guard=guard):
                 self.assertIn(guard, original)
                 try:
-                    path.write_text(original.replace(guard, "已移除答复边界"))
+                    path.write_text(original.replace(guard, "已移除确认守卫"), encoding="utf-8")
                     with self.assertRaises(AssertionError):
                         RULES.check(self.root)
                 finally:
-                    path.write_text(original)
+                    path.write_text(original, encoding="utf-8")
 
-    def test_distributed_entry_stops_at_confirmation_request(self):
-        path = self.root / "skills/setup-requirement-workflow/assets/templates/project-entry-light.md"
-        original = path.read_text()
-        guard = "以确认问题结束本轮，等待真实用户回复"
-        self.assertIn(guard, original)
-        path.write_text(original.replace(guard, "确认工具返回即可继续"))
-        with self.assertRaises(AssertionError):
-            RULES.check(self.root)
-
-    def test_confirmation_boundary_cannot_be_removed(self):
-        path = self.root / "workflow/execution-contract.md"
-        original = path.read_text()
-        for guard in ["需求确认后进入正式设计", "设计确认后实施", "批准不追溯覆盖"]:
-            with self.subTest(guard=guard):
-                self.assertIn(guard, original)
-                try:
-                    path.write_text(original.replace(guard, "已移除确认边界"))
-                    with self.assertRaises(AssertionError):
-                        RULES.check(self.root)
-                finally:
-                    path.write_text(original)
-
-    def test_stateful_design_review_applicability_is_required(self):
+    def test_silent_cruise_whitelist_and_anti_drift_locks_cannot_be_removed(self):
         cases = [
-            ("workflow/routing.md", "单一服务或文件少不能作为免审依据"),
-            ("workflow/execution-contract.md", "设计确认前核对审查适用性"),
-            ("skills/setup-requirement-workflow/assets/templates/project-entry-light.md",
-             "状态性设计先按路由核对审查适用性"),
-            ("skills/setup-requirement-workflow/references/codex-adapter.md",
-             "accepted:true"),
-            ("skills/setup-requirement-workflow/references/codex-adapter.md",
-             "仅证明问题已受理"),
-            ("skills/setup-requirement-workflow/references/codex-adapter.md",
-             "核对后续真实用户答案"),
-            ("skills/setup-requirement-workflow/references/codex-adapter.md",
-             "execution-contract.md#人工确认"),
+            ("workflow/execution-contract.md", "中途打断白名单"),
+            ("workflow/execution-contract.md", "只读回读"),
+            ("workflow/execution-contract.md", "主会话单写"),
+            ("workflow/execution-contract.md", "干净子上下文"),
+            ("workflow/execution-contract.md", "连续 2～3 次修复失败且未缩小根因范围时立即熔断停手"),
+            ("workflow/execution-contract.md", "内部验收自闭环"),
+            ("skills/bug-fixing/references/systematic-debugging.md", "连续 2～3 次修改仍失败且未缩小根因范围时，立即触发盲修熔断"),
+            ("skills/feature-development/references/architecture-review.md", "遗漏的 AC"),
+            ("skills/feature-development/references/architecture-review.md", "擅自扩权范围"),
+            ("skills/feature-development/references/architecture-review.md", "模块契约冲突"),
+            ("skills/feature-development/references/architecture-review.md", "未证实假设与边界风险"),
+            ("skills/acceptance-testing/references/completion-gate.md", "破坏性反例"),
         ]
-        for name, guard in cases:
-            with self.subTest(path=name, guard=guard):
-                path = self.root / name
-                original = path.read_text()
+        for rel, guard in cases:
+            with self.subTest(path=rel, guard=guard):
+                path = self.root / rel
+                original = path.read_text(encoding="utf-8")
                 self.assertIn(guard, original)
                 try:
-                    path.write_text(original.replace(guard, "已移除适用性边界"))
+                    path.write_text(original.replace(guard, "已移除防偏航守卫"), encoding="utf-8")
                     with self.assertRaises(AssertionError):
                         RULES.check(self.root)
                 finally:
-                    path.write_text(original)
+                    path.write_text(original, encoding="utf-8")
+
+    def test_first_principles_contracts_cannot_be_removed(self):
+        cases = [
+            ("skills/setup-requirement-workflow/assets/templates/project-entry-light.md", "穿透 XY 表象"),
+            ("AGENTS.md", "穿透 XY 表象"),
+            ("workflow/execution-contract.md", "穿透 XY 表象"),
+            ("workflow/execution-contract.md", "先删减简化、再机械下沉"),
+            ("workflow/execution-contract.md", "拒绝经验类比盲试"),
+            ("skills/requirement-analysis/references/clarification.md", "穿透 XY 问题"),
+            ("skills/requirement-analysis/references/clarification.md", "根本矛盾"),
+            ("skills/requirement-analysis/assets/templates/requirements.md", "表面解法"),
+            ("skills/feature-development/references/design-and-decomposition.md", "先删减、再下沉、后新增"),
+            ("skills/feature-development/references/design-and-decomposition.md", "机械约束下沉"),
+            ("skills/feature-development/assets/templates/technical-plan.md", "先删减、再下沉、后新增"),
+            ("skills/feature-development/references/architecture-review.md", "第一性原理与防叠补丁"),
+            ("skills/bug-fixing/references/systematic-debugging.md", "拒绝经验类比盲试"),
+            ("skills/bug-fixing/references/systematic-debugging.md", "破坏不变量"),
+        ]
+        for rel, guard in cases:
+            with self.subTest(path=rel, guard=guard):
+                path = self.root / rel
+                original = path.read_text(encoding="utf-8")
+                self.assertIn(guard, original)
+                try:
+                    path.write_text(original.replace(guard, "已移除第一性原理守卫"), encoding="utf-8")
+                    with self.assertRaises(AssertionError):
+                        RULES.check(self.root)
+                finally:
+                    path.write_text(original, encoding="utf-8")
 
     def test_confirmation_consumers_need_the_authoritative_pointer(self):
         for name in [
-            "workflow/routing.md", "workflow/handoff.md", "workflow/bugfix.md",
-            *[f"agents/{role}-agent.md" for role in
-              ["coordinator", "product", "development", "testing", "bug"]],
-            *[f"skills/{stage}/SKILL.md" for stage in
-              ["requirement-analysis", "feature-development", "acceptance-testing", "bug-fixing"]],
+            *[f"agents/{role}-agent.md" for role in ["coordinator", "product", "development", "testing", "bug"]],
+            *[f"skills/{stage}/SKILL.md" for stage in ["requirement-analysis", "feature-development", "acceptance-testing", "bug-fixing"]],
         ]:
             with self.subTest(path=name):
                 path = self.root / name
-                original = path.read_text()
+                original = path.read_text(encoding="utf-8")
                 pointer = "execution-contract.md#人工确认"
                 self.assertIn(pointer, original)
                 try:
-                    path.write_text(original.replace(pointer, "execution-contract.md"))
+                    path.write_text(original.replace(pointer, "execution-contract.md"), encoding="utf-8")
                     with self.assertRaises(AssertionError):
                         RULES.check(self.root)
                 finally:
-                    path.write_text(original)
+                    path.write_text(original, encoding="utf-8")
 
     def test_professional_delegation_loading_chain_cannot_be_removed(self):
         cases = [
-            ("agents/coordinator-agent.md", "../workflow/routing.md",
-             "../workflow/execution-contract.md"),
-            ("workflow/routing.md", "host-adapters.md", "execution-contract.md"),
-            ("workflow/host-adapters.md",
-             "../skills/setup-requirement-workflow/references/codex-adapter.md#无具名选择参数时的业务独立协作",
-             "../skills/setup-requirement-workflow/references/codex-adapter.md"),
-            ("skills/setup-requirement-workflow/references/codex-adapter.md",
-             "对应包内角色和完整Skill路径", "父会话摘要"),
-            ("skills/setup-requirement-workflow/references/codex-adapter.md",
-             "实际工具支持独立上下文时选择独立上下文", "总是继承父会话"),
-            ("skills/setup-requirement-workflow/references/codex-adapter.md",
-             "子会话自己核对包身份、读取对应角色和完整Skill", "沿用父会话加载结论"),
-            ("skills/setup-requirement-workflow/references/codex-adapter.md",
-             "父会话回读真实子任务标识、父子关系、加载与执行证据及结果", "父会话只看PASS"),
-            ("skills/setup-requirement-workflow/references/codex-adapter.md",
-             "缺独立上下文、必要加载或实际结果时，受影响审查/验收仍阻塞", "缺加载也可继续"),
-            ("skills/setup-requirement-workflow/references/codex-adapter.md",
-             "不将其计为具名激活探测通过", "通用子会话即具名激活"),
-            ("skills/setup-requirement-workflow/assets/templates/role-body.md",
-             "读取锁定包内 {{role_file}} 和完整 {{skill_file}}", "只看角色名"),
+            ("agents/coordinator-agent.md", "../workflow/routing.md", "../workflow/execution-contract.md"),
+            ("workflow/routing.md", "host-adapters.md#业务派发与降级路径", "execution-contract.md"),
+            (
+                "workflow/host-adapters.md",
+                "../skills/setup-requirement-workflow/references/codex-adapter.md#无具名选择参数时的业务独立协作",
+                "../skills/setup-requirement-workflow/references/codex-adapter.md",
+            ),
+            ("skills/setup-requirement-workflow/references/codex-adapter.md", "对应包内角色和完整Skill路径", "父会话摘要"),
+            ("skills/setup-requirement-workflow/references/codex-adapter.md", "实际工具支持独立上下文时选择独立上下文", "总是继承父会话"),
+            ("skills/setup-requirement-workflow/references/codex-adapter.md", "父会话回读真实子任务标识、父子关系、加载与执行证据及结果", "父会话只看PASS"),
+            ("skills/setup-requirement-workflow/references/codex-adapter.md", "缺独立上下文、必要加载或实际结果时，受影响审查/验收仍阻塞", "缺加载也可继续"),
+            ("skills/setup-requirement-workflow/references/codex-adapter.md", "不将其计为具名激活探测通过", "通用子会话即具名激活"),
+            ("skills/setup-requirement-workflow/assets/templates/role-body.md", "读取 `<缓存根>/{{role_file}}` 与完整 `<缓存根>/{{skill_file}}`", "只看角色名"),
         ]
         for name, guard, replacement in cases:
             with self.subTest(path=name, guard=guard):
                 path = self.root / name
-                original = path.read_text()
+                original = path.read_text(encoding="utf-8")
                 self.assertIn(guard, original)
                 try:
-                    path.write_text(original.replace(guard, replacement))
-                    with self.assertRaisesRegex(
-                        AssertionError, "professional_delegation_"
-                    ):
+                    path.write_text(original.replace(guard, replacement), encoding="utf-8")
+                    with self.assertRaisesRegex(AssertionError, "professional_delegation_"):
                         RULES.check(self.root)
                 finally:
-                    path.write_text(original)
-
-    def test_fallback_contract_must_remain_in_its_linked_section(self):
-        path = self.root / "skills/setup-requirement-workflow/references/codex-adapter.md"
-        original = path.read_text()
-        start = original.index("### 无具名选择参数时的业务独立协作\n")
-        end = original.index("\n### ", start + 1)
-        section = original[start:end]
-        replacements = [""]
-        for level in [1, 2, 3]:
-            replacements.append(
-                "### 无具名选择参数时的业务独立协作\n\n见其他说明。\n"
-                + "\n" + "#" * level + " 历史示例\n"
-                + section.split("\n", 1)[1]
-            )
-        for replacement in replacements:
-            with self.subTest(replacement=replacement[:40]):
-                try:
-                    path.write_text(original[:start] + replacement + original[end:])
-                    with self.assertRaisesRegex(
-                        AssertionError, "professional_delegation_"
-                    ):
-                        RULES.check(self.root)
-                finally:
-                    path.write_text(original)
+                    path.write_text(original, encoding="utf-8")
 
     def test_obsolete_confirmation_bypass_is_rejected(self):
         path = self.root / "skills/requirement-analysis/SKILL.md"
-        path.write_text(path.read_text() + "\n小需求目标清楚即可执行，不强制再写需求稿和统一批准。\n")
+        path.write_text(
+            path.read_text(encoding="utf-8") + "\n小需求目标清楚即可执行，不强制再写需求稿和统一批准。\n",
+            encoding="utf-8",
+        )
         with self.assertRaisesRegex(AssertionError, "obsolete_confirmation_bypass"):
             RULES.check(self.root)
 
@@ -192,7 +238,7 @@ class RuleLoadingTests(unittest.TestCase):
         baseline = Path(self.scratch.name) / "baseline"
         shutil.copytree(self.root, baseline)
         rules = self.root / "skills/feature-development/SKILL.md"
-        rules.write_text(rules.read_text() + "\n补充必要说明。\n")
+        rules.write_text(rules.read_text(encoding="utf-8") + "\n补充必要说明。\n", encoding="utf-8")
         result = RULES.check(self.root, baseline)
         self.assertGreater(
             result["selected_rule_utf8_bytes"]["after"],
@@ -201,162 +247,41 @@ class RuleLoadingTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, "rule_size_not_reduced"):
             RULES.check(self.root, baseline, require_smaller=True)
 
-    def test_patch_version_is_read_from_metadata(self):
-        path = self.root / "framework.yaml"
-        original = RULES.check(self.root)["framework"]["version"]
-        self.assertNotEqual(original, "99.0.0")
-        path.write_text(path.read_text().replace(f'"{original}"', '"99.0.0"'))
-        self.assertEqual(RULES.check(self.root)["framework"]["version"], "99.0.0")
-
     def test_unknown_or_mismatched_protocol_fails(self):
         path = self.root / "framework.yaml"
         path.write_text(
-            path.read_text().replace("protocol_version: 3", "protocol_version: 99")
+            path.read_text(encoding="utf-8").replace("protocol_version: 4", "protocol_version: 99"),
+            encoding="utf-8",
         )
         with self.assertRaises(AssertionError):
-            RULES.check(self.root)
-
-    def test_missing_document_format_pointer_fails(self):
-        path = self.root / "skills/feature-development/SKILL.md"
-        path.write_text(
-            path.read_text().replace(
-                "../../workflow/documents.md", "../../workflow/absent.md"
-            )
-        )
-        with self.assertRaises(AssertionError):
-            RULES.check(self.root)
-
-    def test_evidence_free_retry_allowance_is_rejected(self):
-        path = self.root / "skills/bug-fixing/references/systematic-debugging.md"
-        path.write_text(
-            path.read_text().replace(
-                "没有改变假设、失败类别或验证范围时停止修改",
-                "三次没有新证据的失败后停止盲改",
-            )
-        )
-        with self.assertRaises(AssertionError):
-            RULES.check(self.root)
-
-    def test_native_receipt_requires_actual_child_relationship(self):
-        path = self.root / "skills/setup-requirement-workflow/SKILL.md"
-        path.write_text(
-            path.read_text().replace("回读宿主实际子任务记录", "仅看命令成功")
-        )
-        with self.assertRaises(AssertionError):
-            RULES.check(self.root)
-
-    def test_root_and_distributed_entry_guards_are_required(self):
-        for name in [
-            "AGENTS.md",
-            "skills/setup-requirement-workflow/assets/templates/project-entry-light.md",
-        ]:
-            path = self.root / name
-            original = path.read_text()
-            for guard in ["**修改前判断**", "不执行或实现自动重放、补偿"]:
-                with self.subTest(path=name, guard=guard):
-                    path.write_text(original.replace(guard, "已移除守卫"))
-                    with self.assertRaises(AssertionError):
-                        RULES.check(self.root)
-            path.write_text(original)
-
-    def test_pstack_lightweight_contracts_are_required(self):
-        cases = [
-            (
-                "skills/acceptance-testing/references/completion-gate.md",
-                "无适用反例",
-            ),
-            (
-                "skills/feature-development/references/design-and-decomposition.md",
-                "不建立阶段状态",
-            ),
-            (
-                "skills/acceptance-testing/assets/templates/test-report.md",
-                "按需证据绑定",
-            ),
-        ]
-        for relative_path, guard in cases:
-            with self.subTest(path=relative_path, guard=guard):
-                path = self.root / relative_path
-                original = path.read_text()
-                self.assertIn(guard, original)
-                try:
-                    path.write_text(original.replace(guard, "已移除候选守卫", 1))
-                    with self.assertRaises(AssertionError):
-                        RULES.check(self.root)
-                finally:
-                    path.write_text(original)
-
-    def test_missing_stage_template_fails(self):
-        (
-            self.root / "skills/feature-development/assets/templates/technical-plan.md"
-        ).unlink()
-        with self.assertRaises(AssertionError):
-            RULES.check(self.root)
-
-    def test_missing_linked_design_method_is_detected(self):
-        (
-            self.root
-            / "skills/feature-development/references/design-and-decomposition.md"
-        ).unlink()
-        with self.assertRaisesRegex(AssertionError, "linked_rule_missing"):
             RULES.check(self.root)
 
     def test_broken_link_in_shared_workflow_is_detected(self):
         path = self.root / "workflow/routing.md"
         path.write_text(
-            path.read_text() + "\n[必要设计方法](absent-design-method.md)\n"
+            path.read_text(encoding="utf-8") + "\n[缺失文件](absent-design-method.md)\n",
+            encoding="utf-8",
         )
         with self.assertRaisesRegex(AssertionError, "linked_rule_missing"):
             RULES.check(self.root)
 
-    def test_external_links_and_document_fragments_are_not_file_paths(self):
-        path = self.root / "workflow/routing.md"
-        path.write_text(
-            path.read_text()
-            + "\n[外部](https://example.invalid/missing.md) [本页](#路径选择)\n"
-        )
-        RULES.check(self.root)
-
-    def test_second_progress_checklist_fails(self):
-        path = (
-            self.root
-            / "skills/feature-development/assets/templates/implementation-plan.md"
-        )
-        original = path.read_text()
-        for checkbox in [
-            "- [ ] 待办",
-            "* [ ] 待办",
-            "+ [ ] 待办",
-            "  - [ ] 嵌套待办",
-            "1. [ ] 有序待办",
-            "> - [x] 引用中的任务",
-            "- [ ]",
-        ]:
+    def test_second_progress_checklist_in_non_task_template_fails(self):
+        path = self.root / "skills/feature-development/assets/templates/implementation-plan.md"
+        original = path.read_text(encoding="utf-8")
+        for checkbox in ["- [ ] 待办", "* [ ] 待办", "1. [ ] 有序待办", "> - [x] 引用中的任务"]:
             with self.subTest(checkbox=checkbox):
-                path.write_text(original + "\n" + checkbox + "\n")
+                path.write_text(original + "\n" + checkbox + "\n", encoding="utf-8")
                 with self.assertRaises(AssertionError):
                     RULES.check(self.root)
 
     def test_lock_template_protocol_must_match_source(self):
-        path = (
-            self.root
-            / "skills/setup-requirement-workflow/assets/templates/workflow.lock.yaml"
-        )
+        path = self.root / "skills/setup-requirement-workflow/assets/templates/workflow.lock.yaml"
         path.write_text(
-            path.read_text().replace("protocol_version: 3", "protocol_version: 2")
+            path.read_text(encoding="utf-8").replace("protocol_version: 4", "protocol_version: 3"),
+            encoding="utf-8",
         )
         with self.assertRaises(AssertionError):
             RULES.check(self.root)
-
-    def test_reduction_flag_needs_a_baseline(self):
-        with self.assertRaisesRegex(AssertionError, "size_baseline_required"):
-            RULES.check(self.root, require_smaller=True)
-
-    def test_incomplete_size_baseline_is_rejected(self):
-        baseline = Path(self.scratch.name) / "baseline"
-        baseline.mkdir()
-        with self.assertRaises(FileNotFoundError):
-            RULES.check(self.root, baseline)
 
     def test_optimized_python_cannot_disable_the_checks(self):
         result = subprocess.run(

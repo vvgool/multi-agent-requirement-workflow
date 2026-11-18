@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """Read-only digest of a strict installed workflow package; Python stdlib only."""
-import argparse
-import hashlib
-import json
-from pathlib import Path
-import re
-import stat
 import sys
+
+sys.dont_write_bytecode = True
+
+import argparse  # noqa: E402
+import hashlib  # noqa: E402
+import json  # noqa: E402
+from pathlib import Path  # noqa: E402
+import re  # noqa: E402
+import stat  # noqa: E402
 
 ROOT_FILES = {'framework.yaml', 'AGENTS.md', 'README.md', 'workflow.yaml'}
 ROOT_DIRS = {'agents', 'skills', 'workflow', 'templates'}
+FORBIDDEN_NAMES = {'__pycache__', '.DS_Store'}
 
 
 def digest(root):
@@ -23,6 +27,8 @@ def digest(root):
         raise ValueError(f'missing={sorted(missing)}, extra={sorted(extra)}')
 
     def visit(path):
+        if path.name in FORBIDDEN_NAMES or path.suffix in {'.pyc', '.pyo'}:
+            raise ValueError(f'bytecode or system artifact rejected: {path}')
         mode = path.lstat().st_mode
         if stat.S_ISREG(mode):
             rows.append([path.relative_to(root).as_posix(),

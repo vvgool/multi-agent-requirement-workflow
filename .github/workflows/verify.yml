@@ -40,13 +40,18 @@ jobs:
         run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
       - name: Fetch locked framework revision for install regression
         run: |
-          revision="$(python - <<'PY'
+          revision="$(python -B - <<'PY'
           import yaml
           with open('workflow.lock.yaml', encoding='utf-8') as stream:
-              print(yaml.safe_load(stream)['source']['revision'])
+              lock = yaml.safe_load(stream)
+          source = lock.get('source') or {}
+          if source.get('kind') == 'git' and source.get('revision'):
+              print(source['revision'])
           PY
           )"
-          git fetch --no-tags origin "$revision"
+          if [ -n "$revision" ]; then
+            git fetch --no-tags origin "$revision"
+          fi
       - name: Run source regressions
         run: python -B -m unittest discover -s tests
       # Discovery intentionally skips these tests until fixture writes are

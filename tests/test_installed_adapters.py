@@ -1,9 +1,9 @@
 """Regression checks for the source repository's generated host adapters."""
-import importlib.util
 import subprocess
-import yaml
-from pathlib import Path
 import unittest
+from pathlib import Path
+
+import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,7 +29,10 @@ class InstalledAdapterTests(unittest.TestCase):
         package = lock["package"]
         package_sha = package["sha256"]
         cached = (
-            ROOT / ".agents" / "requirement-workflow-cache" / package_sha
+            ROOT
+            / ".agents"
+            / "requirement-workflow-cache"
+            / package_sha
             / "skills/setup-requirement-workflow/assets/templates/project-entry-light.md"
         )
         if cached.is_file():
@@ -37,20 +40,30 @@ class InstalledAdapterTests(unittest.TestCase):
 
         revision = lock["source"].get("revision")
         if lock["source"].get("kind") == "git" and revision:
-            path = "skills/setup-requirement-workflow/assets/templates/project-entry-light.md"
             try:
-                content = subprocess.check_output(
-                    ["git", "show", f"{revision}:{path}"],
+                fw_raw = subprocess.check_output(
+                    ["git", "show", f"{revision}:framework.yaml"],
                     cwd=ROOT,
                     stderr=subprocess.DEVNULL,
                     text=True,
                 )
+                rev_fw = yaml.safe_load(fw_raw) or {}
+                if (
+                    str(rev_fw.get("version")) == str(package.get("version"))
+                    and rev_fw.get("protocol_version") == package.get("protocol_version")
+                ):
+                    path = "skills/setup-requirement-workflow/assets/templates/project-entry-light.md"
+                    content = subprocess.check_output(
+                        ["git", "show", f"{revision}:{path}"],
+                        cwd=ROOT,
+                        stderr=subprocess.DEVNULL,
+                        text=True,
+                    )
+                    return content, f"locked Git revision {revision}"
             except (OSError, subprocess.CalledProcessError):
-                content = None
-            if content is not None:
-                return content, f"locked Git revision {revision}"
+                pass
 
-        return None, "locked package cache and Git revision are unavailable"
+        return None, "locked package cache and matching Git revision are unavailable"
 
     def test_managed_entry_matches_template(self):
         actual = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
@@ -84,7 +97,9 @@ class InstalledAdapterTests(unittest.TestCase):
                     "skill_file": f"skills/{skill}/SKILL.md",
                 }
                 values["role_body"] = render(body_template, values)
-                expected = render((TEMPLATES / f"native-{host}.{extension}").read_text(), values)
+                expected = render(
+                    (TEMPLATES / f"native-{host}.{extension}").read_text(encoding="utf-8"), values
+                )
                 path = ROOT / f".{host}/agents/{name}.{extension}"
                 self.assertEqual(path.read_text(encoding="utf-8"), expected, path)
 

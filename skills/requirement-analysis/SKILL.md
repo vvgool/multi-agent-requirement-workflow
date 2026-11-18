@@ -1,16 +1,18 @@
 ---
 name: requirement-analysis
-description: Design a PRD for complex features or clarify missing goals, user journeys, business rules and acceptance before implementation.
+description: Clarify business goals, edge rules and verifiable AC with code grounding, or write a focused PRD before design.
 ---
 
 # 需求分析与产品设计
 
-遵循目标项目规则及 [执行约定](../../workflow/execution-contract.md)。task.md 是唯一协调和进度入口，相关文档按 [文档分工](../../workflow/documents.md#按复杂度选择文档) 维护，原生任务保留派发和结束事实；不创建机器业务账本、逐轮快照或版本目录。旧任务回原锁定包，不以本 Skill 解释旧任务的权限。共享文档单写，返回结果由文档写入者合并。
+遵循目标项目既有约定、[执行约定](../../workflow/execution-contract.md) 与 [文档分工](../../workflow/documents.md#按复杂度选择文档)。明确局部低风险小修直接完成，不建需求文档；需持久跟踪的事项以 `task.md` 为唯一进度入口（主会话单写勾选），复杂跨模块需求单独维护 `requirements.md`。
 
-先按 [路径选择](../../workflow/routing.md#路径选择) 核实职责，不代替协调者另开流程；专业审查由协调者安排，不递归派角色。先核实用户已有目标、相关实现和现有约定，优先记录可定位的代码/配置/测试证据，并区分已确认事实、Agent建议与待验证假设；只问会影响实现/验收的缺失决策。已有授权和已回答问题不重复询问。按 [人工确认](../../workflow/execution-contract.md#人工确认) 展示当前需求并等待用户确认，再进入正式设计；一般事项用短稿，既有契约内小修保持直通。
-
-把必要目标、范围、可验证行为及业务确认结论写回需求文档；小事项可合并在 task.md，不复制原输入、完整对话或历史版本。用户补充沿用同事项入口，仅在目标独立时新建事项。范围/验收存在分歧或具体风险时按执行约定确认，不能借澄清扩大授权。
-
-一般事项使用 [任务模板](../../templates/task.md)。复杂需求在实施前按 [产品设计方法](references/clarification.md) 完成问题分析、轻量领域建模、用户旅程、方案取舍和需求自检，将独立 requirements.md 写成可指导设计与验收的 PRD。已有文档按同一内容标准补缺后引用。task.md 只保留目标摘要、当前任务和阻塞链接，不复制完整需求。
-
-仅在创建或更新人读文档时读取 [格式规范](../../workflow/documents.md#人读文档格式)。复杂需求起草或续改前读取 [PRD模板](assets/templates/requirements.md)，并按 [领域建模方法](references/domain-modeling.md) 判断是否需要把术语、实体、状态、不变量和业务责任主体写入 PRD；提交前按产品设计方法核对内容覆盖及可实施性。已有项目格式保留，按内容映射检查，不能以标题齐全代替质量检查。已确认结论持续有效，文档拆分不触发重新澄清或重复批准。区分已确定、可由实施者决定和必须澄清的事项；按 [实施与完成门槛](../../workflow/execution-contract.md#实施与完成门槛) 提交必要独立审查，自检不能替代审查。
+1. **先读代码取证，一次性合并必答提问**：
+   - 先核实相关代码、配置与现有测试，区分**已证实事实、Agent 推荐默认值、待确认业务决策**；能从代码确认或属常规可逆工程细节的不打断用户。
+   - 按 [人工确认](../../workflow/execution-contract.md#人工确认) 将真正影响产品范围、用户可观察行为、权限或验收的必答问题**一次性合并提出**，展示当前需求稿并将首屏置为 `pending_req_approval`。
+   - 用户仅补充业务答案或提问工具仅返回受理回执（如 `accepted:true`）不等于需求获批；须合入答案展示完整需求，待用户明确批准（`req_approved`）后才进入正式设计。
+2. **按复杂度产出可判定 AC**：
+   - 一般事项直接按 [任务模板](../../templates/task.md) 在 `task.md` 合并维护目标与可判定 AC。
+   - 复杂需求读取 [PRD 模板](assets/templates/requirements.md) 与 [产品设计方法](references/clarification.md)（涉及多角色权限、持久状态或不变量时按需读取 [轻量领域建模](references/domain-modeling.md)），输出覆盖正常、关键异常与边界条件的稳定编号（`F-xx` / `AC-xx`）及明确非目标（Non-Goals）。
+3. **首屏可读与 Delta 差量续改**：
+   - 创建或更新文档时遵循 [人读文档格式](../../workflow/documents.md#人读文档格式) 与 [Delta 差量规范](../../workflow/documents.md#delta-差量续改与归档)：同事项补充直接更新当前有效规则并简述 `Delta（原规则 → 现规则）`，不新建版本目录；实质变更范围或验收时仅重确认受影响部分。

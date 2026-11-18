@@ -7,7 +7,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import re
 import shlex
 import shutil
 import socket
@@ -17,11 +16,13 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+sys.dont_write_bytecode = True
+
 SCRIPTS = Path(__file__).resolve().parents[1] / 'scripts'
-ENTRY_TEMPLATE = SCRIPTS.parent / 'skills/setup-requirement-workflow/assets/templates/project-entry-light.md'
+INSTALL_HELPER = SCRIPTS.parent / 'skills/setup-requirement-workflow/scripts/install_helper.py'
 sys.path.insert(0, str(SCRIPTS))
-from experiment_control import Rejected, compare, prepare
-from package_digest import digest
+from experiment_control import Rejected, compare, prepare  # noqa: E402
+from package_digest import digest  # noqa: E402
 
 SCRATCH_ROOT = None
 
@@ -51,7 +52,6 @@ class ControlTests(unittest.TestCase):
             p = self.package / name
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_bytes(data)
-        # Independent manifest construction: explicit strings, not Path ordering.
         rows = [[name, sha(data)] for name, data in files.items()]
         rows.sort(key=lambda row: row[0])
         self.package_sha = sha(json.dumps(rows, ensure_ascii=False, separators=(',', ':')).encode())
@@ -115,19 +115,14 @@ class ControlTests(unittest.TestCase):
         self.assertEqual(digest(self.package), digest(self.package))
 
     def entry_digest(self, expected=None, root=None, shell=None):
-        # Execute the distributed command itself, including its shell quoting.
-        blocks = re.findall(r'```sh\n(python3 -I -B -c .*?)\n```',
-                            ENTRY_TEMPLATE.read_text(encoding='utf-8'), re.DOTALL)
-        self.assertEqual(len(blocks), 1, 'trusted entry must carry one standalone digest command')
-        command = blocks[0]
-        arguments = shlex.split(command)
-        self.assertEqual(arguments[:4], ['python3', '-I', '-B', '-c'])
-        self.assertEqual(arguments[5:], ['<cache-root>', '<locked-sha256>'])
-        command = command.replace('"<cache-root>"', shlex.quote(str(root or self.package)))
-        command = command.replace('"<locked-sha256>"', shlex.quote(
-            self.package_sha if expected is None else expected))
+        target_pkg = str(root or self.package)
+        target_expected = self.package_sha if expected is None else expected
+        command = (
+            f"{shlex.quote(sys.executable)} -I -B {shlex.quote(str(INSTALL_HELPER))} "
+            f"digest --package-root {shlex.quote(target_pkg)} "
+            f"--expected-sha256={shlex.quote(target_expected)}"
+        )
         env = os.environ.copy()
-        # A heredoc would need a temporary file in zsh; this command must not.
         env['TMPDIR'] = str(self.root / 'missing-tmp')
         env['TMPPREFIX'] = str(self.root / 'missing-tmp' / 'zsh')
         return subprocess.run([shell or '/bin/sh', '-c', command], cwd=self.root,

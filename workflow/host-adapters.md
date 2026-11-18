@@ -1,64 +1,31 @@
-# 宿主适配契约
+# 宿主适配与安装锁定契约
 
-初始化按 [宿主选择规则](../skills/setup-requirement-workflow/references/installation.md#宿主选择与批量初始化) 加载全部目标宿主行；业务协调派发只加载当前实际宿主一行。具名角色宿主统一产品/开发/测试/Bug角色及交接；规则型宿主只负责项目规则入口读取。宿主负责真实注册、文件读取、派发、等待、结果和恢复，不复制阶段业务规则。
+协议 4 将包完整性核验与宿主薄文件生成前置到**安装/升级/克隆恢复期一次性确定性完成**，使日常业务会话保持**零哈希计算、零回执查询开销**。
 
-| host        | 原生角色 product / development / testing / bug                                        | 定义位置                                                   | 适配说明                                                                              |
-| ----------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| codex       | requirement_product / requirement_development / requirement_testing / requirement_bug | .codex/config.toml 受管registry区块 + .codex/agents/*.toml | [Codex](../skills/setup-requirement-workflow/references/codex-adapter.md)             |
-| claude-code | requirement-product / requirement-development / requirement-testing / requirement-bug | .claude/agents/*.md                                        | [Claude Code](../skills/setup-requirement-workflow/references/claude-code-adapter.md) |
-| opencode    | requirement-product / requirement-development / requirement-testing / requirement-bug | .opencode/agents/*.md                                      | [OpenCode](../skills/setup-requirement-workflow/references/opencode-adapter.md)       |
-| zed | 无项目级具名注册；自带Agent可按实测能力显式派发非具名专业子Agent | `AGENTS.md`（规则型宿主入口） | [Zed及ACP边界](../skills/setup-requirement-workflow/references/zed-adapter.md) |
+## 四宿主映射与规则型宿主
 
-## 规则型宿主约定
+| 宿主 | 原生专业角色（product / development / testing / bug） | 项目内位置 | 适配细则 |
+| --- | --- | --- | --- |
+| `codex` | `requirement_{product,development,testing,bug}` | `.codex/config.toml` + `.codex/agents/*.toml` | [Codex 适配](../skills/setup-requirement-workflow/references/codex-adapter.md) |
+| `claude-code` | `requirement-{product,development,testing,bug}` | `CLAUDE.md` + `.claude/agents/*.md` | [Claude Code 适配](../skills/setup-requirement-workflow/references/claude-code-adapter.md) |
+| `opencode` | `requirement-{product,development,testing,bug}` | `.opencode/agents/*.md` | [OpenCode 适配](../skills/setup-requirement-workflow/references/opencode-adapter.md) |
+| `zed` | 规则型宿主（不注册 product、development、testing、bug 文件） | 复用根目录 `AGENTS.md`（不生成 `.zed/agents`） | [Zed 适配](../skills/setup-requirement-workflow/references/zed-adapter.md) |
 
-规则型宿主不生成四个原生角色文件，也不创建虚假的角色注册。其安装/探测核对共享 `AGENTS.md` 入口；回执中的 `native_role_probes` 为空，`native_role_invocation` 为 `not_applicable`，不能将规则读取报告为具名角色激活。Zed自带Agent若实际提供独立上下文，可按Zed适配显式加载包内专业角色/完整Skill并核验父子任务及结果，满足独立性后计入适用审查/验收，不能以同Agent自审替代；业务协作证据留原验证文档，不扩回执schema。Zed经ACP使用Codex另核执行层配置及真实调用，不用自带Agent或规则入口证据代替。
+- **规则型宿主边界**：Zed 仅在用户明确指定或当前会话确认为 Zed 时纳入选择；若记录初始化回执，`native_role_probes` 为空、`native_role_invocation` 为 `not_applicable`。
+- **被动尊重宿主权限**：仅生成上述受管块与薄角色，**严禁生成或修改宿主的模型、权限、沙箱或 Hook 配置文件**；宿主开启只读或拦截策略时被动遵守。
 
-## 确定的模板参数
+## 安装期校验与日常零核包
 
-具名角色宿主的原生文件以UTF-8/LF写入：product对应role=product-agent、role_file=agents/product-agent.md、skill_file=skills/requirement-analysis/SKILL.md、description=澄清需求并输出验收标准；development对应development-agent、agents/development-agent.md、skills/feature-development/SKILL.md、description=实现已批准需求并完成自验；testing对应testing-agent、agents/testing-agent.md、skills/acceptance-testing/SKILL.md、description=独立验收当前开发基线并报告缺陷。bug 对应 bug-agent、agents/bug-agent.md、skills/bug-fixing/SKILL.md、description=诊断并修复缺陷并完成自验。native_name取上表，不自行润色描述。规则型宿主不使用这些模板。
+1. **仓库提交 vs 本地忽略**：提交 `workflow.yaml`、`workflow.lock.yaml`、`AGENTS.md` 受管块、`.gitignore` 忽略块及具名宿主薄角色；本地忽略 `.agents/requirement-workflow-cache/<package.sha256>/`。
+2. **确定性脚本与日常零开销**：安装/升级统一调用 [setup Skill](../skills/setup-requirement-workflow/SKILL.md) 的 `install_helper.py`。日常 `.agents/requirement-workflow-cache/<lock.sha256>/` 存在时直接按需读取规则与 Skill，无需重算哈希。
+3. **克隆缺缓存恢复**：缺失缓存目录时，主会话按锁检出 `source.location` 的 `source.revision` 至临时目录，运行一次 `<tmp>/skills/setup-requirement-workflow/scripts/install_helper.py restore --source-root <tmp> --target-root .` 补齐缓存（`manual` 源或子角色直接报告缺包阻塞）。
 
-先对role-body.md进行上述原样字符串替换，再将完整正文（包括末尾换行，不strip/rstrip）替换原生模板的role_body；其他占位符同样替换，保留模板其余字节。共同入口、桥接和忽略区块使用模板完整原字节，不自选空白风格。追加时保留原文：原文非空且不以LF结束则先补一个LF，再追加完整模板；区块拥有摘要包含起始标记至结束标记后的LF，不包含原文或分隔LF。已有锁保持原字节，不要求其他机器重序列化。这样克隆后无本机回执也能确定性核对薄文件和拥有区块。
+## 业务派发与降级路径
 
-## 初始化输出与能力
+1. **具名角色可用**：按上表原生名称派发，传入 [最小派发短卡片](handoff.md#派发短卡片正反例)。
+2. **无具名参数但支持独立子会话**（见 [Codex 无具名协作](../skills/setup-requirement-workflow/references/codex-adapter.md#无具名选择参数时的业务独立协作) 与 [Zed 非具名协作](../skills/setup-requirement-workflow/references/zed-adapter.md#非具名独立协作)）：派发全新独立上下文子会话读取缓存内 `agents/<role>.md` 与完整 `skills/<skill>/SKILL.md`，父会话回读子任务标识与执行证据（不冒称具名注册激活）。
+3. **纯单会话环境**：当前会话执行并在每单元后重读 `task.md` 与 `AC` 锚点；必需独立审查/验收无法建立独立上下文时如实披露限制并标阻塞。
 
-本机回执 schema_version=2：package（真实四字段身份）、framework_path（项目相对路径）、owned_files（路径与实际SHA256）、owned_blocks（文件、标记、区块实际SHA256）、hosts。普通已有文件不作为整体拥有项；AGENTS/CLAUDE/.gitignore/.codex/config.toml 只拥有指定区块。默认初始化当前宿主和项目检测到的宿主；显式范围优先。全部目标先预检，再用同一 pending 安装，共享一份锁和缓存。非当前宿主只准备文件，不启动其程序；逐宿主报告 file_installation 和原生 pending。
+## 恢复判定与接续
 
-hosts.<host> 保存实际可取得的 host_version（不可得=null）、role_mapping、file_installation、entry_probe、具名角色宿主的四个 native_role_probes（status、真实host_task_id或null、实际结果/原因）、native_role_invocation、end_to_end。规则型宿主的 native_role_probes 为空，native_role_invocation=not_applicable。通常状态为 passed/pending/failed；仅不适用的原生角色字段允许 not_applicable。相同包下追加宿主时保留其他宿主有效回执，不把它们改成当前宿主通过；升级或拥有内容变化则将旧探测连同原包身份移入 hosts.<host>.probe_history，当前探测重置 pending。缺少回执时，不能接管归属尚未确认的已有文件。
-
-current host 必须来自实际会话或用户明确选定，不能从项目名称或安装目录推断。检查可用的注册格式、文件读取、原生角色选择、委派、等待/结束事实、恢复/查询、项目权限及外部连接；工具名和版本以实际宿主为准。不强行改模型/权限或安装宿主工具。原生选择缺失记 host_role_selection_unavailable，委派缺失记 host_delegation_unavailable；未知宿主返回 unsupported_host。某版本格式不支持时返回 host_format_unsupported，不套用另一个宿主配置。
-
-文件校验只证明适配文件完整。具名角色宿主生效后，分别实际调用四个角色，并传入 initialization_probe=true 及当前机器上的项目、锁文件和框架路径；角色只读核对框架身份、角色、完整Skill及模板，返回实际事实。规则型宿主只核对共享入口，并将 native_role_invocation 记为 not_applicable。保存真实任务标识；缺标识说明限制。具名角色宿主的入口与四个原生探测均通过才将当前宿主 native_role_invocation=passed，不能用通用 Agent 阅读定义替代。不提供统一的重载命令，按实际能力启动新会话/重载；缺能力保持 pending。安装探测不执行 Issue/飞书写入，不创建业务需求。
-
-回执中的 unavailable/pending 是上次探测事实，不能直接推断当前会话仍缺能力。当前会话实际提供映射的原生角色选择及委派工具时，重新执行只读探测并保存新任务标识及结果；工具出现本身不算 passed，end_to_end 仍只由真实需求闭环证明。
-
-## 业务派发和恢复
-
-仅在确需另一专长时按当前host映射调用原生角色；Codex实际缺具名选择参数但有独立子会话能力时，按[业务独立协作](../skills/setup-requirement-workflow/references/codex-adapter.md#无具名选择参数时的业务独立协作)显式加载专业角色，不计具名激活通过。消息带项目根、目标和允许范围、已有结果及未决项，已有文档需要时引用；不以缺文档阻塞一次性小修。角色加载共享角色和完整Skill，不要求task.yaml、invocation_id、host/result、授权版本或delivery。原生任务保存调用与结束事实；文档仅在恢复确有需要时引用任务，不重复建立账本。只有在需要创建、切换或在指定 worktree 中执行时，才核对真实仓库根、当前分支、`GIT_DIR` 与 `GIT_COMMON_DIR`，并确认不是子模块；已处于 linked worktree 时禁止再次创建。普通当前仓库中的读取、测试和小修不触发 worktree 创建流程。项目根、worktree 根和框架缓存根分别解析，不通过字符串拼接推断；命令、测试和文件证据必须绑定已确认的执行根。
-
-旧锁旧任务由原包解释，禁止跨协议续写。更换宿主前先核实原任务已结束，新宿主角色激活另行验证；未知外部操作先查询，不重放。主会话能完成的简单工作可以直接执行；缺委派能力只阻塞实际需要的委派，不能冒称原生角色已激活。
-
-### 恢复判定与接续
-
-客户端断连、服务重启或旧记录停在streaming时，先按原任务ID查询真实宿主，核对项目、包绑定、消息和已产生结果。持久消息状态与当前执行状态分别判断：CLI退出、页面静止或活动列表暂时缺席，单独都不能证明原执行已经停止。
-
-```mermaid
-flowchart TD
-    Q[查询原任务与当前执行] --> A{原执行是否停止？}
-    A -->|仍在运行| W[等待或查询原任务]
-    A -->|无法确认| B[保留unknown并阻塞接续]
-    A -->|有实际停止证据| R{核对未完成操作}
-    R -->|已有完成结果| D[核对并复用结果]
-    R -->|只读工作| C[原会话接续剩余读取]
-    R -->|本地文件写入| F[核对差异后只补未完成部分]
-    R -->|外部写入结果未知| E[查询原外部调用，未知仍阻塞]
-```
-
-停止证据采用宿主实际结束/取消状态，或原执行进程已退出且宿主查询确认没有活动执行；无法取得可靠证据时保持unknown。服务重启后的旧streaming消息不是运行证明，也不是完成证明，不为解除阻塞修改历史消息或伪造结束状态。
-
-确认原执行停止后，先复用已有结果。只读工作可以在原会话发一次明确的接续消息，引用中断事实和未完成范围；本地写入还须先核对当前文件差异、部分落盘与并写情况，仅补当前授权内的缺口。无法排除并写或确认落盘结果时停止。原会话不可恢复时，才交接原引用和上述已核实事实到新会话，不整单重发。
-
-外部写入必须查询原操作结果；原进程结束不代表外部操作失败，查不清仍阻塞，不重放。接续后再次按原任务查询完成事实、验证实际结果，保留原中断记录；只有新证据成立才报接续完成。人工接续通过不等于宿主自动恢复通过。
-
-## 方案通信
-
-复杂工作有必要先通知实现思路时，直接在原调用通信并继续，不结束重派、不生成展示事件和通知文件。任务文档保持单写，角色返回实际改动、验证和限制，由文档写入者合并。
+断连或异常中断时先查宿主原任务状态与文件差异，禁止整单盲目重派：运行中则等待；状态不明保持 `unknown` 阻塞；已确认停止则核对 `git diff` 复用已完成成果只补缺口；外部操作结果未知时先查原请求，幂等性未确认前严禁重放。

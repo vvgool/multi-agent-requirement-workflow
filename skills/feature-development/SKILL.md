@@ -1,20 +1,20 @@
 ---
 name: feature-development
-description: Design and decompose complex features into modules and verifiable delivery tasks, or implement scoped work with relevant verification.
+description: Design modular technical contracts, decompose verifiable units, and execute TDD implementation with anti-drift anchor checks.
 ---
 
-# 开发
+# 功能设计与开发实施
 
-设计/实施前按 [人工确认](../../workflow/execution-contract.md#人工确认) 核对需求与设计各自批准对象；完成适用独立审查后展示当前设计待用户确认，再实施。一般事项可用短稿，已批准契约内持续推进，实质偏离暂停受影响部分；明确小修例外保持。
+遵循目标项目既有约定、[路径选择](../../workflow/routing.md#路径选择) 与 [执行约定](../../workflow/execution-contract.md)。
 
-遵循目标项目规则及 [执行约定](../../workflow/execution-contract.md)。一次性、局部低风险且目标明确的小修在当前会话直接定位、最小修复、相关回归并简短返回，无需先建文档、清单、计划或原生任务；需要持久跟踪才维护一个协调入口，需要委派才用原生任务；不创建机器业务账本、逐轮快照或版本目录。旧任务回原锁定包，不以本 Skill 解释旧任务的权限。共享文档单写，需要长期保留的结果由文档写入者合并。
-
-按需要读取已有文档、相关代码与 [项目开发原则](references/development-principles.md)。先用相关代码、配置和测试建立现状证据，再明确允许改动的范围和验证方法；简单修改直接执行，原因未知先同一角色定位；跨会话恢复、交接或多步持久跟踪才补文档。复杂需求实施前读取 [方案与拆分方法](references/design-and-decomposition.md) 及下方技术设计、实施计划模板；按 [文档分工](../../workflow/documents.md#按复杂度选择文档) 检查PRD输入，形成方案、模块边界与契约，再拆可独立交付和验证的实施单元，完成需求覆盖、契约一致和可执行性自检。按复杂度拆分，不等文档过长才拆。跨能力或架构影响型变更按需读取 [架构审查与复盘](references/architecture-review.md)。
-
-实施行为代码或修复前读取 [测试先行](../../workflow/test-first.md)，默认对可自动验证业务行为执行真实RED/GREEN及必要重构，例外说明原因与替代验证。路径选择见 [路由](../../workflow/routing.md#路径选择)，阶段就绪、复杂需求实施前独立审查及最终独立验收遵循 [实施与完成门槛](../../workflow/execution-contract.md#实施与完成门槛)。技术审查由未参与起草的开发专长承担；需要审查时请协调者安排，不自行递归委派，起草者自检不能替代。原需求已确定则引用，不重写PRD。
-
-当前进度只在 task.md 勾选，详细单元维护在 implementation-plan.md；每个单元写清范围、输入/产出契约、文件归属、前置依赖和验证方法，需要另一专长时交由协调者安排对应原生任务，一个事项可有多个实施任务。修改遵循既有调用链与架构，不借机重构无关内容；行为、接口、状态、错误或架构变化时同步更新受影响的原需求、技术设计、计划或验证段落，不复制第二套变更日志。修复先确认错误行为；适用时用已有检查或有意义的回归验证修复前后的行为差异。失败按新证据查因，反复失败且没有新证据时，停止盲目修改。
-
-按影响完成相关自验和必要集成/异常检查，不默认全量测试或无意义新增测试，记录真实通过、失败、未执行及限制，已有证据适用时注明未重跑。每个实施单元完成前核对其验收、契约和验证证据；依赖于未完成单元的实施单元不得推进，无依赖且已授权的单元可以并行或独立推进。交接仅返回实际改动、检查和未决项，适用时附真实RED/GREEN证据；代码阅读、自验和独立验收分别说明。需要避免验证错内容时才按 [内容定位](../../workflow/code-baseline.md) 记录相关版本，不对整个项目逐文件计算摘要。
-
-仅在创建或更新人读文档时读取 [格式规范](../../workflow/documents.md#人读文档格式)，按实际产物读取 [任务](../../templates/task.md)、[设计](assets/templates/technical-plan.md)、[实现说明](assets/templates/development.md)、[依赖与步骤](assets/templates/implementation-plan.md) 或 [验证](assets/templates/verification.md) 模板。设计保存为 technical-design.md，计划保存为 implementation-plan.md，复杂验收使用 verification.md；已有对应文档直接引用。各类正文分别维护，任务勾选只在 task.md；一次性小修不为加载规范而产稿。
+1. **小修直通 vs 复杂设计门禁**：
+   - **明确局部低风险小修**：在当前会话直接定位 → 最小修改 → 相关回归 → 简短返回，零新建文档、零子角色派发。
+   - **需对齐事项**：按 [人工确认](../../workflow/execution-contract.md#人工确认) 核实需求已处于 `req_approved`；复杂或状态性需求按 [方案与拆分方法](references/design-and-decomposition.md) 产出 `technical-design.md` 与 `implementation-plan.md`，经未参与起草的独立角色完成 [四项规格对齐审查](references/architecture-review.md) 无阻断后展示给用户，获明确批准进入 `ready_to_implement` 后才写业务实现代码。
+2. **测试先行（TDD）与静音连续巡航**：
+   - 遵循 [项目开发原则](references/development-principles.md) 与 [测试先行与根因诊断](../../workflow/execution-contract.md#测试先行与根因诊断)：可自动验证的行为先写失败测试并核实真实 RED 原因，再做最小实现达 GREEN 并完成必要重构，不借机重构无关代码。
+   - 进入 `ready_to_implement` 后遵循 [静音连续巡航与抗偏航](../../workflow/execution-contract.md#静音连续巡航与抗偏航)：除 3 类打断白名单真阻塞外连续推进；同一故障**连续 2～3 次修复失败且未缩小根因范围时立即熔断停手**，转系统化根因诊断重核调用链与设计契约。
+3. **单元锚点只读回读与单写交接**：
+   - `task.md` 是唯一进度勾选清单且**统一由主会话（Coordinator）单写更新**；实施单元仅在允许写入的文件边界内修改。
+   - **每完成一个实施单元，必须只读回读 `task.md` 首屏目标及对应 `AC`/接口契约原文**，确认未通过删减测试、放宽条件或越界改动过关，按要求返回结构化结果与真实运行输出。
+4. **按需加载模板与格式**：
+   - 写文档时遵循 [人读文档格式](../../workflow/documents.md#人读文档格式) 与 [Delta 差量规范](../../workflow/documents.md#delta-差量续改与归档)，按实际产物读取 [任务模板](../../templates/task.md)、[技术设计模板](assets/templates/technical-plan.md)、[实施计划模板](assets/templates/implementation-plan.md) 或 [验证报告模板](assets/templates/verification.md)。

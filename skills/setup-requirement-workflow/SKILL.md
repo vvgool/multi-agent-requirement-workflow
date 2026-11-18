@@ -1,18 +1,20 @@
 ---
 name: setup-requirement-workflow
-description: Initialize or restore a version-pinned requirement workflow in Codex, Claude Code, OpenCode, or Zed using thin host adapters while preserving project configuration.
+description: Initialize, restore, or upgrade a version-pinned requirement workflow (Protocol 4) in Codex, Claude Code, OpenCode, or Zed using deterministic install_helper.py and thin host adapters.
 ---
 
-# 通用需求协作初始化
+# 通用需求协作初始化与升级（协议 4）
 
-用户要求安装、初始化、补齐本机环境或明确升级，或协调入口要求按现有锁自动恢复缺失缓存/回执时使用。在宿主内执行文件操作，无独立工作流 CLI，不修改全局目录或真实业务项目之外的环境。共享框架、项目策略与宿主注册分开；文件安装、原生生效和业务闭环分别报告。
+用户要求为目标业务项目安装、补齐克隆缓存或显式升级本框架时使用。通过纯标准库脚本 [install_helper.py](scripts/install_helper.py) 在安装期一次性完成包摘要核验与薄文件生成，使日常业务会话保持**零哈希计算、零回执查询开销**。
 
-1. **定位和选择**：用户提供 GitHub/Git URL 时先按 [Git 获取步骤](references/installation.md#githubgit-url-获取) 在临时目录取得并核实实际提交，再从该提交读取本 Skill；使用本地包时，通过本 Skill 的所在路径定位包根目录。确认用户的目标项目与实际宿主；不根据业务项目名称猜宿主，不默认装进框架自身。读取 [包与版本绑定](../../workflow/package.md)、[宿主契约](../../workflow/host-adapters.md)，按 [宿主选择](references/installation.md#宿主选择与批量初始化) 确定目标宿主集合，逐个加载其适配说明。当前支持 codex、claude-code、opencode 的原生角色薄文件格式，以及 Zed 的规则型宿主适配；不等于这些真实宿主均已验证。Zed 只复用 AGENTS.md，不生成四个原生角色文件。
-2. **读取现状**：restore_only=true 时先读 [启动恢复](../../workflow/bootstrap.md)，只按原锁补本机缓存/回执，不生成或修改受管入口/角色，不扩大宿主集合；配置/入口/角色不完整时报告阻塞，只有明确初始化才可新增。读取项目规则、workflow.yaml、workflow.lock.yaml、本地回执及新旧 pending。已有锁默认恢复同一包，提供了不同源版本也不自动升级。已有旧快照且无新锁时按包规则报告 legacy_snapshot，不覆盖旧入口或暗中迁移。明确升级必须先确认所有仍在活动的原生调用均已结束（旧任务还须按原包核对active_run）。
-3. **完整预检**：按 [通用安装步骤](references/installation.md) 核对来源、实际包摘要、所有目标/祖先路径、全部目标宿主的同名角色与已有规则遮蔽，生成变更计划；文件解析、锁/配置、权限或归属不可靠时先停止，不留下半配置。保留用户文件，只增改本框架拥有的区块及薄角色。
-4. **安装或恢复**：按同一 pending 意图准备忽略规则、本地内容缓存、版本锁和各目标宿主入口及Codex显式注册区块；不将全包列为待提交文件，不生成 Skill 符号链接。模板须从 assets/templates/ 的真实文件读取。已有无本机回执的克隆项目，按通用流程核对受管入口真实内容后才重建回执，不覆盖未知内容。
-5. **分层核验**：包摘要、模板实例、相对路径、角色及入口一致后分别记录每个目标宿主 file_installation=passed。只有当前实际宿主可执行原生探测；其他宿主保留自己的已有有效证据或标记 pending，不继承当前宿主结果。具名角色宿主在新会话或已证实重载后真实只读探测入口及四个原生角色；Zed 只核对 AGENTS.md 入口，并将 native_role_probes 记为空、native_role_invocation=not_applicable；不使用通用子 Agent 模拟通过。end_to_end 仅在真实需求闭环后更新。
-
-**回执收口**：写入具名角色探测 passed 前，回读宿主实际子任务记录，核对父会话关系、指定角色、目标项目及成功终态；只有主角色会话、角色自述或命令退出码不能作为通过证据。OpenCode 的 `run --agent` 只选主角色，即使四个命令都成功也不能填 native_role_invocation=passed。无法取得实际子任务关系时保持 pending 并说明缺口，file_installation 可独立通过；不为凑通过重派已知仍在运行或终态未知的探针。依据及具体工具见各宿主适配说明。
-
-返回框架版本/摘要、当前宿主、检测依据与目标宿主集合、逐宿主安装/激活结果、需提交的少量路径、忽略的本地目录、真实探测与未完成项。相同安装重复执行不重写；明确升级也不覆盖用户修改、不删旧包、不重算历史审批、不迁移旧任务。协议3安装不生成任何业务机器记录；旧协议只能按其原包恢复。真实远程 Issue、文档写入、发布及宿主全局安装不属于初始化。
+1. **获取与宿主选择**：
+   - 用户提供 Git URL 时，按 [通用安装步骤](references/installation.md#githubgit-url-获取) 在临时目录检出完整代码并取得 40 位提交 SHA；本地包则由本文件位置向上定位包根。
+   - 核实目标业务项目根（禁止默认安装进源框架自身）与目标宿主集合（见 [宿主选择规则](references/installation.md#宿主选择与批量初始化)）：支持 `codex`、`claude-code`、`opencode` 三个具名角色宿主及 `zed` 规则型宿主（Zed 仅复用 `AGENTS.md`，不生成四个角色文件，且仅在用户明确指定或当前确认为 Zed 会话时纳入）。
+2. **预检与确定性执行**：
+   - 先按各目标宿主适配说明（[Codex](references/codex-adapter.md)、[Claude Code](references/claude-code-adapter.md)、[OpenCode](references/opencode-adapter.md)、[Zed](references/zed-adapter.md)）检查同名角色遮蔽与既有配置语法。
+   - **首次安装或同锁补宿主**：运行 `python3 -B <包根>/skills/setup-requirement-workflow/scripts/install_helper.py install --source-root <包根> --target-root <项目根> --hosts <宿主列表> --source-kind git|manual --source-location <来源> [--source-revision <提交SHA>]`（保护用户原有配置与非受管区块字节；新项目尚无 `workflow.yaml` 时自动生成外部写默认 `off` 的配置）。
+   - **克隆缺缓存恢复**：已有 `workflow.lock.yaml` 与受管入口但缺本地缓存目录时，运行 `install_helper.py restore --source-root <包根> --target-root <项目根>` 只读核验受管块并补齐 `.agents/requirement-workflow-cache/<sha256>/`，不改写任何受管项目文件。
+   - **显式升级**：确认当前无在途未完成子任务且受管文件未被手工篡改后，追加 `--upgrade` 更新缓存、锁与全部已装宿主的薄文件。
+3. **分层核验与真实报告**：
+   - 区分“文件安装完成”与“原生角色真实调用验证”。需要验证具名角色激活时，须在新会话或重载后回读宿主实际子任务记录，核对父会话关系、指定角色、目标项目及成功终态（OpenCode 的 `run --agent` 只选主角色，即使四个命令都成功也不能当作具名子角色派发通过；无法取得实际子任务关系时如实说明限制）。
+   - 返回包版本、64 位 SHA256、目标宿主集合、新增/更新的待提交路径与本地忽略目录，不自动执行远程提交或生产发布。
