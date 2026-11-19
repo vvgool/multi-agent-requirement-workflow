@@ -1,6 +1,6 @@
 # Multi-Agent Requirement Workflow（v1.0 / 协议 4 轻内核）
 
-面向 Codex、Claude Code、OpenCode 与 Zed 的**第一性原理驱动、抗偏航、少打断**需求协作框架（`1.0.1` / `protocol_version: 4`）。
+面向 Codex、Claude Code、OpenCode 与 Zed 的**第一性原理驱动、抗偏航、少打断**需求协作框架（`1.0.2` / `protocol_version: 4`）。
 
 ## 核心机制
 

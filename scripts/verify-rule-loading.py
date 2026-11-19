@@ -125,15 +125,28 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
     assert framework["schema_version"] == 1
     assert framework["name"] == "multi-agent-requirement-workflow"
     assert isinstance(framework["version"], str) and framework["version"].strip()
+    assert framework["version"] == "1.0.2", (
+        f"version_or_exact_file_count_mismatch: framework.yaml -> {framework['version']}"
+    )
     assert type(framework["protocol_version"]) is int and framework["protocol_version"] == 4
     assert lock["package"]["protocol_version"] == framework["protocol_version"]
 
-    # AC-01: Quantitative light-kernel limits & entry slimming
+    # Quantitative light-kernel limits & exact 58-file package budget
     pkg_files = list(_iter_package_files(root))
     pkg_file_count = len(pkg_files)
     pkg_total_bytes = sum(p.stat().st_size for p in pkg_files)
-    assert pkg_file_count <= MAX_PACKAGE_FILES, f"package_file_count_exceeded: {pkg_file_count}"
+    assert pkg_file_count == MAX_PACKAGE_FILES, (
+        f"version_or_exact_file_count_mismatch: package_file_count={pkg_file_count}"
+    )
     assert pkg_total_bytes <= MAX_PACKAGE_BYTES, f"package_bytes_exceeded: {pkg_total_bytes}"
+
+    for meta_name in ("README.md", "AGENTS.md"):
+        meta_path = root / meta_name
+        if meta_path.is_file():
+            meta_text = meta_path.read_text(encoding="utf-8")
+            assert framework["version"] in meta_text and "1.0.1" not in meta_text, (
+                f"version_or_exact_file_count_mismatch: {meta_name}"
+            )
 
     for rel, body in texts.items():
         if rel.startswith("agents/"):
@@ -160,6 +173,7 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
         assert ceremonial not in claude_entry, f"ceremonial_claude_label_forbidden: {ceremonial}"
 
     project_entry_path = root / "AGENTS.md"
+    project_entry = None
     if project_entry_path.is_file():
         project_entry = project_entry_path.read_text(encoding="utf-8")
         assert "<!-- requirement-workflow:begin -->" in project_entry
@@ -167,7 +181,7 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
         for guard in ("前期先查代码、合并必答提问", "穿透 XY 表象", "严禁自动重放或补偿", "中途打断白名单"):
             assert guard in project_entry, f"project_entry_guard_missing: {guard}"
 
-    # AC-02: Thin role body zero runtime hash, cache-missing block & zero ceremonial persona
+    # Thin role body zero runtime hash, cache-missing block & zero ceremonial persona
     role = texts["skills/setup-requirement-workflow/assets/templates/role-body.md"]
     assert "framework_cache_missing" in role
     for ceremonial in ("你是需求协作框架", "当前宿主原生名称为", "协议 4"):
@@ -177,7 +191,7 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
         "professional_delegation_role_loading_missing"
     )
 
-    # AC-03: Explicit stage states & 2-gate confirmation contracts
+    # Explicit stage states & 2-gate confirmation contracts
     execution = texts["workflow/execution-contract.md"]
     routing = texts["workflow/routing.md"]
     for state in (
@@ -264,7 +278,7 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
         body = (root / path).read_text(encoding="utf-8")
         assert not any(term in body for term in obsolete), f"obsolete_confirmation_bypass: {path}"
 
-    # AC-07: Silent continuous cruise, interruption whitelist & anti-drift 4 locks
+    # Silent continuous cruise, interruption whitelist & anti-drift 4 locks
     for guard in (
         "中途打断白名单",
         "契约证伪",
@@ -283,7 +297,7 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
     )
     assert "连续 2～3 次修改仍失败且未缩小根因范围时，立即触发盲修熔断" in debugging
 
-    # AC-08: First-principles operational loop across requirement, design, review & debugging
+    # First-principles operational loop across requirement, design, review & debugging
     for guard in ("穿透 XY 表象", "先删减简化、再机械下沉", "拒绝经验类比盲试"):
         assert guard in execution, f"first_principles_execution_missing: {guard}"
 
@@ -311,7 +325,7 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
     for guard in ("拒绝经验类比盲试", "破坏不变量"):
         assert guard in debugging, f"first_principles_debugging_missing: {guard}"
 
-    # AC-05: 4-point pre-implementation alignment review & adversarial counterexample gate
+    # 4-point pre-implementation alignment review & adversarial counterexample gate
     arch_review = (root / "skills/feature-development/references/architecture-review.md").read_text(
         encoding="utf-8"
     )
@@ -332,13 +346,83 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
     setup = texts["skills/setup-requirement-workflow/SKILL.md"]
     assert "回读宿主实际子任务记录" in setup and "install_helper.py" in setup
 
-    # AC-04: First-screen template rules, Delta continuation & single task.md checklist
+    # First-screen template rules, Delta continuation & single task.md checklist
     documents = texts["workflow/documents.md"]
     assert "≤ 100 行" in documents and "Delta 差量" in documents and "禁止新建 `v2/v3` 版本目录" in documents
 
     task_tpl = (root / "templates/task.md").read_text(encoding="utf-8")
     for req in ("阶段状态", "本次请确认", "- [ ]", "≤ 100 行", "Delta"):
         assert req in task_tpl, f"task_template_missing: {req}"
+
+    # v1.0.2 anti-idle cruise, pseudo-blocker exclusion, entry exclusivity, session isolation & task dump guards
+    for rel in ("workflow/execution-contract.md", "skills/feature-development/SKILL.md"):
+        for guard in (
+            "可行性探针须在 `STOP 2` 前最小取证或并入已批 `T1`",
+            "严禁将探针/测试夹具拆成多轮 `pending_design_approval`",
+            "未完成对应业务源码实现前严禁将纯探针/夹具通过标为 `verified`",
+        ):
+            assert guard in texts[rel], f"probe_micro_approval_guard_missing: {rel} -> {guard}"
+
+    pseudo_blocker_targets = [
+        ("skills/setup-requirement-workflow/assets/templates/project-entry-light.md", entry),
+        ("workflow/execution-contract.md", execution),
+    ]
+    if project_entry is not None:
+        pseudo_blocker_targets.append(("AGENTS.md", project_entry))
+    for rel, body in pseudo_blocker_targets:
+        for guard in (
+            "按锁文件安装本地依赖",
+            "复用当前宿主运行隔离验证",
+            "隔离环境内生成随机合成密钥/假数据",
+            "均非打断白名单",
+            "声称缺环境前须先核实本机隔离可行性",
+        ):
+            assert guard in body, f"pseudo_blocker_whitelist_guard_missing: {rel} -> {guard}"
+
+    exclusivity_targets = [
+        ("skills/setup-requirement-workflow/assets/templates/project-entry-light.md", entry),
+        ("skills/setup-requirement-workflow/assets/templates/claude-entry.md", claude_entry),
+    ]
+    if project_entry is not None:
+        exclusivity_targets.append(("AGENTS.md", project_entry))
+    for rel, body in exclusivity_targets:
+        for guard in (
+            "禁止混用外部通用规格工作流 Skill",
+            "保留领域/工具专项 Skill 正常调用",
+        ):
+            assert guard in body, f"external_spec_skill_exclusivity_missing: {rel} -> {guard}"
+
+    opencode_adapter = (
+        root / "skills/setup-requirement-workflow/references/opencode-adapter.md"
+    ).read_text(encoding="utf-8")
+    session_guard = "实施前设计审查与实施后最终对抗验收严禁复用同一子会话 `sessionID`"
+    for rel, body in (
+        ("workflow/handoff.md", handoff),
+        ("agents/testing-agent.md", texts["agents/testing-agent.md"]),
+        ("skills/setup-requirement-workflow/references/opencode-adapter.md", opencode_adapter),
+    ):
+        assert session_guard in body, (
+            f"review_session_isolation_or_async_resume_missing: {rel} -> {session_guard}"
+        )
+    for guard in (
+        "后台完成后自动接续，无需回复继续",
+        "被唤醒后若处于 `ready_to_implement` 则直接推进后续单元",
+    ):
+        assert guard in opencode_adapter, (
+            f"review_session_isolation_or_async_resume_missing: opencode-adapter.md -> {guard}"
+        )
+
+    for rel, body in (("workflow/documents.md", documents), ("templates/task.md", task_tpl)):
+        for guard in (
+            "严禁借单行塞入长流水账绕过",
+            "严禁仅留 `/tmp` 等易失路径作唯一验收证据",
+        ):
+            assert guard in body, (
+                f"task_single_line_dump_or_ephemeral_evidence_missing: {rel} -> {guard}"
+            )
+    assert "复杂跨模块事项标 `verified` 前须落盘 `verification.md`" in documents, (
+        "task_single_line_dump_or_ephemeral_evidence_missing: workflow/documents.md -> verification.md_required"
+    )
 
     local_rule_links = check_local_rule_links(root)
 
@@ -362,7 +446,6 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
             ), f"non_task_template_checkbox_forbidden: {template}"
         for link in re.findall(r"\]\((assets/templates/[^)#]+\.md)\)", body):
             assert (skill.parent / link).is_file(), link
-
 
     # Template consolidation (7 -> 5): retired paths, orthogonal set, anchors & single-writer
     for path in _iter_package_files(root):
@@ -419,6 +502,7 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
             "first-screen-templates-and-delta-evolution",
             "first-principles-xy-subtractive-and-ground-truth",
             "unknown-external-operation-no-replay",
+            "anti-probe-micro-approval-and-host-convergence",
         ],
         selected_rule_utf8_bytes=dict(
             before=before,

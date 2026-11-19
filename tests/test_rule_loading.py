@@ -35,11 +35,152 @@ class RuleLoadingTests(unittest.TestCase):
         self.assertEqual(RULES.MAX_PACKAGE_BYTES, 162373)
         result = RULES.check(self.root)
         self.assertEqual(result["framework"]["protocol_version"], 4)
-        self.assertEqual(result["framework"]["version"], "1.0.1")
+        self.assertEqual(result["framework"]["version"], "1.0.2")
         self.assertLessEqual(result["entry_lines"], 60)
-        self.assertLessEqual(result["package_file_count"], 58)
-        self.assertLessEqual(result["package_total_bytes"], 162373)
+        self.assertEqual(result["package_file_count"], 58)
+        self.assertLessEqual(result["package_total_bytes"], 162350)
         self.assertIsNone(result["selected_rule_utf8_bytes"]["before"])
+
+    def test_v102_anti_idle_and_host_convergence_guards_cannot_be_removed(self):
+        cases = [
+            # AC-01: anti-probe micro-approval & pure-probe verified ban
+            (
+                "workflow/execution-contract.md",
+                "可行性探针须在 `STOP 2` 前最小取证或并入已批 `T1`",
+                "probe_micro_approval_guard_missing",
+            ),
+            (
+                "workflow/execution-contract.md",
+                "严禁将探针/测试夹具拆成多轮 `pending_design_approval`",
+                "probe_micro_approval_guard_missing",
+            ),
+            (
+                "workflow/execution-contract.md",
+                "未完成对应业务源码实现前严禁将纯探针/夹具通过标为 `verified`",
+                "probe_micro_approval_guard_missing",
+            ),
+            (
+                "skills/feature-development/SKILL.md",
+                "可行性探针须在 `STOP 2` 前最小取证或并入已批 `T1`",
+                "probe_micro_approval_guard_missing",
+            ),
+            (
+                "skills/feature-development/SKILL.md",
+                "严禁将探针/测试夹具拆成多轮 `pending_design_approval`",
+                "probe_micro_approval_guard_missing",
+            ),
+            (
+                "skills/feature-development/SKILL.md",
+                "未完成对应业务源码实现前严禁将纯探针/夹具通过标为 `verified`",
+                "probe_micro_approval_guard_missing",
+            ),
+            # AC-02: pseudo-blocker exclusion from interruption whitelist
+            *(
+                (rel, guard, "pseudo_blocker_whitelist_guard_missing")
+                for rel in (
+                    "skills/setup-requirement-workflow/assets/templates/project-entry-light.md",
+                    "workflow/execution-contract.md",
+                    "AGENTS.md",
+                )
+                for guard in (
+                    "按锁文件安装本地依赖",
+                    "复用当前宿主运行隔离验证",
+                    "隔离环境内生成随机合成密钥/假数据",
+                    "均非打断白名单",
+                    "声称缺环境前须先核实本机隔离可行性",
+                )
+            ),
+            # AC-03: entry exclusivity + domain/tool skill preservation
+            *(
+                (rel, guard, "external_spec_skill_exclusivity_missing")
+                for rel in (
+                    "skills/setup-requirement-workflow/assets/templates/project-entry-light.md",
+                    "skills/setup-requirement-workflow/assets/templates/claude-entry.md",
+                    "AGENTS.md",
+                )
+                for guard in (
+                    "禁止混用外部通用规格工作流 Skill",
+                    "保留领域/工具专项 Skill 正常调用",
+                )
+            ),
+            # AC-04: review/acceptance sessionID isolation & OpenCode async wakeup resume
+            *(
+                (
+                    rel,
+                    "实施前设计审查与实施后最终对抗验收严禁复用同一子会话 `sessionID`",
+                    "review_session_isolation_or_async_resume_missing",
+                )
+                for rel in (
+                    "workflow/handoff.md",
+                    "agents/testing-agent.md",
+                    "skills/setup-requirement-workflow/references/opencode-adapter.md",
+                )
+            ),
+            (
+                "skills/setup-requirement-workflow/references/opencode-adapter.md",
+                "后台完成后自动接续，无需回复继续",
+                "review_session_isolation_or_async_resume_missing",
+            ),
+            (
+                "skills/setup-requirement-workflow/references/opencode-adapter.md",
+                "被唤醒后若处于 `ready_to_implement` 则直接推进后续单元",
+                "review_session_isolation_or_async_resume_missing",
+            ),
+            # AC-05: ban single-line log dumps, /tmp sole evidence & require verification.md
+            *(
+                (rel, guard, "task_single_line_dump_or_ephemeral_evidence_missing")
+                for rel in ("workflow/documents.md", "templates/task.md")
+                for guard in (
+                    "严禁借单行塞入长流水账绕过",
+                    "严禁仅留 `/tmp` 等易失路径作唯一验收证据",
+                )
+            ),
+            (
+                "workflow/documents.md",
+                "复杂跨模块事项标 `verified` 前须落盘 `verification.md`",
+                "task_single_line_dump_or_ephemeral_evidence_missing",
+            ),
+        ]
+        for rel, guard, err_prefix in cases:
+            with self.subTest(path=rel, guard=guard):
+                path = self.root / rel
+                original = path.read_text(encoding="utf-8")
+                self.assertIn(guard, original)
+                try:
+                    path.write_text(original.replace(guard, "已移除v102守卫"), encoding="utf-8")
+                    with self.assertRaisesRegex(AssertionError, err_prefix):
+                        RULES.check(self.root)
+                finally:
+                    path.write_text(original, encoding="utf-8")
+
+    def test_version_sync_and_exact_58_file_count_enforced(self):
+        for rel in ("README.md", "AGENTS.md"):
+            with self.subTest(stale_version_in=rel):
+                path = self.root / rel
+                original = path.read_text(encoding="utf-8")
+                try:
+                    path.write_text(original.replace("1.0.2", "1.0.1"), encoding="utf-8")
+                    with self.assertRaisesRegex(AssertionError, "version_or_exact_file_count_mismatch"):
+                        RULES.check(self.root)
+                finally:
+                    path.write_text(original, encoding="utf-8")
+
+        extra = self.root / "workflow/extra-drift-note.md"
+        extra.write_text("# extra\n", encoding="utf-8")
+        try:
+            with self.assertRaisesRegex(AssertionError, "version_or_exact_file_count_mismatch"):
+                RULES.check(self.root)
+        finally:
+            extra.unlink()
+
+        lic = self.root / "LICENSE"
+        orig_lic = lic.read_bytes()
+        lic.unlink()
+        try:
+            with self.assertRaisesRegex(AssertionError, "version_or_exact_file_count_mismatch"):
+                RULES.check(self.root)
+        finally:
+            lic.write_bytes(orig_lic)
 
     def test_runtime_hash_dead_words_and_agent_line_budget_enforced(self):
         for rel, bad_text in (
@@ -276,7 +417,7 @@ class RuleLoadingTests(unittest.TestCase):
 
     def test_template_set_is_five_orthogonal_templates_and_old_paths_retired(self):
         result = RULES.check(self.root)
-        self.assertLessEqual(result["package_file_count"], 58)
+        self.assertEqual(result["package_file_count"], 58)
         self.assertLess(result["package_total_bytes"], 162373)
         for rel in RULES.RETIRED_TEMPLATES:
             with self.subTest(retired=rel):
