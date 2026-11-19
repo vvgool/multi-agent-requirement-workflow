@@ -2,12 +2,12 @@
 
 配套契约见 [宿主适配与规则型宿主](../../../workflow/host-adapters.md#四宿主映射与规则型宿主)。
 
-Zed 在本框架中定义为**规则型宿主**，复用项目根目录 `AGENTS.md` 中的受管入口区块：初始化时不生成 Zed 角色文件，也不伪造 `.zed/agents` 或其他宿主目录。Zed 仅在用户明确指定或当前会话确认为 Zed 时纳入宿主选择；安装回执（若使用）中 `native_role_probes` 为空、`native_role_invocation` 记为 `not_applicable`。
+Zed 在本框架中定义为**规则型宿主**，复用项目根目录 `AGENTS.md` 中的受管入口区块：初始化时不生成 Zed 角色文件，也不伪造 `.zed/agents` 或其他宿主目录。Zed 仅在用户明确指定或当前会话确认为 Zed 时纳入宿主选择；初始化核验中 `native_role_probes` 为空、`native_role_invocation` 记为 `not_applicable`。
 
 ## Zed 自带 Agent 与非具名独立协作
 
 - 先核对真实 Zed 线程、项目根、Profile（Write/Ask/Minimal 为工具权限而非业务阶段批准）以及 `.rules` 等高优先级规则是否遮蔽 `AGENTS.md`；不覆盖用户规则或全局设置。
-- 自带 Agent 按 `AGENTS.md` 与 [人工确认](../../../workflow/execution-contract.md#人工确认) 执行需求、设计、小修与静音连续巡航。
+- 自带 Agent 按 `AGENTS.md` 与 [人工确认](../../../workflow/execution-contract.md#人工确认) 执行小修直通、不确定性驱动 `Spec Gate` 与静音连续巡航。
 
 ### 非具名独立协作
 

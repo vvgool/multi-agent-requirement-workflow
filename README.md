@@ -1,13 +1,13 @@
-# Multi-Agent Requirement Workflow（v1.0 / 协议 4 轻内核）
+# Multi-Agent Requirement Workflow（v2.0 / 协议 4 轻内核）
 
-面向 Codex、Claude Code、OpenCode 与 Zed 的**第一性原理驱动、抗偏航、少打断**需求协作框架（`1.0.2` / `protocol_version: 4`）。
+面向 Codex、Claude Code、OpenCode 与 Zed 的**第一性原理驱动、零重复文档、不确定性单次确认**需求协作框架（`2.0.0` / `protocol_version: 4`）。
 
 ## 核心机制
 
-- **第一性原理贯穿全链**：需求期穿透 XY 表象直击根本矛盾与硬约束；设计期质疑假设“先删减、再下沉脚本/类型、后新增”；排障期拒绝经验盲试，沿真实数据流与不变量推导根因。
-- **自适应分流与两次精准对齐**：局部小修零建档直通；复杂变更先读代码合并必答提问，严守 `pending_req_approval` → `req_approved` → `pending_design_approval` → `ready_to_implement` → `verified` 两道 `<HARD-GATE>`。
-- **静音连续巡航与抗偏航四锁**：`ready_to_implement` 后连续推进各单元与内部验收，仅 **3 类真阻塞**可打断；靠**回读 AC 锚点 + 单写 `task.md` + 干净子上下文 + 2～3 次盲修熔断 + 独立反例验收**防偏航。
-- **安装期核验、日常零开销**：`install_helper.py` 一次性完成包 SHA256 核验与宿主适配，日常缓存存在时零哈希重算。
+- **不确定性驱动 `Spec Gate` 与受控 `Spike`**：局部小修 `0` 门禁直通；意图明确事项（含复杂跨模块变更）在后台先完成 `spec.md` 与独立四项对齐审查闭环，向用户发起 **1 次 `Spec Gate`（`pending_approval → ready_to_implement`）**；业务分叉或 UI 体感未知时先一次性轻澄清或执行隔离受控 `Spike`。
+- **`task.md + spec.md` 零重复体系与 `Contract-First`**：`task.md` 为全事项唯一状态机、批准记录与复选框控制面；`spec.md` 合一承载业务 `F/AC` 与架构契约；代码走 `Contract-First + TDD`，文档/规则走 `SDD + 纯结构/GFM #锚点门禁 + 独立对抗验收`。
+- **静音连续巡航与抗偏航硬锁**：`ready_to_implement` 后连续推进单元实施与独立验收，仅 **3 类真阻塞**可打断；靠**回读 AC 锚点 + 单写 `task.md` + 干净子上下文 + 2～3 次盲修熔断 + 独立 `sessionID` 反例验收**防偏航。
+- **安装期核验、日常零开销**：`install_helper.py` 一次性完成包 SHA256 核验与四宿主薄适配，日常缓存存在时零哈希重算。
 
 ## 安装与恢复
 

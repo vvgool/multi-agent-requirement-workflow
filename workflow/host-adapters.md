@@ -11,7 +11,7 @@
 | `opencode` | `requirement-{product,development,testing,bug}` | `.opencode/agents/*.md` | [OpenCode 适配](../skills/setup-requirement-workflow/references/opencode-adapter.md) |
 | `zed` | 规则型宿主（不注册 product、development、testing、bug 文件） | 复用根目录 `AGENTS.md`（不生成 `.zed/agents`） | [Zed 适配](../skills/setup-requirement-workflow/references/zed-adapter.md) |
 
-- **规则型宿主边界与原生问答**：Zed 仅在显式指定时选择，其初始化回执 `native_role_probes` 为空、`native_role_invocation` 为 `not_applicable`。宿主支持原生交互问答组件时，推荐优先用于展示必答决策点与门禁确认项（推荐优先调用宿主原生交互问答组件）。
+- **规则型宿主边界与原生问答**：Zed 仅在显式指定时选择，其初始化回执 `native_role_probes` 为空、`native_role_invocation` 为 `not_applicable`。宿主支持原生交互问答组件时，推荐优先调用宿主原生交互问答组件发起轻澄清或 `Spec Gate` 确认（选项须具明确授权语义）。
 - **被动尊重宿主权限**：仅生成上述受管块与薄角色，**严禁生成或修改宿主的模型、权限、沙箱或 Hook 配置文件**；宿主开启只读或拦截策略时被动遵守。
 
 ## 安装期校验与日常零核包

@@ -82,7 +82,7 @@ def main():
     entry = (root / "AGENTS.md").read_text(encoding="utf-8")
     assert "requirement-workflow:begin" in entry and "requirement-workflow:end" in entry
     bridge = (templates / "claude-entry.md").read_text(encoding="utf-8")
-    for guard in ("AGENTS.md", "明确局部低风险小修", "两道确认门禁", "静音连续巡航", "日常零核包开销"):
+    for guard in ("AGENTS.md", "明确局部低风险小修", "Spec Gate", "静音连续巡航", "日常零核包开销"):
         assert guard in bridge, f"claude_bridge_missing: {guard}"
     assert "你是需求协作框架" not in bridge and "协议 4" not in bridge
 
