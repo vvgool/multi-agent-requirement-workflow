@@ -424,6 +424,23 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
         "task_single_line_dump_or_ephemeral_evidence_missing: workflow/documents.md -> verification.md_required"
     )
 
+    qa_interaction_targets = [
+        ("skills/setup-requirement-workflow/assets/templates/project-entry-light.md", entry),
+        ("workflow/execution-contract.md", execution),
+    ]
+    if project_entry is not None:
+        qa_interaction_targets.append(("AGENTS.md", project_entry))
+    for rel, body in qa_interaction_targets:
+        for guard in (
+            "推荐优先调用宿主原生交互问答组件",
+            "确认选项必须具备明确授权语义",
+            "严禁仅凭业务参数澄清选项流转状态",
+        ):
+            assert guard in body, f"native_qa_interaction_guard_missing: {rel} -> {guard}"
+    assert "推荐优先调用宿主原生交互问答组件" in host_adapter, (
+        "native_qa_interaction_guard_missing: workflow/host-adapters.md"
+    )
+
     local_rule_links = check_local_rule_links(root)
 
     for stage in ("requirement-analysis", "feature-development", "acceptance-testing", "bug-fixing"):

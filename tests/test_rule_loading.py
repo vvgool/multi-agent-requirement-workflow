@@ -140,6 +140,25 @@ class RuleLoadingTests(unittest.TestCase):
                 "复杂跨模块事项标 `verified` 前须落盘 `verification.md`",
                 "task_single_line_dump_or_ephemeral_evidence_missing",
             ),
+            # AC-01 (QA interaction): native structured QA tool prioritization & authorization semantics
+            *(
+                (rel, guard, "native_qa_interaction_guard_missing")
+                for rel in (
+                    "skills/setup-requirement-workflow/assets/templates/project-entry-light.md",
+                    "workflow/execution-contract.md",
+                    "AGENTS.md",
+                )
+                for guard in (
+                    "推荐优先调用宿主原生交互问答组件",
+                    "确认选项必须具备明确授权语义",
+                    "严禁仅凭业务参数澄清选项流转状态",
+                )
+            ),
+            (
+                "workflow/host-adapters.md",
+                "推荐优先调用宿主原生交互问答组件",
+                "native_qa_interaction_guard_missing",
+            ),
         ]
         for rel, guard, err_prefix in cases:
             with self.subTest(path=rel, guard=guard):
