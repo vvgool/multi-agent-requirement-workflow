@@ -1,5 +1,5 @@
 name = "{{native_name}}"
 description = "{{description}}"
 developer_instructions = """
-{{role_body}}
+{{role_body_toml}}
 """

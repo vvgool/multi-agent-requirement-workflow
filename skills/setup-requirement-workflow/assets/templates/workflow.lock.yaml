@@ -1,10 +1,10 @@
 schema_version: 1
 package:
   name: multi-agent-requirement-workflow
-  version: null # 从真实 framework.yaml 读取（如 1.0.0）
-  protocol_version: 4
+  version: null # 从真实 framework.yaml 读取（如 3.0.0）
+  protocol_version: 5
   sha256: null # install_helper.py digest 计算的 64 位小写 SHA256
 source:
-  kind: manual # git | manual
-  location: null # git 为无凭据远程仓库 URL；manual 为包名@版本
-  revision: null # git 为 40 位提交 SHA；manual 为 null
+  kind: manual # self | git | manual
+  location: null # self 为 .；git 为无凭据远程仓库 URL；manual 为包名@版本
+  revision: null # self 为 self；git 为 40 位提交 SHA；manual 为 null

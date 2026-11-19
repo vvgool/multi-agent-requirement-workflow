@@ -1,4 +1,4 @@
-"""Structural, topological, tree-purity, and GFM anchor regression tests for Protocol 4 v2.0.0 rules."""
+"""Structural, topological, tree-purity, and dual-root regression tests for Protocol 5 v3.0.0 rules."""
 
 import importlib.util
 import shutil
@@ -11,18 +11,22 @@ from pathlib import Path
 sys.dont_write_bytecode = True
 
 ROOT = Path(__file__).resolve().parents[1]
-SPEC = importlib.util.spec_from_file_location(
-    "rule_loading", ROOT / "scripts/verify-rule-loading.py"
-)
+SPEC = importlib.util.spec_from_file_location("rule_loading", ROOT / "scripts/verify-rule-loading.py")
 RULES = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(RULES)
+
+IH_SPEC = importlib.util.spec_from_file_location(
+    "install_helper", ROOT / "skills/setup-requirement-workflow/scripts/install_helper.py"
+)
+IH = importlib.util.module_from_spec(IH_SPEC)
+IH_SPEC.loader.exec_module(IH)
 
 
 class RuleLoadingTests(unittest.TestCase):
     def setUp(self):
         self.scratch = tempfile.TemporaryDirectory()
         self.addCleanup(self.scratch.cleanup)
-        self.root = Path(self.scratch.name) / "source"
+        self.root = Path(self.scratch.name).resolve() / "source"
         self.root.mkdir()
         for name in ["framework.yaml", "AGENTS.md", "README.md", "workflow.yaml", "LICENSE"]:
             shutil.copyfile(ROOT / name, self.root / name)
@@ -45,20 +49,39 @@ class RuleLoadingTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-    def test_v200_protocol4_source_and_upper_bound_budgets(self):
-        self.assertEqual(RULES.MAX_PACKAGE_FILES, 58)
-        self.assertEqual(RULES.MAX_PACKAGE_BYTES, 153000)
-        self.assertEqual(RULES.MAX_ENTRY_LINES, 20)
-        self.assertEqual(RULES.MAX_ENTRY_BYTES, 2200)
+    def test_v300_protocol5_source_cache_dual_root_and_stdlib_purity(self):
+        for scan_dir in ("scripts", "skills", "tests"):
+            for py_path in sorted((ROOT / scan_dir).rglob("*.py")):
+                if py_path.resolve() == Path(__file__).resolve():
+                    continue
+                src = py_path.read_text(encoding="utf-8")
+                self.assertNotRegex(
+                    src,
+                    r"(?m)^\s*(?:import\s+yaml\b|from\s+yaml\s+import\b)",
+                    f"third_party_pyyaml_import_forbidden: {py_path}",
+                )
+
+        self.assertEqual(RULES.MAX_PACKAGE_FILES, 46)
+        self.assertEqual(RULES.MAX_PACKAGE_BYTES, 122000)
+        self.assertEqual(RULES.MAX_ENTRY_LINES, 16)
+        self.assertEqual(RULES.MAX_ENTRY_BYTES, 2000)
         result = RULES.check(self.root)
-        self.assertEqual(result["framework"]["protocol_version"], 4)
-        self.assertEqual(result["framework"]["version"], "2.0.0")
+        self.assertEqual(result["framework"]["protocol_version"], 5)
+        self.assertEqual(result["framework"]["version"], "3.0.0")
         self.assertLessEqual(result["entry_lines"], RULES.MAX_ENTRY_LINES)
         self.assertLessEqual(result["entry_bytes"], RULES.MAX_ENTRY_BYTES)
-        self.assertEqual(result["package_file_count"], 57)
+        self.assertEqual(result["package_file_count"], 46)
         self.assertLessEqual(result["package_file_count"], RULES.MAX_PACKAGE_FILES)
         self.assertLessEqual(result["package_total_bytes"], RULES.MAX_PACKAGE_BYTES)
-        self.assertIsNone(result["selected_rule_utf8_bytes"]["before"])
+
+        cache_like = Path(self.scratch.name).resolve() / "cache_only"
+        IH.stage_clean_package(self.root, cache_like, include_working_tree=True)
+        self.assertFalse((cache_like / "AGENTS.md").exists())
+        self.assertFalse((cache_like / "README.md").exists())
+        self.assertFalse((cache_like / "workflow.yaml").exists())
+        cache_result = RULES.check(cache_like)
+        self.assertEqual(cache_result["package_file_count"], result["package_file_count"])
+        self.assertEqual(cache_result["package_total_bytes"], result["package_total_bytes"])
 
     def test_version_sync_and_upper_bound_package_limits(self):
         for rel in ("README.md", "AGENTS.md"):
@@ -66,24 +89,20 @@ class RuleLoadingTests(unittest.TestCase):
                 path = self.root / rel
                 original = path.read_text(encoding="utf-8")
                 try:
-                    path.write_text(original.replace("2.0.0", "1.0.2"), encoding="utf-8")
+                    path.write_text(original.replace("3.0.0", "2.0.0"), encoding="utf-8")
                     with self.assertRaisesRegex(AssertionError, "version_mismatch"):
                         RULES.check(self.root)
                 finally:
                     path.write_text(original, encoding="utf-8")
 
-        extras = []
+        p = self.root / "workflow/extra-drift-0.md"
+        p.write_text("# extra\n", encoding="utf-8")
         try:
-            for idx in range(3):
-                p = self.root / f"workflow/extra-drift-{idx}.md"
-                p.write_text("# extra\n", encoding="utf-8")
-                extras.append(p)
             with self.assertRaisesRegex(AssertionError, "package_files_exceeded"):
                 RULES.check(self.root)
         finally:
-            for p in extras:
-                if p.exists():
-                    p.unlink()
+            if p.exists():
+                p.unlink()
 
         lic = self.root / "LICENSE"
         orig_lic = lic.read_bytes()
@@ -147,30 +166,20 @@ class RuleLoadingTests(unittest.TestCase):
         routing = self.root / "workflow/routing.md"
         orig_routing = routing.read_text(encoding="utf-8")
         try:
-            routing.write_text(
-                orig_routing + "\n参见 [不存在文件](absent-design-method.md)\n",
-                encoding="utf-8",
-            )
+            routing.write_text(orig_routing + "\n参见 [不存在文件](absent-design-method.md)\n", encoding="utf-8")
             with self.assertRaisesRegex(AssertionError, "linked_rule_missing"):
                 RULES.check(self.root)
 
-            routing.write_text(
-                orig_routing + "\n参见 [断锚点](execution-contract.md#不存在的锚点)\n",
-                encoding="utf-8",
-            )
+            routing.write_text(orig_routing + "\n参见 [断锚点](execution-contract.md#不存在的锚点)\n", encoding="utf-8")
+            with self.assertRaisesRegex(AssertionError, "linked_anchor_missing"):
+                RULES.check(self.root)
+
+            routing.write_text(orig_routing + "\n参见 [页内断锚点](#本页不存在锚点)\n", encoding="utf-8")
             with self.assertRaisesRegex(AssertionError, "linked_anchor_missing"):
                 RULES.check(self.root)
 
             routing.write_text(
-                orig_routing + "\n参见 [页内断锚点](#本页不存在锚点)\n",
-                encoding="utf-8",
-            )
-            with self.assertRaisesRegex(AssertionError, "linked_anchor_missing"):
-                RULES.check(self.root)
-
-            routing.write_text(
-                orig_routing
-                + "\n示例：`[假链接](missing.md#bad)`\n```md\n[代码块假链接](missing2.md#bad)\n```\n",
+                orig_routing + "\n示例：`[假链接](missing.md#bad)`\n```md\n[代码块假链接](missing2.md#bad)\n```\n",
                 encoding="utf-8",
             )
             RULES.check(self.root)
@@ -198,8 +207,8 @@ class RuleLoadingTests(unittest.TestCase):
                 finally:
                     spec_tpl.write_text(original, encoding="utf-8")
 
-    def test_four_orthogonal_templates_and_six_retired_templates_enforced(self):
-        for rel in RULES.RETIRED_TEMPLATES:
+    def test_orthogonal_templates_and_retired_assets_enforced(self):
+        for rel in RULES.RETIRED_PATHS:
             with self.subTest(retired=rel):
                 path = self.root / rel
                 existed_dirs = []
@@ -210,7 +219,7 @@ class RuleLoadingTests(unittest.TestCase):
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text("# stale\n", encoding="utf-8")
                 try:
-                    with self.assertRaisesRegex(AssertionError, "retired_template_present"):
+                    with self.assertRaisesRegex(AssertionError, "retired_path_present"):
                         RULES.check(self.root)
                 finally:
                     path.unlink()
@@ -229,7 +238,7 @@ class RuleLoadingTests(unittest.TestCase):
         finally:
             spec_tpl.write_text(original, encoding="utf-8")
 
-    def test_obsolete_dual_gate_and_split_template_terms_rejected_globally(self):
+    def test_obsolete_dual_gate_and_dead_terms_rejected_globally(self):
         target = self.root / "skills/requirement-analysis/SKILL.md"
         original = target.read_text(encoding="utf-8")
         try:
@@ -260,6 +269,7 @@ class RuleLoadingTests(unittest.TestCase):
             ("skills/feature-development/references/development-principles.md", "Contract-First", "contract_first_sdd_identifier_missing"),
             ("skills/setup-requirement-workflow/references/codex-adapter.md", "accepted:true", "async_receipt_identifier_missing"),
             ("workflow/handoff.md", "sessionID", "session_isolation_identifier_missing"),
+            ("skills/setup-requirement-workflow/assets/templates/project-entry-light.md", "verify_feature.py", "verify_feature_gate_missing"),
         ]
         for rel, token, err in identifier_cases:
             with self.subTest(rel=rel, token=token):
@@ -278,6 +288,7 @@ class RuleLoadingTests(unittest.TestCase):
             ("agents/product-agent.md", "execution-contract.md#人工确认", "execution-contract.md", "confirmation_pointer_missing"),
             ("skills/feature-development/SKILL.md", "execution-contract.md#契约先行与分层验证", "execution-contract.md", "contract_verification_pointer_missing"),
             ("workflow/routing.md", "host-adapters.md#业务派发与降级路径", "execution-contract.md", "professional_delegation_pointer_missing"),
+            ("workflow/host-adapters.md", "../skills/setup-requirement-workflow/references/agents-md-adapter.md#非具名独立协作", "../workflow/routing.md", "professional_delegation_pointer_missing"),
         ]
         for rel, ptr, replacement, err in pointer_cases:
             with self.subTest(rel=rel, pointer=ptr):
@@ -290,11 +301,11 @@ class RuleLoadingTests(unittest.TestCase):
                 finally:
                     p.write_text(orig, encoding="utf-8")
 
-    def test_runtime_hash_dead_words_ceremonial_labels_and_entry_limits(self):
+    def test_runtime_hash_dead_words_self_reread_and_entry_limits(self):
         for rel, bad_text in (
             ("agents/testing-agent.md", "\n每次启动运行 scripts/package_digest.py 计算哈希\n"),
             ("skills/setup-requirement-workflow/assets/templates/role-body.md", "\n读取 codex-bootstrap.local.json 回执\n"),
-            ("skills/setup-requirement-workflow/references/zed-adapter.md", "\n检查安装回执字段\n"),
+            ("skills/setup-requirement-workflow/references/agents-md-adapter.md", "\n记录 native_role_probes 状态\n"),
         ):
             path = self.root / rel
             orig = path.read_text(encoding="utf-8")
@@ -308,6 +319,10 @@ class RuleLoadingTests(unittest.TestCase):
         agent_path = self.root / "agents/testing-agent.md"
         orig_agent = agent_path.read_text(encoding="utf-8")
         try:
+            agent_path.write_text(orig_agent + "\n先读 SKILL.md 再执行\n", encoding="utf-8")
+            with self.assertRaisesRegex(AssertionError, "subagent_self_reread_forbidden"):
+                RULES.check(self.root)
+
             agent_path.write_text(orig_agent + "\n" * 20, encoding="utf-8")
             with self.assertRaisesRegex(AssertionError, "agent_lines_exceeded"):
                 RULES.check(self.root)
@@ -323,17 +338,26 @@ class RuleLoadingTests(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, "entry_lines_exceeded"):
                 RULES.check(self.root)
 
-            entry_path.write_text(orig_entry.replace("<!-- requirement-workflow:end -->", "补充填充" * 200 + "\n<!-- requirement-workflow:end -->"), encoding="utf-8")
+            entry_path.write_text(
+                orig_entry.replace("<!-- requirement-workflow:end -->", "填充" * 60 + "\n<!-- requirement-workflow:end -->"),
+                encoding="utf-8",
+            )
             self._sync_agents_managed_block()
             with self.assertRaisesRegex(AssertionError, "entry_bytes_exceeded"):
                 RULES.check(self.root)
 
-            entry_path.write_text(orig_entry.replace("<!-- requirement-workflow:end -->", "参见 [路由](workflow/routing.md)\n<!-- requirement-workflow:end -->"), encoding="utf-8")
+            entry_path.write_text(
+                orig_entry.replace("<!-- requirement-workflow:end -->", "参见 [路由](workflow/routing.md)\n<!-- requirement-workflow:end -->"),
+                encoding="utf-8",
+            )
             self._sync_agents_managed_block()
             with self.assertRaisesRegex(AssertionError, "entry_forbids_consumer_relative_links"):
                 RULES.check(self.root)
 
-            entry_path.write_text(orig_entry.replace("## 需求协作入口", "## 需求协作入口（协议 4）"), encoding="utf-8")
+            entry_path.write_text(
+                orig_entry.replace("## 需求协作入口", "## 需求协作入口（协议 5）"),
+                encoding="utf-8",
+            )
             self._sync_agents_managed_block()
             with self.assertRaisesRegex(AssertionError, "ceremonial_entry_label_forbidden"):
                 RULES.check(self.root)
@@ -370,7 +394,7 @@ class RuleLoadingTests(unittest.TestCase):
                     path.write_text(original, encoding="utf-8")
 
     def test_equal_or_larger_rules_only_fail_when_reduction_is_requested(self):
-        baseline = Path(self.scratch.name) / "baseline"
+        baseline = Path(self.scratch.name).resolve() / "baseline"
         shutil.copytree(self.root, baseline)
         rules = self.root / "skills/feature-development/SKILL.md"
         rules.write_text(rules.read_text(encoding="utf-8") + "\n补充说明。\n", encoding="utf-8")
@@ -386,7 +410,7 @@ class RuleLoadingTests(unittest.TestCase):
         fw = self.root / "framework.yaml"
         orig_fw = fw.read_text(encoding="utf-8")
         try:
-            fw.write_text(orig_fw.replace("protocol_version: 4", "protocol_version: 99"), encoding="utf-8")
+            fw.write_text(orig_fw.replace("protocol_version: 5", "protocol_version: 4"), encoding="utf-8")
             with self.assertRaises(AssertionError):
                 RULES.check(self.root)
         finally:
@@ -395,20 +419,14 @@ class RuleLoadingTests(unittest.TestCase):
         lock = self.root / "skills/setup-requirement-workflow/assets/templates/workflow.lock.yaml"
         orig_lock = lock.read_text(encoding="utf-8")
         try:
-            lock.write_text(orig_lock.replace("protocol_version: 4", "protocol_version: 3"), encoding="utf-8")
+            lock.write_text(orig_lock.replace("protocol_version: 5", "protocol_version: 4"), encoding="utf-8")
             with self.assertRaises(AssertionError):
                 RULES.check(self.root)
         finally:
             lock.write_text(orig_lock, encoding="utf-8")
 
         result = subprocess.run(
-            [
-                sys.executable,
-                "-O",
-                str(ROOT / "scripts/verify-rule-loading.py"),
-                "--source-root",
-                str(self.root),
-            ],
+            [sys.executable, "-O", str(ROOT / "scripts/verify-rule-loading.py"), "--source-root", str(self.root)],
             capture_output=True,
             text=True,
         )

@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-"""Read-only Protocol 4 structural, topological, tree-purity, and size invariants verification (v2.0.0)."""
+"""Read-only Protocol 5 structural, topological, tree-purity, and size invariants verification (v3.0.0, stdlib only)."""
 
 import sys
 
 sys.dont_write_bytecode = True
 
 import argparse  # noqa: E402
+import importlib.util  # noqa: E402
 import json  # noqa: E402
 import re  # noqa: E402
 import unicodedata  # noqa: E402
 import urllib.parse  # noqa: E402
 from pathlib import Path  # noqa: E402
-
-import yaml  # noqa: E402
 
 ENTRY_FILES = [
     "agents/coordinator-agent.md",
@@ -31,15 +30,14 @@ ENTRY_FILES = [
     "skills/bug-fixing/SKILL.md",
     "skills/acceptance-testing/SKILL.md",
     "skills/setup-requirement-workflow/SKILL.md",
-    "skills/issue-tracking/SKILL.md",
     "skills/setup-requirement-workflow/assets/templates/role-body.md",
     "skills/setup-requirement-workflow/assets/templates/project-entry-light.md",
 ]
 
-MAX_PACKAGE_FILES = 58
-MAX_PACKAGE_BYTES = 153000
-MAX_ENTRY_LINES = 20
-MAX_ENTRY_BYTES = 2200
+MAX_PACKAGE_FILES = 46
+MAX_PACKAGE_BYTES = 122000
+MAX_ENTRY_LINES = 16
+MAX_ENTRY_BYTES = 2000
 MAX_AGENT_LINES = 20
 
 FORBIDDEN_RUNTIME_HASH_TERMS = (
@@ -52,22 +50,28 @@ FORBIDDEN_RUNTIME_HASH_TERMS = (
     "shasum",
     "hashlib.sha256",
     "安装回执",
+    "native_role_probes",
+    "zed-adapter.md",
 )
 
-RETIRED_TEMPLATES = (
+RETIRED_PATHS = (
     "skills/feature-development/assets/templates/implementation-plan.md",
     "skills/feature-development/assets/templates/technical-plan.md",
     "skills/feature-development/assets/templates/verification.md",
     "skills/acceptance-testing/assets/templates/test-report.md",
     "skills/requirement-analysis/assets/templates/requirements.md",
     "skills/feature-development/assets/templates/technical-design.md",
+    "skills/issue-tracking/SKILL.md",
+    "skills/setup-requirement-workflow/references/zed-adapter.md",
 )
 
-REQUIRED_TEMPLATES = (
+REQUIRED_FILES = (
     "templates/task.md",
     "templates/spec.md",
     "skills/acceptance-testing/assets/templates/verification.md",
     "skills/bug-fixing/assets/templates/bug-report.md",
+    "skills/acceptance-testing/scripts/verify_feature.py",
+    "skills/setup-requirement-workflow/references/agents-md-adapter.md",
 )
 
 OBSOLETE_WORKFLOW_TERMS = (
@@ -82,6 +86,7 @@ OBSOLETE_WORKFLOW_TERMS = (
     "STOP 2",
     "requirements.md",
     "technical-design.md",
+    "issue-tracking/SKILL.md",
 )
 
 STAGE_STATES_FULL = (
@@ -109,8 +114,17 @@ NON_TASK_CHECKBOX = re.compile(
 )
 
 
+def _load_install_helper(root: Path):
+    hp = root / "skills/setup-requirement-workflow/scripts/install_helper.py"
+    assert hp.is_file(), f"required_package_file_missing: {hp}"
+    spec = importlib.util.spec_from_file_location("install_helper_gate", hp)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 def _iter_package_files(root: Path):
-    for name in ("framework.yaml", "AGENTS.md", "README.md", "workflow.yaml", "LICENSE"):
+    for name in ("framework.yaml", "LICENSE"):
         p = root / name
         if p.is_file():
             yield p
@@ -195,9 +209,7 @@ def check_local_rule_links(root: Path) -> int:
             if target.startswith("#"):
                 anchor = urllib.parse.unquote(target[1:])
                 if anchor:
-                    assert anchor in get_anchors(path), (
-                        f"linked_anchor_missing: {rel} -> {target}"
-                    )
+                    assert anchor in get_anchors(path), f"linked_anchor_missing: {rel} -> {target}"
                 continue
             file_part, sep, frag = target.partition("#")
             destination = (path.parent / urllib.parse.unquote(file_part)).resolve()
@@ -208,25 +220,27 @@ def check_local_rule_links(root: Path) -> int:
             assert destination.is_file(), f"linked_rule_missing: {rel} -> {target}"
             if sep and frag and destination.suffix == ".md":
                 anchor = urllib.parse.unquote(frag)
-                assert anchor in get_anchors(destination), (
-                    f"linked_anchor_missing: {rel} -> {target}"
-                )
+                assert anchor in get_anchors(destination), f"linked_anchor_missing: {rel} -> {target}"
     return checked
 
 
 def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -> dict:
+    assert (root / "LICENSE").is_file(), "required_package_file_missing: LICENSE"
+    assert (root / "framework.yaml").is_file(), "required_package_file_missing: framework.yaml"
+    for rel in RETIRED_PATHS:
+        assert not (root / rel).exists(), f"retired_path_present: {rel}"
+    assert not (root / "skills/issue-tracking").exists(), "retired_path_present: skills/issue-tracking"
     for rel in ENTRY_FILES:
         assert (root / rel).is_file(), f"linked_rule_missing: {rel}"
-    assert (root / "LICENSE").is_file(), "required_package_file_missing: LICENSE"
-    for rel in RETIRED_TEMPLATES:
-        assert not (root / rel).exists(), f"retired_template_present: {rel}"
-    for rel in REQUIRED_TEMPLATES:
-        assert (root / rel).is_file(), f"required_template_missing: {rel}"
+    for rel in REQUIRED_FILES:
+        assert (root / rel).is_file(), f"required_file_missing: {rel}"
     texts = {p: (root / p).read_text(encoding="utf-8") for p in ENTRY_FILES}
 
-    # 1. Version & Protocol Schema
-    framework = yaml.safe_load((root / "framework.yaml").read_text(encoding="utf-8"))
-    lock = yaml.safe_load(
+    ih = _load_install_helper(root)
+
+    # 1. Version & Protocol Schema (100% stdlib parse_simple_yaml)
+    framework = ih.parse_simple_yaml((root / "framework.yaml").read_text(encoding="utf-8"))
+    lock = ih.parse_simple_yaml(
         (root / "skills/setup-requirement-workflow/assets/templates/workflow.lock.yaml").read_text(
             encoding="utf-8"
         )
@@ -234,10 +248,8 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
     assert framework["schema_version"] == 1
     assert framework["name"] == "multi-agent-requirement-workflow"
     assert isinstance(framework["version"], str) and framework["version"].strip()
-    assert framework["version"] == "2.0.0", (
-        f"version_mismatch: framework.yaml -> {framework['version']}"
-    )
-    assert type(framework["protocol_version"]) is int and framework["protocol_version"] == 4
+    assert framework["version"] == "3.0.0", f"version_mismatch: framework.yaml -> {framework['version']}"
+    assert type(framework["protocol_version"]) is int and framework["protocol_version"] == 5
     assert lock["package"]["protocol_version"] == framework["protocol_version"]
 
     for meta_name in ("README.md", "AGENTS.md"):
@@ -246,11 +258,10 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
             meta_text = meta_path.read_text(encoding="utf-8")
             assert (
                 framework["version"] in meta_text
-                and "1.0." not in meta_text
-                and "v1." not in meta_text
+                and all(old not in meta_text for old in ("1.0.", "v1.", "2.0.", "v2."))
             ), f"version_mismatch: {meta_name}"
 
-    # 2. Tree Purity & Upper-bound Entry / Package Budgets (per-file checks before aggregate cap)
+    # 2. Tree Purity & Upper-bound Entry / Package Budgets
     pkg_files = list(_iter_package_files(root))
     pkg_file_count = len(pkg_files)
     pkg_total_bytes = sum(p.stat().st_size for p in pkg_files)
@@ -260,6 +271,8 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
         if rel.startswith("agents/"):
             line_cnt = len(body.splitlines())
             assert line_cnt <= MAX_AGENT_LINES, f"agent_lines_exceeded: {rel} ({line_cnt})"
+            if rel != "agents/coordinator-agent.md":
+                assert "SKILL.md" not in body, f"subagent_self_reread_forbidden: {rel}"
 
     entry = texts["skills/setup-requirement-workflow/assets/templates/project-entry-light.md"]
     entry_lines = entry.splitlines()
@@ -271,11 +284,12 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
         "entry_forbids_consumer_relative_links"
     )
     assert "## 需求协作入口" in entry, "entry_heading_missing"
+    assert "verify_feature.py" in entry, "verify_feature_gate_missing: project-entry-light.md"
 
     claude_entry = (
         root / "skills/setup-requirement-workflow/assets/templates/claude-entry.md"
     ).read_text(encoding="utf-8")
-    for ceremonial in ("你是需求协作框架", "协议 4"):
+    for ceremonial in ("你是需求协作框架", "协议 4", "协议 5"):
         assert ceremonial not in entry, f"ceremonial_entry_label_forbidden: {ceremonial}"
         assert ceremonial not in claude_entry, f"ceremonial_claude_label_forbidden: {ceremonial}"
 
@@ -296,13 +310,12 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
 
     role = texts["skills/setup-requirement-workflow/assets/templates/role-body.md"]
     assert "framework_cache_missing" in role
-    for ceremonial in ("你是需求协作框架", "当前宿主原生名称为", "协议 4"):
+    for ceremonial in ("你是需求协作框架", "当前宿主原生名称为", "协议 4", "协议 5"):
         assert ceremonial not in role, f"ceremonial_role_label_forbidden: {ceremonial}"
-    assert "<缓存根>/{{role_file}}" in role and "<缓存根>/{{skill_file}}" in role, (
-        "professional_delegation_role_loading_missing"
-    )
+    for inline_slot in ("{{cache_dir}}", "{{role_content}}", "{{skill_content}}"):
+        assert inline_slot in role, f"precompiled_role_slot_missing: {inline_slot}"
 
-    # 3. Template Orthogonality, Zero Dual-Write Status Header on spec.md & Format Redlines
+    # 3. Template Orthogonality & Format Redlines
     task_tpl = (root / "templates/task.md").read_text(encoding="utf-8")
     for req in ("阶段状态", "批准记录", "本次请确认", "- [ ]"):
         assert req in task_tpl, f"task_template_missing: {req}"
@@ -416,6 +429,14 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
     ):
         assert "sessionID" in body, f"session_isolation_identifier_missing: {rel}"
 
+    for rel, body in (
+        ("workflow/execution-contract.md", execution),
+        ("workflow/documents.md", documents),
+        ("workflow/handoff.md", handoff),
+        ("skills/acceptance-testing/SKILL.md", texts["skills/acceptance-testing/SKILL.md"]),
+    ):
+        assert "verify_feature.py" in body, f"verify_feature_gate_missing: {rel}"
+
     # 5. Topological Link & Pointer Reachability
     local_rule_links = check_local_rule_links(root)
 
@@ -447,9 +468,7 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
         "skills/bug-fixing/SKILL.md",
     ]
     for path in confirmation_consumers:
-        assert "execution-contract.md#人工确认" in texts[path], (
-            f"confirmation_pointer_missing: {path}"
-        )
+        assert "execution-contract.md#人工确认" in texts[path], f"confirmation_pointer_missing: {path}"
 
     design_decomp = (
         root / "skills/feature-development/references/design-and-decomposition.md"
@@ -471,6 +490,11 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
             "workflow/host-adapters.md",
             host_adapter,
             "../skills/setup-requirement-workflow/references/codex-adapter.md#无具名选择参数时的业务独立协作",
+        ),
+        (
+            "workflow/host-adapters.md",
+            host_adapter,
+            "../skills/setup-requirement-workflow/references/agents-md-adapter.md#非具名独立协作",
         ),
     ]:
         assert f"]({pointer})" in body, f"professional_delegation_pointer_missing: {path}"
@@ -495,15 +519,11 @@ def check(root: Path, baseline: Path = None, *, require_smaller: bool = False) -
         package_total_bytes=pkg_total_bytes,
         local_rule_links=local_rule_links,
         scenarios=[
-            "light-kernel-upper-bound-size-and-entry-budget",
-            "managed-entry-byte-sync-and-tree-purity",
-            "install-time-verification-zero-runtime-hash",
-            "uncertainty-driven-spec-gate-and-controlled-spike",
-            "zero-duplication-task-and-spec-orthogonal-templates",
-            "contract-first-sdd-tdd-stratified-verification",
-            "full-package-gfm-heading-anchor-and-topology-reachability",
-            "obsolete-dual-gate-and-split-template-term-elimination",
-            "session-isolation-and-async-receipt-identifiers",
+            "protocol5-pure-runtime-package-dual-root-parity",
+            "precompiled-inline-roles-zero-self-reread",
+            "deterministic-verify-feature-gate-integration",
+            "universal-agents-md-host-and-dead-word-elimination",
+            "zero-third-party-stdlib-yaml-and-gfm-anchor-reachability",
         ],
         selected_rule_utf8_bytes=dict(
             before=before,

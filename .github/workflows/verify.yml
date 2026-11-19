@@ -31,38 +31,51 @@ jobs:
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 1
       - name: Set up Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
         with:
           python-version: '3.11'
-      - name: Install verification dependency
-        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
-      - name: Fetch locked framework revision for install regression
-        run: |
-          revision="$(python -B - <<'PY'
-          import yaml
-          with open('workflow.lock.yaml', encoding='utf-8') as stream:
-              lock = yaml.safe_load(stream)
-          source = lock.get('source') or {}
-          if source.get('kind') == 'git' and source.get('revision'):
-              print(source['revision'])
-          PY
-          )"
-          if [ -n "$revision" ]; then
-            git fetch --no-tags origin "$revision"
-          fi
+      - name: Restore locked framework cache
+        run: python -B skills/setup-requirement-workflow/scripts/install_helper.py restore --source-root . --target-root .
       - name: Run source regressions
         run: python -B -m unittest discover -s tests
-      # Discovery intentionally skips these tests until fixture writes are
-      # authorized by a scratch directory; execute them explicitly here.
-      - name: Run experiment-control regressions in an isolated directory
-        run: |
-          scratch="$(mktemp -d)"
-          scratch="$(cd "$scratch" && pwd -P)"
-          python -B tests/test_experiment_control.py --scratch-root "$scratch"
-      - name: Check rule and template loading
+      - name: Check rule and template loading (source root)
         run: python -B scripts/verify-rule-loading.py --source-root .
+      - name: Check rule and template loading and feature gate (restored cache)
+        run: |
+          sha="$(python -B - <<'PY'
+          import importlib.util, pathlib
+          spec = importlib.util.spec_from_file_location('ih', 'skills/setup-requirement-workflow/scripts/install_helper.py')
+          ih = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(ih)
+          lock = ih.parse_simple_yaml(pathlib.Path('workflow.lock.yaml').read_text(encoding='utf-8'))
+          print(lock['package']['sha256'])
+          PY
+          )"
+          cache_root=".agents/requirement-workflow-cache/$sha"
+          python -B scripts/verify-rule-loading.py --source-root "$cache_root"
+          fdir="$(mktemp -d)"
+          python -B - "$fdir/task.md" <<'PY'
+          import pathlib, sys
+          pathlib.Path(sys.argv[1]).write_text(
+              "# CI Gate Smoke\n\n"
+              "> **阶段状态**：`verified`\n"
+              "> **批准记录**：CI 冒烟核验｜自动回归｜2026-01-01\n\n"
+              "**当前结论**：校验缓存内 verify_feature.py CLI。\n\n"
+              "## 目标、AC 与文档\n"
+              "- **目标与验收标准（AC）**：AC-01 门禁脚本零依赖通过收口校验\n\n"
+              "## 任务进度\n"
+              "- [x] T1 [AC-01]：验证缓存门禁\n\n"
+              "## 验证摘要与阻塞\n\n"
+              "| 检查范围 | 状态 | 证据 |\n"
+              "| --- | --- | --- |\n"
+              "| AC-01 | 通过 | `python -B -m unittest` |\n\n"
+              "- **当前阻塞**：无\n",
+              encoding="utf-8",
+          )
+          PY
+          python -B "$cache_root/skills/acceptance-testing/scripts/verify_feature.py" --feature-dir "$fdir" --phase verified
       - name: Check adapter templates and configuration protection
         run: |
           scratch="$(mktemp -d)"

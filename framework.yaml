@@ -1,4 +1,4 @@
 schema_version: 1
 name: multi-agent-requirement-workflow
-version: "2.0.0"
-protocol_version: 4
+version: "3.0.0"
+protocol_version: 5

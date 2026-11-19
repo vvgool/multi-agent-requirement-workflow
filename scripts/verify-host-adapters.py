@@ -1,34 +1,28 @@
 #!/usr/bin/env python3
-"""Render real Protocol 4 host templates into an authorized empty fixture directory."""
+"""Render real Protocol 5 precompiled host roles into an authorized empty fixture directory (stdlib only)."""
+
 import argparse
 import hashlib
 import importlib.util
 import json
-from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import time
+from pathlib import Path
 
 sys.dont_write_bytecode = True
 
-ROLES = {
-    "product": ("product-agent", "requirement-analysis", "澄清需求并输出验收标准"),
-    "development": ("development-agent", "feature-development", "实现已批准需求并完成自验"),
-    "testing": ("testing-agent", "acceptance-testing", "独立验收当前开发基线并报告缺陷"),
-    "bug": ("bug-agent", "bug-fixing", "诊断并修复缺陷并完成自验"),
-}
 
-
-def sha(raw):
+def sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
-def render(text, values):
-    for key, value in values.items():
-        text = text.replace("{{" + key + "}}", value)
-    if "{{" in text or "}}" in text:
-        raise ValueError("unresolved template parameter")
-    return text
+def _load_module(name: str, path: Path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 def main():
@@ -57,87 +51,92 @@ def main():
         parser.error("scratch must be an authorized existing empty ordinary directory")
 
     templates = root / "skills/setup-requirement-workflow/assets/templates"
-    helper = root / "skills/setup-requirement-workflow/scripts/codex_registry.py"
-    spec = importlib.util.spec_from_file_location("codex_registry", helper)
-    registry = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(registry)
+    ih_path = root / "skills/setup-requirement-workflow/scripts/install_helper.py"
+    reg_path = root / "skills/setup-requirement-workflow/scripts/codex_registry.py"
+    ih = _load_module("install_helper_verify", ih_path)
+    registry = _load_module("codex_registry_verify", reg_path)
+
+    assert ih.normalize_hosts("zed") == ["agents-md"]
+    assert ih.normalize_hosts("codex,zed,agents-md") == ["codex", "agents-md"]
 
     adapter = (root / "skills/setup-requirement-workflow/references/opencode-adapter.md").read_text(
         encoding="utf-8"
     )
     assert "不创建业务 `host.yaml`" in adapter or "不创建业务host.yaml" in adapter
 
-    zed_adapter = (root / "skills/setup-requirement-workflow/references/zed-adapter.md").read_text(
-        encoding="utf-8"
-    )
+    assert not (root / "skills/setup-requirement-workflow/references/zed-adapter.md").exists()
+    agents_md_adapter = (
+        root / "skills/setup-requirement-workflow/references/agents-md-adapter.md"
+    ).read_text(encoding="utf-8")
     host_entry = (root / "workflow/host-adapters.md").read_text(encoding="utf-8")
-    for zed_text in (zed_adapter, host_entry):
-        assert "规则型宿主" in zed_text
-        assert "AGENTS.md" in zed_text
-        assert "native_role_probes" in zed_text
-        assert "not_applicable" in zed_text
-    assert "不生成 Zed 角色文件" in zed_adapter
-    assert "不生成 `.zed/agents`" in host_entry
+    for rules_text in (agents_md_adapter, host_entry):
+        assert "规则型宿主" in rules_text
+        assert "AGENTS.md" in rules_text
+        assert "agents-md" in rules_text
+        assert "native_role_probes" not in rules_text
+    assert ".zed/agents" in agents_md_adapter
 
-    entry = (root / "AGENTS.md").read_text(encoding="utf-8")
-    assert "requirement-workflow:begin" in entry and "requirement-workflow:end" in entry
+    if (root / "AGENTS.md").is_file():
+        entry = (root / "AGENTS.md").read_text(encoding="utf-8")
+        assert "requirement-workflow:begin" in entry and "requirement-workflow:end" in entry
     bridge = (templates / "claude-entry.md").read_text(encoding="utf-8")
     for guard in ("AGENTS.md", "明确局部低风险小修", "Spec Gate", "静音连续巡航", "日常零核包开销"):
         assert guard in bridge, f"claude_bridge_missing: {guard}"
-    assert "你是需求协作框架" not in bridge and "协议 4" not in bridge
+    for ceremonial in ("你是需求协作框架", "协议 4", "协议 5"):
+        assert ceremonial not in bridge, f"ceremonial_claude_label_forbidden: {ceremonial}"
+
+    with tempfile.TemporaryDirectory() as pkg_tmp:
+        staged_pkg = Path(pkg_tmp) / "pkg"
+        pkg_info = ih.stage_clean_package(root, staged_pkg, include_working_tree=True)
+        pkg_sha = pkg_info["sha256"]
+        cache_prefix = f".agents/requirement-workflow-cache/{pkg_sha}/"
+        built = ih._build_roles(
+            staged_pkg, ["codex", "claude-code", "opencode", "agents-md"], pkg_sha
+        )
+        assert len(built) == 12
+        assert not any(rel.startswith(".zed/") or rel.startswith(".agents-md/") for rel in built)
 
     expected_bodies = {}
-    for host, prefix, separator, extension in [
-        ("codex", ".codex", "_", "toml"),
-        ("claude-code", ".claude", "-", "md"),
-        ("opencode", ".opencode", "-", "md"),
-    ]:
-        for logical, (role, skill, description) in ROLES.items():
-            name = "requirement" + separator + logical
-            values = dict(
-                native_name=name,
-                role=role,
-                description=description,
-                role_file=f"agents/{role}.md",
-                skill_file=f"skills/{skill}/SKILL.md",
+    for rel, raw_bytes in sorted(built.items()):
+        native = raw_bytes.decode("utf-8")
+        for ceremonial in ("你是需求协作框架", "当前宿主原生名称为", "协议 4", "协议 5"):
+            assert ceremonial not in native, (rel, ceremonial)
+        for guard in (
+            "framework_cache_missing",
+            "只读回读",
+            "2～3 次",
+            "未知外部操作先查原调用",
+            "workflow.lock.yaml",
+            cache_prefix,
+        ):
+            assert guard in native, (rel, guard)
+        assert "](../" not in native, f"unrewritten_relative_link_in_precompiled_role: {rel}"
+
+        if rel.startswith(".codex/agents/"):
+            name = Path(rel).stem
+            logical = name.removeprefix("requirement_")
+            description = ih.ROLES[logical][2]
+            parsed = registry._parse(raw_bytes)
+            assert set(parsed) == {"name", "description", "developer_instructions"}
+            assert parsed["name"] == name and parsed["description"] == description
+            assert cache_prefix in parsed["developer_instructions"]
+        else:
+            name = Path(rel).stem
+            logical = name.removeprefix("requirement-")
+            description = ih.ROLES[logical][2]
+            head, actual_body = native.removeprefix("---\n").split("---\n\n", 1)
+            expected_head = (
+                f"name: {name}\ndescription: {description}\n"
+                if rel.startswith(".claude/agents/")
+                else f"description: {description}\nmode: subagent\n"
             )
-            for key in ("role_file", "skill_file"):
-                assert (root / values[key]).is_file(), values[key]
-            body = render((templates / "role-body.md").read_text(encoding="utf-8"), values)
-            values["role_body"] = body
-            native = render(
-                (templates / f"native-{host}.{extension}").read_text(encoding="utf-8"), values
-            )
-            for ceremonial in ("你是需求协作框架", "当前宿主原生名称为", "协议 4"):
-                assert ceremonial not in native, (host, name, ceremonial)
-            for guard in (
-                "framework_cache_missing",
-                "只读回读",
-                "2～3 次",
-                "未知外部操作先查原调用",
-                "workflow.lock.yaml",
-                values["role_file"],
-                values["skill_file"],
-            ):
-                assert guard in native, (host, name, guard)
-            if host == "codex":
-                parsed = registry._parse(native.encode("utf-8"))
-                assert parsed["name"] == name and parsed["developer_instructions"] == body + "\n"
-                assert set(parsed) == {"name", "description", "developer_instructions"}
-            else:
-                head, actual_body = native.removeprefix("---\n").split("---\n\n", 1)
-                assert actual_body == body
-                expected = (
-                    f"name: {name}\ndescription: {description}\n"
-                    if host == "claude-code"
-                    else f"description: {description}\nmode: subagent\n"
-                )
-                assert head == expected, (host, head)
-            path = scratch / prefix / "agents" / f"{name}.{extension}"
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_bytes(native.encode("utf-8"))
-            if host == "opencode":
-                expected_bodies[name] = body.strip()
+            assert head == expected_head, (rel, head)
+            if rel.startswith(".opencode/agents/"):
+                expected_bodies[name] = actual_body.strip()
+
+        path = scratch / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw_bytes)
 
     original = b'# exact user bytes\r\n[agents.other_reader]\r\ndescription="User"\r\n'
     block = (templates / "codex-registry.toml").read_bytes()
@@ -160,10 +159,10 @@ def main():
     opencode_config = scratch / "opencode.jsonc"
     opencode_config.write_bytes(user_jsonc)
     result = dict(
-        scope="template/helper regression, not setup installation or native activation",
+        scope="precompiled Protocol 5 role/helper regression, not live invocation",
         host_roles=12,
         rules_hosts=1,
-        zed_rules_adapter="passed",
+        agents_md_rules_adapter="passed",
         codex_registry="passed",
         markdown_minimal_fields="passed",
         opencode_discovery="not_requested",
@@ -183,9 +182,7 @@ def main():
         command = [str(args.opencode.resolve()), "debug", "agents"]
         attempts = []
         for attempt in range(3):
-            observed = subprocess.run(
-                command, cwd=scratch, capture_output=True, text=True, timeout=60
-            )
+            observed = subprocess.run(command, cwd=scratch, capture_output=True, text=True, timeout=60)
             if observed.returncode:
                 raise RuntimeError(
                     f"OpenCode discovery failed, exit {observed.returncode}; no config rewritten"
@@ -203,11 +200,11 @@ def main():
             assert actual[name]["mode"] == "subagent"
             assert actual[name].get("system", actual[name].get("prompt", "")).strip() == body
         assert any(a.get("name") == "other-reader" for a in agents), "user role not loaded"
-        result["opencode_discovery"] = "passed; four native definitions loaded; invocation untested"
+        result["opencode_discovery"] = "passed; four precompiled definitions loaded; invocation untested"
         result["discovery_command"] = command
 
     assert opencode_config.read_bytes() == user_jsonc
-    assert not list(helper.parent.rglob("*.pyc")), "source bytecode contamination"
+    assert not list(reg_path.parent.rglob("*.pyc")), "source bytecode contamination"
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
 
 
