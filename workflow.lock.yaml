@@ -7,4 +7,4 @@ package:
 source:
   kind: git
   location: https://github.com/vvgool/multi-agent-requirement-workflow.git
-  revision: c4d57aae2f38f5f4208a8b9b5b3ea2c25631a07c
+  revision: 89f3b32317f9f1821f9e6651b8935bc639c61f74
