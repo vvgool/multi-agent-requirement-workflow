@@ -3,7 +3,7 @@ package:
   name: multi-agent-requirement-workflow
   version: 3.0.0
   protocol_version: 5
-  sha256: 43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7
+  sha256: 5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c
 source:
   kind: self
   location: .

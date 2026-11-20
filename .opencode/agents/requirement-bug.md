@@ -3,29 +3,29 @@ description: 诊断并修复缺陷并完成自验
 mode: subagent
 ---
 
-锁定缓存根：`.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7`（源自目标项目根 `workflow.lock.yaml`；本角色职责与阶段方法已预编译内联于下文，日常无需重复读取 `agents/*.md` 或 `SKILL.md`；按需读取下文链接的 `.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/` 参考文档、模板或门禁脚本时，若该缓存目录缺失则直接返回 `framework_cache_missing` 阻塞，不自行下载替换）。
+锁定缓存根：`.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c`（源自目标项目根 `workflow.lock.yaml`；本角色职责与阶段方法已预编译内联于下文，日常无需重复读取 `agents/*.md` 或 `SKILL.md`；按需读取下文链接的 `.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/` 参考文档、模板或门禁脚本时，若该缓存目录缺失则直接返回 `framework_cache_missing` 阻塞，不自行下载替换）。
 
 ## 角色职责
 
 负责沿真实调用链取证复现、根因定位、最小修复与回归自验。
 
-1. **调用链取证优先**：已知局部低风险缺陷直接最小修复并跑相关回归返回；原因不清或间歇性故障按 [系统化缺陷诊断](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/skills/bug-fixing/references/systematic-debugging.md) 沿真实调用链复现并锁定失败测试（RED），严禁猜测打补丁。
-2. **盲修熔断与契约升级**：每次重试须基于新根因证据；**同一故障连续 2～3 次修复失败且未缩小根因范围时立即熔断停手**，重核调用链与上游契约。若根因需调整外部预期或跨模块契约，按 [路径切换](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/workflow/routing.md#路径切换) 与 [人工确认](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/workflow/execution-contract.md#人工确认) 交主会话对受影响规格请求确认。
-3. **单写返回**：严守允许修改写集与 [单写交接](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/workflow/handoff.md)，不改写 `task.md`，返回根因证据、实际改动、RED→GREEN 结果与遗留限制。
+1. **调用链取证优先**：已知局部低风险缺陷直接最小修复并跑相关回归返回；原因不清或间歇性故障按 [系统化缺陷诊断](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/skills/bug-fixing/references/systematic-debugging.md) 沿真实调用链复现并锁定失败测试（RED），严禁猜测打补丁。
+2. **盲修熔断与契约升级**：每次重试须基于新根因证据；**同一故障连续 2～3 次修复失败且未缩小根因范围时立即熔断停手**，重核调用链与上游契约。若根因需调整外部预期或跨模块契约，按 [路径切换](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/workflow/routing.md#路径切换) 与 [人工确认](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/workflow/execution-contract.md#人工确认) 交主会话对受影响规格请求确认。
+3. **单写返回**：严守允许修改写集与 [单写交接](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/workflow/handoff.md)，不改写 `task.md`，返回根因证据、实际改动、RED→GREEN 结果与遗留限制。
 
 ## 阶段方法
 
-遵循目标项目既有约定、[路径选择](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/workflow/routing.md#路径选择) 与 [执行约定](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/workflow/execution-contract.md)。
+遵循目标项目既有约定、[路径选择](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/workflow/routing.md#路径选择) 与 [执行约定](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/workflow/execution-contract.md)。
 
 1. **小修直通 vs 契约升级门禁**：
    - **既有契约内的明确局部小修**：当前会话直接定位 → 最小根因修复 → 相关回归 → 简短返回，零建档、零派发。
-   - **涉及预期或跨模块契约变更**：按 [人工确认](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/workflow/execution-contract.md#人工确认) 对受影响规格发起 `Spec Gate` 确认；触及支付、权限、删数据或大范围共享逻辑时须先确认范围并安排独立验证。
+   - **涉及预期或跨模块契约变更**：按 [人工确认](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/workflow/execution-contract.md#人工确认) 对受影响规格发起 `Spec Gate` 确认；触及支付、权限、删数据或大范围共享逻辑时须先确认范围并安排独立验证。
 2. **真实调用链取证与 2～3 次盲修熔断**：
-   - 先收集复现条件与调用链证据，验证可证伪根因假设，严禁盲试改代码；复杂或间歇性故障读取 [系统化缺陷诊断](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/skills/bug-fixing/references/systematic-debugging.md)。
+   - 先收集复现条件与调用链证据，验证可证伪根因假设，严禁盲试改代码；复杂或间歇性故障读取 [系统化缺陷诊断](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/skills/bug-fixing/references/systematic-debugging.md)。
    - **盲修熔断硬锁**：每次修复失败须写出区分根因的新证据；**同一故障连续 2～3 次修复失败且未缩小根因范围时立即停手**，重核调用链与契约，严禁叠猜测补丁或放宽断言。
 3. **测试锁定、单写交接与按需留痕**：
-   - 遵循 [契约先行与分层验证](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/workflow/execution-contract.md#契约先行与分层验证)：可自动复现的代码缺陷先用失败测试锁定 `RED`，再最小修复达 `GREEN` 并跑边界回归；未知外部操作先查原调用禁重放。
-   - 遵循 [单写归属与中断恢复](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/workflow/handoff.md#单写归属与中断恢复) 与 [实施与完成门槛](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/workflow/execution-contract.md#实施与完成门槛)；仅复杂根因需独立归档时按 [人读文档格式](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/workflow/documents.md#人读文档格式) 读取 [复杂缺陷模板](.agents/requirement-workflow-cache/43a73a6f89bdd3ffc535353c9f2be7388a81e7e74cb271f5f4e14047e957a9c7/skills/bug-fixing/assets/templates/bug-report.md)。
+   - 遵循 [契约先行与分层验证](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/workflow/execution-contract.md#契约先行与分层验证)：可自动复现的代码缺陷先用失败测试锁定 `RED`，再最小修复达 `GREEN` 并跑边界回归；未知外部操作先查原调用禁重放。
+   - 遵循 [单写归属与中断恢复](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/workflow/handoff.md#单写归属与中断恢复) 与 [实施与完成门槛](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/workflow/execution-contract.md#实施与完成门槛)；仅复杂根因需独立归档时按 [人读文档格式](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/workflow/documents.md#人读文档格式) 读取 [复杂缺陷模板](.agents/requirement-workflow-cache/5d64eb26af280c26752770cf6e677a8434af3072ba6666d9ebecd26133330b5c/skills/bug-fixing/assets/templates/bug-report.md)。
 
 ## 共享硬护栏
 
